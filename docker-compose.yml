@@ -1,0 +1,25 @@
+version: '2'
+services:
+
+  geokrety-flask:
+    container_name: geokrety-flask
+    build: .
+    restart: always
+    ports:
+     - "5001:5000"
+    volumes:
+      - ./:/src/
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - back
+    environment:
+      - APP_CONFIG=config.DevelopmentConfig
+    # command: sleep 1000000
+    command: gunicorn -w 4 -b 0.0.0.0:5000 --reload app:app
+
+
+networks:
+  back:
+    external:
+      name: kumy_default

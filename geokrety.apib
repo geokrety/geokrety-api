@@ -1,0 +1,1485 @@
+FORMAT: 1A
+HOST: http://192.168.125.64:5001
+
+# GeoKrety
+GeoKrety API for geokrety.org project.
+
+# Group Authentication
+
+The API uses JWT Authentication to authenticate users to the server. For authentication, you need to be a registered user. Once you have registered yourself as an user, you can send a request to get the access_token. This access_token you need to then use in Authorization header while sending a request in the following manner: `Authorization: JWT <access_token>`
+
+## JWT Authentication [/auth/session]
+
+### Authenticate and generate token [POST]
+
++ Request
+
+    + Headers
+
+            Content-Type: application/json
+
+    + Body
+
+            {
+                "username": "your_username",
+                "password": "your_password"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6MjY0MjIsImlhdCI6MTUwMzg1NTcxNywibmJmIjoxNTAzODU1NzE3LCJleHAiOjE1MDM5NDIxMTd9.laV71Wi14Zd50MEZN5D15naGEmBYtaYV_Qo_YHfDpw"
+        }
+
+# Group Users
+Resources related to users in the API.
+
+## Users Collection [/v1/users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
+### List All Users [GET]
+Retrieve users list.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+        {
+            "meta": {
+                "count": 1
+            },
+            "data": [
+                {
+                    "type": "user",
+                    "id": 1,
+                    "attributes": {
+                        "name": "someone",
+                        "email": "user@ema.il",
+                        "join-date": "2017-01-26T19:46:44+00:00",
+                        "daily-mails": true,
+                        "ip": "10.0.0.5",
+                        "timestamp": "2017-01-26T19:46:44+00:00",
+                        "language": "fr",
+                        "latitude": 48.86471,
+                        "longitude": 2.34901,
+                        "observation-radius": 7,
+                        "country": "fr",
+                        "hour": 7,
+                        "statpic-id": 4,
+                        "last-mail": "2017-03-29T07:52:02",
+                        "last-login": "2017-03-14T22:04:05",
+                        "secid": "abc123"
+                    },
+                    "relationships": {
+                        "news": {
+                            "links": {
+                                "self": "/users/1/relationship/news",
+                                "related": "/users/1/news"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/users/1"
+                    }
+                }
+            ],
+            "jsonapi": {
+                "version": "1.0"
+            },
+            "links": {
+                "self": "/users",
+            }
+        }
+
+
+## Author [/v1/news/{news_id}/author]
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### Get News Author [GET]
+Get the author for a news.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1,
+                    "attributes": {
+                        "name": "someone",
+                        "email": "user@ema.il",
+                        "join-date": "2017-01-26T19:46:44+00:00",
+                        "daily-mails": true,
+                        "ip": "10.0.0.5",
+                        "timestamp": "2017-01-26T19:46:44+00:00",
+                        "language": "fr",
+                        "latitude": 48.86471,
+                        "longitude": 2.34901,
+                        "observation-radius": 7,
+                        "country": "fr",
+                        "hour": 7,
+                        "statpic-id": 4,
+                        "last-mail": "2017-03-29T07:52:02",
+                        "last-login": "2017-03-14T22:04:05",
+                        "secid": "abc123"
+                    },
+                    "relationships": {
+                        "news": {
+                            "links": {
+                                "self": "/users/1/relationship/news",
+                                "related": "/users/1/news"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/users/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/users/1"
+                }
+            }
+
+
+
+## Author [/v1/news-comments/{news_id}/author]
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### Get NewsComment Author [GET]
+Get the author for a news comment.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1,
+                    "attributes": {
+                        "name": "someone",
+                        "email": "user@ema.il",
+                        "join-date": "2017-01-26T19:46:44+00:00",
+                        "daily-mails": true,
+                        "ip": "10.0.0.5",
+                        "timestamp": "2017-01-26T19:46:44+00:00",
+                        "language": "fr",
+                        "latitude": 48.86471,
+                        "longitude": 2.34901,
+                        "observation-radius": 7,
+                        "country": "fr",
+                        "hour": 7,
+                        "statpic-id": 4,
+                        "last-mail": "2017-03-29T07:52:02",
+                        "last-login": "2017-03-14T22:04:05",
+                        "secid": "abc123"
+                    },
+                    "relationships": {
+                        "news": {
+                            "links": {
+                                "self": "/users/1/relationship/news",
+                                "related": "/users/1/news"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/users/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/users/1"
+                }
+            }
+
+
+# Group News
+Resources related to news in the API.
+
+Data related to all the news.
+
+| Parameter | Description | Type | Required |
+|:----------|-------------|------|----------|
+| `title`  | Title of the news| string | **yes** |
+| `content` |  The full text of the news | string | **yes** |
+| `date` |  Date of the news post | date | - |
+| `username` | Override the username who posted the news | string | - |
+| `comments-count` | How many comment are attached to the news | integer | - |
+| `last-comment` | Date of the last comment | date | - |
+
+
+
+## News Collection [/v1/news{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
+
+### List All News [GET]
+Retrieve news list.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+        {
+            "meta": {
+                "count": 1
+            },
+            "data": [
+                {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "First news",
+                        "content": "3,2,1,0 START! :) Have Fun!",
+                        "date": "2007-10-26T18:31:20",
+                        "username": "someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/1/relationship/comments",
+                                "related": "/news/1/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/1/relationship/author",
+                                "related": "/users/1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/1"
+                    }
+                }
+            ],
+            "jsonapi": {
+                "version": "1.0"
+            },
+            "links": {
+                "self": "/news",
+            }
+        }
+
+
+### Create News [POST]
+Create a new News.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+              "data": {
+                "type": "news",
+                "attributes": {
+                  "title": "First news",
+                  "content": "3,2,1,0 START! :) Have Fun!",
+                  "username": "someone"
+                },
+                "relationships": {
+                  "author": {
+                      "data": {
+                          "type": "user",
+                          "id": "1"
+                      }
+                  }
+                }
+              }
+            }
+
++ Response 201 (application/vnd.api+json)
+
+        {
+          "data": {
+            "type": "news",
+            "id": "1",
+            "attributes": {
+              "title": "First news",
+              "content": "3,2,1,0 START! :) Have Fun!",
+              "date": "2007-10-26T18:31:20",
+              "username": "someone",
+              "comments-count": 0,
+              "last-comment": null
+            },
+            "links": {
+              "self": "/news/1"
+            },
+            "relationships": {
+              "author": {
+                "links": {
+                  "related": "/users/1",
+                  "self": "/news/1/relationships/author"
+                },
+                "data": [
+                  {
+                    "id": "1",
+                    "type": "user"
+                  }
+                ]
+              },
+              "comments": {
+                  "links": {
+                      "self": "/news/1/relationship/comments",
+                      "related": "/news/1/news-comments"
+                  },
+                "data": []
+              },
+            },
+          }
+          "jsonapi": {
+            "version": "1.0"
+          },
+          "links": {
+            "self": "/news/1"
+          }
+        }
+
+
+## News Details [/v1/news/{news_id}]
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+### News Details [GET]
+Get a single microlocation.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "First News",
+                        "content": "3,2,1,0 START! :) Have Fun!",
+                        "date": "2007-10-26T18:31:20",
+                        "user-id": 1,
+                        "username": "someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/1/relationship/comments",
+                                "related": "/news/1/news-comments"
+                            },
+                            "data": []
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/1/relationship/author",
+                                "related": "/users/1"
+                            },
+                            "data": {
+                                "type": "user",
+                                "id": "1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/1"
+                }
+            }
+
+
+### Update News [PATCH]
+Update a single news by `id`.
+
++ `id` (integer) - ID of the record to update **(required)**
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+
+    + Body
+
+            {
+                "data": {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "Updated title",
+                        "username": "someone else"
+                    }
+                }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "Updated title",
+                        "content": "3,2,1,0 START! :) Have Fun!",
+                        "date": "2007-10-26T00:00:00",
+                        "user-id": 1,
+                        "username": "someone else",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/1/relationship/comments",
+                                "related": "/news/1/news-comments"
+                            },
+                            "data": []
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/1/relationship/author",
+                                "related": "/users/1"
+                            },
+                            "data": {
+                                "type": "user",
+                                "id": "1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/1"
+                }
+            }
+
+
+
+### Delete News [DELETE]
+Delete a single News.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+              "meta": {
+                "message": "Object successfully deleted"
+              },
+              "jsonapi": {
+                "version": "1.0"
+              }
+            }
+
+
+## Relationship Author [/v1/users/{user_id}/news{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
++ Parameters
+    + user_id: 1 (integer) - ID of the user_id in the form of an integer
+
+### List News published by User [GET]
+Retrieve news list.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+        {
+            "meta": {
+                "count": 1
+            },
+            "data": [
+                {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "First news",
+                        "content": "3,2,1,0 START! :) Have Fun!",
+                        "date": "2007-10-26T18:31:20",
+                        "username": "someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/1/relationship/comments",
+                                "related": "/news/1/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/1/relationship/author",
+                                "related": "/users/1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/1"
+                    }
+                }
+            ],
+            "jsonapi": {
+                "version": "1.0"
+            },
+            "links": {
+                "self": "/news",
+            }
+        }
+
+
+## Relationship Author [/v1/news/{news_id}/relationship/author]
+Manage news author.
+
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### Get Relationship [GET]
+Get the author relation for a news.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/168/relationship/author",
+                    "related": "/users/1"
+                }
+            }
+
+
+### Create Relationship [POST]
+Create the author relation for a news.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+                {
+                    "data": {
+                        "type": "user",
+                        "id": 1
+                    }
+                }
+
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "included": [
+                    {
+                        "type": "user",
+                        "id": 26422,
+                        "attributes": {
+                            "name": "kumy",
+                            "email": "user@ema.il",
+                            "join-date": "2017-05-17T21:38:18+00:00",
+                            "daily-mails": true,
+                            "ip": "10.0.0.1",
+                            "timestamp": "2017-08-16T18:30:50+00:00",
+                            "language": "fr",
+                            "latitude": 48.86471,
+                            "longitude": 2.34901,
+                            "observation-radius": 10,
+                            "country": null,
+                            "hour": 16,
+                            "statpic-id": 6,
+                            "last-mail": null,
+                            "last-login": "2017-08-16T18:30:50",
+                            "secid": "xxxx"
+                        },
+                        "relationships": {
+                            "news": {
+                                "links": {
+                                    "self": "/users/26422/relationship/news",
+                                    "related": "/users/26422/news"
+                                }
+                            }
+                        },
+                        "links": {
+                            "self": "/users/26422"
+                        }
+                    }
+                ],
+                "data": {
+                    "type": "news",
+                    "id": "176",
+                    "attributes": {
+                        "title": "News title",
+                        "content": "news content",
+                        "date": "2016-10-26T19:26:09",
+                        "user-id": 26422,
+                        "username": "Someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/176/relationship/comments",
+                                "related": "/news/176/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/176/relationship/author",
+                                "related": "/users/26422"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/176"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/176/relationship/author"
+                }
+            }
+
+
+### Update Relationship [PATCH]
+Change the author of a news.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                }
+            }
+
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "included": [
+                    {
+                        "type": "user",
+                        "id": 1,
+                        "attributes": {
+                            "name": "someone",
+                            "email": "user@ema.il",
+                            "join-date": "2017-01-26T19:46:44+00:00",
+                            "daily-mails": true,
+                            "ip": "10.0.0.5",
+                            "timestamp": "2017-01-26T19:46:44+00:00",
+                            "language": "fr",
+                            "latitude": 48.86471,
+                            "longitude": 2.34901,
+                            "observation-radius": 7,
+                            "country": "fr",
+                            "hour": 7,
+                            "statpic-id": 4,
+                            "last-mail": "2017-03-29T07:52:02",
+                            "last-login": "2017-03-14T22:04:05",
+                            "secid": "abc123"
+                        },
+                        "relationships": {
+                            "news": {
+                                "links": {
+                                    "self": "/users/1/relationship/news",
+                                    "related": "/users/1/news"
+                                }
+                            }
+                        },
+                        "links": {
+                            "self": "/users/1"
+                        }
+                    }
+                ],
+                "data": {
+                    "type": "news",
+                    "id": "176",
+                    "attributes": {
+                        "title": "News title",
+                        "content": "news content",
+                        "date": "2016-10-26T19:26:09",
+                        "user-id": 26422,
+                        "username": "Someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/176/relationship/comments",
+                                "related": "/news/176/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/176/relationship/author",
+                                "related": "/users/1"
+                            },
+                            "data": {
+                                "type": "user",
+                                "id": "1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/176"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/176/relationship/author"
+                }
+            }
+
+
++ Response 204 (application/vnd.api+json)
+
+### Delete Relationship [DELETE]
+Remove author of a news.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "news",
+                    "id": "176",
+                    "attributes": {
+                        "title": "News title",
+                        "content": "news content",
+                        "date": "2016-10-26T19:26:09",
+                        "user-id": 26422,
+                        "username": "Someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/176/relationship/comments",
+                                "related": "/news/176/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/176/relationship/author",
+                                "related": "/users/0"
+                            },
+                            "data": null
+                        }
+                    },
+                    "links": {
+                        "self": "/news/176"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news/176/relationship/author"
+                }
+            }
+
+
+# Group NewsComments
+Resources related to news comments in the API.
+
+Data related to all the news comments.
+
+| Parameter | Description | Type | Required |
+|:----------|-------------|------|----------|
+| `comment` |  The full text of the comment | string | **yes** |
+| `icon` | Comment icon id - Not really used at the moment. Always 0 | integer | - |
+
+
+
+## NewsComments Collection [/v1/news-comments{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
+
+### List All NewsComments [GET]
+Retrieve NewsComment list.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "meta": {
+                    "count": 1
+                },
+                "data": [
+                    {
+                        "type": "news-comment",
+                        "id": 1,
+                        "attributes": {
+                            "created-on": "2017-08-21T00:54:53+00:00",
+                            "comment": "tutututututututuutu!",
+                            "icon": 0
+                        },
+                        "relationships": {
+                            "author": {
+                                "links": {
+                                    "self": "/news-comments/1/relationship/author",
+                                    "related": "/users/1"
+                                }
+                            },
+                            "news": {
+                                "links": {
+                                    "self": "/news-comments/1/relationship/news",
+                                    "related": "/news/1"
+                                }
+                            }
+                        },
+                        "links": {
+                            "self": "/news-comments/1"
+                        }
+                    }
+                ],
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/1",
+                }
+            }
+
+
+### Create NewsComments [POST]
+Create a new NewsComments.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+              "data": {
+                "type": "news-comment",
+                "attributes": {
+                  "comment": "3,2,1,0 START! :) Have Fun!"
+                },
+                "relationships": {
+                  "author": {
+                      "data": {
+                          "type": "user",
+                          "id": "1"
+                      }
+                  },
+                  "news": {
+                      "data": {
+                          "type": "news",
+                          "id": "1"
+                      }
+                  }
+                }
+              }
+            }
+
++ Response 201 (application/vnd.api+json)
+
+        {
+          "data": {
+            "type": "news",
+            "id": "1",
+            "attributes": {
+              "title": "First news",
+              "content": "3,2,1,0 START! :) Have Fun!",
+              "date": "2007-10-26T18:31:20",
+              "username": "someone",
+              "comments-count": 0,
+              "last-comment": null
+            },
+            "links": {
+              "self": "/news/1"
+            },
+            "relationships": {
+              "author": {
+                "links": {
+                  "related": "/users/1",
+                  "self": "/news/1/relationships/author"
+                },
+                "data": [
+                  {
+                    "id": "1",
+                    "type": "user"
+                  }
+                ]
+              },
+              "comments": {
+                  "links": {
+                      "self": "/news/1/relationship/comments",
+                      "related": "/news/1/news-comments"
+                  },
+                "data": []
+              },
+            },
+          }
+          "jsonapi": {
+            "version": "1.0"
+          },
+          "links": {
+            "self": "/news/1"
+          }
+        }
+
+
+## NewsComments Details [/v1/news-comments/{newscomment_id}]
++ Parameters
+    + newscomment_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### NewsComments Details [GET]
+Get a single microlocation.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "news-comment",
+                    "id": 1,
+                    "attributes": {
+                        "news-id": 1,
+                        "user-id": 1,
+                        "created-on": "2012-03-27T21:49:38+00:00",
+                        "comment": "Hey hey hey great news!",
+                        "icon": 0
+                    },
+                    "relationships": {
+                        "author": {
+                            "links": {
+                                "self": "/news-comments/1/relationship/author",
+                                "related": "/users/1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news-comments/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/1"
+                }
+            }
+
+
+### Update NewsComments [PATCH]
+Update a single news by `id`.
+
++ `id` (integer) - ID of the record to update **(required)**
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+
+    + Body
+
+            {
+              "data": {
+                "type": "news-comment",
+                "id": "1",
+                "attributes": {
+                  "comment": "Yeah"
+                }
+              },
+              "relationships": {
+                "news": {
+                  "data": [
+                    {
+                      "id": "1",
+                      "type": "news"
+                    }
+                  ]
+                }
+              }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "TODO":""
+            }
+
+
+
+### Delete NewsComments [DELETE]
+Delete a single News.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+              "meta": {
+                "message": "Object successfully deleted"
+              },
+              "jsonapi": {
+                "version": "1.0"
+              }
+            }
+
+
+## Published [/v1/users/{user_id}/news-comments]
+
++ Parameters
+    + user_id (integer, 1) - ID of the user_id in the form of an integer
+
+### List News Comments published by User [GET]
+Retrieve news list.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+        {
+            "meta": {
+                "count": 1
+            },
+            "data": [
+                {
+                    "type": "news",
+                    "id": "1",
+                    "attributes": {
+                        "title": "First news",
+                        "content": "3,2,1,0 START! :) Have Fun!",
+                        "date": "2007-10-26T18:31:20",
+                        "username": "someone",
+                        "comments-count": 0,
+                        "last-comment": null
+                    },
+                    "relationships": {
+                        "comments": {
+                            "links": {
+                                "self": "/news/1/relationship/comments",
+                                "related": "/news/1/news-comments"
+                            }
+                        },
+                        "author": {
+                            "links": {
+                                "self": "/news/1/relationship/author",
+                                "related": "/users/1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news/1"
+                    }
+                }
+            ],
+            "jsonapi": {
+                "version": "1.0"
+            },
+            "links": {
+                "self": "/news",
+            }
+        }
+
+
+## Relationship Author [/v1/news-comments/{newscomment_id}/relationship/author]
+Manage news comment author.
+
++ Parameters
+    + newscomment_id: 1 (integer) - ID of the news comment in the form of an integer
+
+
+### Get Relationship [GET]
+Get the author relation for a news comment.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/68/relationship/author",
+                    "related": "/users/1"
+                }
+            }
+
+
+### Create Relationship [POST]
+Create the author relation for a news comment.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "included": [
+                    {
+                        "type": "user",
+                        "id": 1,
+                        "attributes": {
+                            "name": "someone",
+                            "email": "user@ema.il",
+                            "join-date": "2017-01-26T19:46:44+00:00",
+                            "daily-mails": true,
+                            "ip": "10.0.0.5",
+                            "timestamp": "2017-01-26T19:46:44+00:00",
+                            "language": "fr",
+                            "latitude": 48.86471,
+                            "longitude": 2.34901,
+                            "observation-radius": 7,
+                            "country": "fr",
+                            "hour": 7,
+                            "statpic-id": 4,
+                            "last-mail": "2017-03-29T07:52:02",
+                            "last-login": "2017-03-14T22:04:05",
+                            "secid": "abc123"
+                        },
+                        "relationships": {
+                            "news": {
+                                "links": {
+                                    "self": "/users/1/relationship/news",
+                                    "related": "/users/1/news"
+                                }
+                            }
+                        },
+                        "links": {
+                            "self": "/users/1"
+                        }
+                    }
+                ],
+                "data": {
+                    "type": "news-comment",
+                    "id": 68,
+                    "attributes": {
+                        "news-id": 109,
+                        "user-id": 1,
+                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "comment": "a comment on a news",
+                        "icon": 0
+                    },
+                    "relationships": {
+                        "author": {
+                            "links": {
+                                "self": "/news-comments/68/relationship/author",
+                                "related": "/users/1"
+                            },
+                            "data": {
+                                "type": "user",
+                                "id": "1"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news-comments/68"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/68/relationship/author"
+                }
+            }
+
+
+### Update Relationship [PATCH]
+Change the author of a news comment.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "included": [
+                    {
+                        "type": "user",
+                        "id": 26422,
+                        "attributes": {
+                            "name": "someone",
+                            "email": "user@ema.il",
+                            "join-date": "2017-01-26T19:46:44+00:00",
+                            "daily-mails": true,
+                            "ip": "10.0.0.5",
+                            "timestamp": "2017-01-26T19:46:44+00:00",
+                            "language": "fr",
+                            "latitude": 48.86471,
+                            "longitude": 2.34901,
+                            "observation-radius": 7,
+                            "country": "fr",
+                            "hour": 7,
+                            "statpic-id": 4,
+                            "last-mail": "2017-03-29T07:52:02",
+                            "last-login": "2017-03-14T22:04:05",
+                            "secid": "abc123"
+                        },
+                        "relationships": {
+                            "news": {
+                                "links": {
+                                    "self": "/users/26422/relationship/news",
+                                    "related": "/users/26422/news"
+                                }
+                            }
+                        },
+                        "links": {
+                            "self": "/users/26422"
+                        }
+                    }
+                ],
+                "data": {
+                    "type": "news-comment",
+                    "id": 68,
+                    "attributes": {
+                        "news-id": 109,
+                        "user-id": 26422,
+                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "comment": "a comment on a news",
+                        "icon": 0
+                    },
+                    "relationships": {
+                        "author": {
+                            "links": {
+                                "self": "/news-comments/68/relationship/author",
+                                "related": "/users/14185"
+                            },
+                            "data": {
+                                "type": "user",
+                                "id": "26422"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/news-comments/68"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/68/relationship/author"
+                }
+            }
+
+### Delete Relationship [DELETE]
+Remove author of a news comment.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Body
+
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
+                }
+            }
+
++ Response 200 (application/vnd.api+json)
+
+            {
+                "data": {
+                    "type": "news-comment",
+                    "id": 68,
+                    "attributes": {
+                        "news-id": 109,
+                        "user-id": 0,
+                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "comment": "a comment on a news",
+                        "icon": 0
+                    },
+                    "relationships": {
+                        "author": {
+                            "links": {
+                                "self": "/news-comments/68/relationship/author",
+                                "related": "/users/0"
+                            },
+                            "data": null
+                        }
+                    },
+                    "links": {
+                        "self": "/news-comments/68"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news-comments/68/relationship/author"
+                }
+            }

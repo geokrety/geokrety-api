@@ -1,0 +1,12 @@
+git+https://github.com/kumy/flask-rest-jsonapi.git@geokrety#egg=flask-rest-jsonapi
+gunicorn
+Flask-SQLAlchemy
+flask-cors
+Flask-OAuthlib
+flask-login
+wtforms
+flask-admin
+envparse
+raven[flask]
+flask-jwt
+pytz
