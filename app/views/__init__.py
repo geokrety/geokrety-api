@@ -105,7 +105,7 @@ class BlueprintsManager:
         :return:
         """
         app.register_blueprint(home_routes)
-        admin = Admin(app, name='Open Event API', template_mode='bootstrap3', index_view=MyAdminIndexView(),
+        admin = Admin(app, name='GeoKrety API', template_mode='bootstrap3', index_view=MyAdminIndexView(),
                       base_template='admin_base.html')
 
         # Get all the models in the db, all models should have a explicit __tablename__
