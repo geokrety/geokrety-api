@@ -1,7 +1,5 @@
 from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
 
-
-from app.api.bootstrap import api
 from app.models import db
 from app.models.user import User
 from app.api.schema.users import UserSchema, UserSchemaPublic
