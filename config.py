@@ -115,3 +115,4 @@ class TestingConfig(Config):
     BROKER_BACKEND = 'memory'
     SQLALCHEMY_DATABASE_URI = env('TEST_DATABASE_URL', default=None)
     PROPOGATE_ERROR = True
+    PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='unit_test')
