@@ -10,3 +10,4 @@ envparse
 raven[flask]
 flask-jwt
 pytz
+mysqlclient
