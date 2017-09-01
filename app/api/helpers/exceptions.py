@@ -15,7 +15,7 @@ class ForbiddenException(JsonApiException):
     """
     Default class for 403 Error
     """
-    title = 'Access Forbidden'
+    title = "Access Forbidden"
     status = 403
 
 
