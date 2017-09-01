@@ -1,5 +1,3 @@
-import unittest
-
 from app import current_app as app
 
 from tests.unittests.utils import GeokretyTestCase
@@ -20,7 +18,3 @@ class TestErrorsHelperValidation(GeokretyTestCase):
             # Not Found Error
             internal_server_error = ServerError({'source': ''}, 'Internal Server Error.')
             self.assertEqual(internal_server_error.status, 500)
-
-
-if __name__ == '__main__':
-    unittest.main()
