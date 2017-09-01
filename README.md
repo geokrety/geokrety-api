@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/GeoKretyMap/geokrety-api/branch/master/graph/badge.svg)](https://codecov.io/gh/GeoKretyMap/geokrety-api)
+
+
 GeoKrety API Server enable to track GeoKrety objects. The system provides API endpoints to fetch the data, to modify and update it.
 
 
