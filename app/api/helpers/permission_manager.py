@@ -56,9 +56,9 @@ permissions = {
 
 
 def is_multiple(data):
-    if type(data) is list:
+    if isinstance(data, list):
         return True
-    if type(data) is str:
+    if isinstance(data, str):
         if data.find(",") > 0:
             return True
     return False
@@ -195,6 +195,6 @@ def has_access(access_level, **kwargs):
     """
     if access_level in permissions:
         auth = permissions[access_level](lambda *a, **b: True, (), {}, (), **kwargs)
-        if type(auth) is bool and auth is True:
+        if isinstance(auth, bool) and auth is True:
             return True
     return False
