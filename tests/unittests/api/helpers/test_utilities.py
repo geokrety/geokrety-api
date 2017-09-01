@@ -1,5 +1,3 @@
-import unittest
-
 from app import current_app as app
 from app.api.helpers.exceptions import UnprocessableEntity
 from tests.unittests.utils import GeokretyTestCase
@@ -22,6 +20,3 @@ class TestUtilitiesHelperValidation(GeokretyTestCase):
         with self.assertRaises(UnprocessableEntity):
             data = ['event']
             require_relationship(['sponsor', 'event'], data)
-
-if __name__ == '__main__':
-    unittest.main()
