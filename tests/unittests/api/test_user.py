@@ -13,11 +13,16 @@ class TestUser(GeokretyTestCase):
                                      content_type=content_type)
         self.assertEqual(response.status_code, code)
 
-    def test_create_errors(self):
+    def test_user_post_errors(self):
+        """
+        Check error codes from api
+        """
+
         self._check("not a json", 415, content_type='application/json')
         # self._check("not a json", 400, content_type='application/vnd.api+json')
         self._check({}, 422)
         self._check({"user": "kumy"}, 422)
+
         payload = {
             "data": {
                 "type": "user"
@@ -25,7 +30,11 @@ class TestUser(GeokretyTestCase):
         }
         self._check(payload, 500)
 
-    def test_user_create(self):
+
+    def test_user_post(self):
+        """
+        Check Create and Read back an user
+        """
 
         # Test inserting first user
         payload = {
@@ -46,6 +55,7 @@ class TestUser(GeokretyTestCase):
         self.assertTrue('attributes' in data['data'][0])
         self.assertTrue('name' in data['data'][0]['attributes'])
         self.assertEqual(data['data'][0]['attributes']['name'], "kumy")
+
 
         # Test inserting a second user
         payload = {

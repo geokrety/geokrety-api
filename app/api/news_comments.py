@@ -1,6 +1,9 @@
 from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
+from flask_rest_jsonapi.exceptions import ObjectNotFound
+from sqlalchemy.orm.exc import NoResultFound
 
 from app.models import db
+from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.api.schema.news_comments import NewsCommentSchema
 

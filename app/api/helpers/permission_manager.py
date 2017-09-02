@@ -100,21 +100,21 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
         if check(view_kwargs):
             return view(*view_args, **view_kwargs)
 
-    # If event_identifier in route instead of event_id
-    if 'event_identifier' in view_kwargs:
-        try:
-            event = Event.query.filter_by(identifier=view_kwargs['event_identifier']).one()
-        except NoResultFound as e:
-            return NotFoundError({'parameter': 'event_identifier'}, 'Event not found').respond()
-        view_kwargs['event_id'] = event.id
+    # # If event_identifier in route instead of event_id
+    # if 'event_identifier' in view_kwargs:
+    #     try:
+    #         event = Event.query.filter_by(identifier=view_kwargs['event_identifier']).one()
+    #     except NoResultFound as e:
+    #         return NotFoundError({'parameter': 'event_identifier'}, 'Event not found').respond()
+    #     view_kwargs['event_id'] = event.id
 
-    # Only for events API
-    if 'identifier' in view_kwargs:
-        try:
-            event = Event.query.filter_by(identifier=view_kwargs['identifier']).one()
-        except NoResultFound as e:
-            return NotFoundError({'parameter': 'identifier'}, 'Event not found').respond()
-        view_kwargs['id'] = event.id
+    # # Only for events API
+    # if 'identifier' in view_kwargs:
+    #     try:
+    #         event = Event.query.filter_by(identifier=view_kwargs['identifier']).one()
+    #     except NoResultFound as e:
+    #         return NotFoundError({'parameter': 'identifier'}, 'Event not found').respond()
+    #     view_kwargs['id'] = event.id
 
     if 'fetch' in kwargs:
         fetched = None
@@ -129,7 +129,7 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
         if not fetched:
             model = kwargs['model']
             fetch = kwargs['fetch']
-            fetch_as = kwargs['fetch_as']
+            # fetch_as = kwargs['fetch_as']
             fetch_key_url = 'id'
             fetch_key_model = 'id'
             if 'fetch_key_url' in kwargs:
@@ -154,7 +154,7 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
                     continue
                 try:
                     data = mod.query.filter(getattr(mod, fetch_key_model) == view_kwargs[f_url]).one()
-                except NoResultFound as e:
+                except NoResultFound:
                     pass
                 else:
                     found = True

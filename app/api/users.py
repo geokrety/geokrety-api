@@ -1,5 +1,6 @@
 from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
 
+from app.api.bootstrap import api
 from app.models import db
 from app.api.schema.users import UserSchema  #, UserSchemaPublic
 from app.api.helpers.permission_manager import has_access
@@ -50,6 +51,7 @@ class UserDetail(ResourceDetail):
         if (has_access('is_user_itself', user_id=view_kwargs['id'])):
             self.schema = UserSchema
 
+    decorators = (api.has_permission('is_admin', methods="GET"),)
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,

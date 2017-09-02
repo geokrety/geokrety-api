@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pprint
 import os
 import logging
 import sys
@@ -8,18 +7,17 @@ import sys
 from envparse import env
 from datetime import timedelta
 
-from flask import Flask, url_for
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS, cross_origin
+from flask import Flask, json, make_response
+from flask_cors import CORS
 
 from flask_script import Manager
-from flask_login import current_user
 from flask_jwt import JWT
+from flask_rest_jsonapi.errors import jsonapi_errors
+from flask_rest_jsonapi.exceptions import JsonApiException
 
 from app.views import BlueprintsManager
 from app.api.helpers.auth import AuthManager
 from app.api.helpers.jwt import jwt_authenticate, jwt_identity
-
 from app.models import db
 from app.views.sentry import sentry
 

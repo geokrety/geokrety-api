@@ -2,10 +2,12 @@ import flask_login as login
 import requests
 import phpass
 
-from flask import url_for, redirect, render_template, Blueprint, request, make_response
+from flask import url_for, redirect, Blueprint, request, make_response
 from wtforms import form, fields, validators
 from flask_admin import Admin, AdminIndexView, expose, helpers as admin_helpers
 from flask_admin.contrib.sqla import ModelView
+
+# from app import current_app as app
 from app.models import db
 from app.models.user import User
 
@@ -36,7 +38,7 @@ class LoginForm(form.Form):
 
         t_hasher = phpass.PasswordHash(11, False)
         auth_ok = t_hasher.check_password(
-            password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
+            self.password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
             user.password.encode('utf-8')
         )
         if not auth_ok:
