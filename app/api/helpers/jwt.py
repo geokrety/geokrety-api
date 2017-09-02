@@ -19,7 +19,7 @@ def jwt_authenticate(username, password):
         return None
     t_hasher = phpass.PasswordHash(11, False)
     auth_ok = t_hasher.check_password(
-        password.encode('utf-8')+app.config['PASSWORD_HASH_SALT'],
+        password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
         user.password.encode('utf-8')
     )
     if auth_ok:

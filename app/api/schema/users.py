@@ -17,9 +17,10 @@ class UserSchemaPublic(Schema):
     id = fields.Integer(dump_only=True)
     name = fields.Str()
     language = fields.Str()
-    country = fields.Float()
+    country = fields.Str()
 
     join_date_time = fields.Date()
+    statpic_id = fields.Integer()
 
     # statpic = Relationship()
     news = Relationship(self_view='v1.user_news',

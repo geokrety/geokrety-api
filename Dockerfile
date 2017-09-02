@@ -8,9 +8,15 @@ RUN apk add --no-cache \
         py-pip \
         py-mysqldb \
         vim \
-        git
+        git \
+        mariadb-dev \
+        gcc \
+        python2-dev \
+ 	      musl-dev \
+        libffi-dev
 
 COPY requirements.txt requirements.txt
+COPY requirements requirements
 RUN  pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /src

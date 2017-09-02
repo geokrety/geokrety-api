@@ -64,10 +64,8 @@ Retrieve users list.
                     "attributes": {
                         "name": "someone",
                         "email": "user@ema.il",
-                        "join-date": "2017-01-26T19:46:44+00:00",
                         "daily-mails": true,
                         "ip": "10.0.0.5",
-                        "timestamp": "2017-01-26T19:46:44+00:00",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -75,8 +73,10 @@ Retrieve users list.
                         "country": "fr",
                         "hour": 7,
                         "statpic-id": 4,
-                        "last-mail": "2017-03-29T07:52:02",
-                        "last-login": "2017-03-14T22:04:05",
+                        "join-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-mail-date-time": "2017-03-29T07:52:02",
+                        "last-login-date-time": "2017-03-14T22:04:05",
                         "secid": "abc123"
                     },
                     "relationships": {
@@ -96,12 +96,12 @@ Retrieve users list.
                 "version": "1.0"
             },
             "links": {
-                "self": "/users",
+                "self": "/users"
             }
         }
 
 
-## Author [/v1/news/{news_id}/author]
+## News Author [/v1/news/{news_id}/author]
 + Parameters
     + news_id: 1 (integer) - ID of the news in the form of an integer
 
@@ -124,10 +124,8 @@ Get the author for a news.
                     "attributes": {
                         "name": "someone",
                         "email": "user@ema.il",
-                        "join-date": "2017-01-26T19:46:44+00:00",
                         "daily-mails": true,
                         "ip": "10.0.0.5",
-                        "timestamp": "2017-01-26T19:46:44+00:00",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -135,8 +133,10 @@ Get the author for a news.
                         "country": "fr",
                         "hour": 7,
                         "statpic-id": 4,
-                        "last-mail": "2017-03-29T07:52:02",
-                        "last-login": "2017-03-14T22:04:05",
+                        "join-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-mail-date-time": "2017-03-29T07:52:02",
+                        "last-login-date-time": "2017-03-14T22:04:05",
                         "secid": "abc123"
                     },
                     "relationships": {
@@ -161,7 +161,7 @@ Get the author for a news.
 
 
 
-## Author [/v1/news-comments/{news_id}/author]
+## NewsComment Author [/v1/news-comments/{news_id}/author]
 + Parameters
     + news_id: 1 (integer) - ID of the news in the form of an integer
 
@@ -184,10 +184,8 @@ Get the author for a news comment.
                     "attributes": {
                         "name": "someone",
                         "email": "user@ema.il",
-                        "join-date": "2017-01-26T19:46:44+00:00",
                         "daily-mails": true,
                         "ip": "10.0.0.5",
-                        "timestamp": "2017-01-26T19:46:44+00:00",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -195,8 +193,10 @@ Get the author for a news comment.
                         "country": "fr",
                         "hour": 7,
                         "statpic-id": 4,
-                        "last-mail": "2017-03-29T07:52:02",
-                        "last-login": "2017-03-14T22:04:05",
+                        "join-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                        "last-mail-date-time": "2017-03-29T07:52:02",
+                        "last-login-date-time": "2017-03-14T22:04:05",
                         "secid": "abc123"
                     },
                     "relationships": {
@@ -232,21 +232,15 @@ Data related to all the news.
 | `date` |  Date of the news post | date | - |
 | `username` | Override the username who posted the news | string | - |
 | `comments-count` | How many comment are attached to the news | integer | - |
-| `last-comment` | Date of the last comment | date | - |
+| `last-comment-date-time` | Date of the last comment | date | - |
 
 
 
-## News Collection [/v1/news{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+## News Collection [/v1/news]
 
 
 ### List All News [GET]
 Retrieve news list.
-
-+ Parameters
-    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
-    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
-    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 + Request
 
@@ -256,48 +250,48 @@ Retrieve news list.
 
 + Response 200 (application/vnd.api+json)
 
-        {
-            "meta": {
-                "count": 1
-            },
-            "data": [
-                {
-                    "type": "news",
-                    "id": "1",
-                    "attributes": {
-                        "title": "First news",
-                        "content": "3,2,1,0 START! :) Have Fun!",
-                        "date": "2007-10-26T18:31:20",
-                        "username": "someone",
-                        "comments-count": 0,
-                        "last-comment": null
-                    },
-                    "relationships": {
-                        "comments": {
-                            "links": {
-                                "self": "/news/1/relationship/comments",
-                                "related": "/news/1/news-comments"
+            {
+                "meta": {
+                    "count": 1
+                },
+                "data": [
+                    {
+                        "type": "news",
+                        "id": "1",
+                        "attributes": {
+                            "title": "First news",
+                            "content": "3,2,1,0 START! :) Have Fun!",
+                            "created-on-date-time": "2007-10-26T18:31:20",
+                            "username": "someone",
+                            "comments-count": 0,
+                            "last-comment-date-time": null
+                        },
+                        "relationships": {
+                            "news-comments": {
+                                "links": {
+                                    "self": "/news/1/relationship/comments",
+                                    "related": "/news/1/news-comments"
+                                }
+                            },
+                            "author": {
+                                "links": {
+                                    "self": "/news/1/relationship/author",
+                                    "related": "/users/1"
+                                }
                             }
                         },
-                        "author": {
-                            "links": {
-                                "self": "/news/1/relationship/author",
-                                "related": "/users/1"
-                            }
+                        "links": {
+                            "self": "/news/1"
                         }
-                    },
-                    "links": {
-                        "self": "/news/1"
                     }
+                ],
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news"
                 }
-            ],
-            "jsonapi": {
-                "version": "1.0"
-            },
-            "links": {
-                "self": "/news",
             }
-        }
 
 
 ### Create News [POST]
@@ -307,6 +301,7 @@ Create a new News.
 
     + Headers
 
+            Content-Type: application/vnd.api+json
             Accept: application/vnd.api+json
 
     + Body
@@ -332,50 +327,43 @@ Create a new News.
 
 + Response 201 (application/vnd.api+json)
 
-        {
-          "data": {
-            "type": "news",
-            "id": "1",
-            "attributes": {
-              "title": "First news",
-              "content": "3,2,1,0 START! :) Have Fun!",
-              "date": "2007-10-26T18:31:20",
-              "username": "someone",
-              "comments-count": 0,
-              "last-comment": null
-            },
-            "links": {
-              "self": "/news/1"
-            },
-            "relationships": {
-              "author": {
-                "links": {
-                  "related": "/users/1",
-                  "self": "/news/1/relationships/author"
+            {
+              "data": {
+                "type": "news",
+                "id": "1",
+                "attributes": {
+                  "title": "First news",
+                  "content": "3,2,1,0 START! :) Have Fun!",
+                  "created-on-date-time": "2007-10-26T18:31:20",
+                  "username": "someone",
+                  "comments-count": 0,
+                  "last-comment-date-time": null
                 },
-                "data": [
-                  {
-                    "id": "1",
-                    "type": "user"
-                  }
-                ]
-              },
-              "comments": {
-                  "links": {
-                      "self": "/news/1/relationship/comments",
-                      "related": "/news/1/news-comments"
+                "links": {
+                  "self": "/news/1"
+                },
+                "relationships": {
+                  "author": {
+                    "links": {
+                      "related": "/users/1",
+                      "self": "/news/1/relationships/author"
+                    }
                   },
-                "data": []
+                  "news-comments": {
+                      "links": {
+                          "self": "/news/1/relationship/comments",
+                          "related": "/news/1/news-comments"
+                      }
+                  }
+                }
               },
-            },
-          }
-          "jsonapi": {
-            "version": "1.0"
-          },
-          "links": {
-            "self": "/news/1"
-          }
-        }
+              "jsonapi": {
+                "version": "1.0"
+              },
+              "links": {
+                "self": "/news/1"
+              }
+            }
 
 
 ## News Details [/v1/news/{news_id}]
@@ -401,28 +389,22 @@ Get a single microlocation.
                     "attributes": {
                         "title": "First News",
                         "content": "3,2,1,0 START! :) Have Fun!",
-                        "date": "2007-10-26T18:31:20",
-                        "user-id": 1,
+                        "created-on-date-time": "2007-10-26T18:31:20",
                         "username": "someone",
                         "comments-count": 0,
-                        "last-comment": null
+                        "last-comment-date-time": null
                     },
                     "relationships": {
-                        "comments": {
+                        "news-comments": {
                             "links": {
                                 "self": "/news/1/relationship/comments",
                                 "related": "/news/1/news-comments"
-                            },
-                            "data": []
+                            }
                         },
                         "author": {
                             "links": {
                                 "self": "/news/1/relationship/author",
                                 "related": "/users/1"
-                            },
-                            "data": {
-                                "type": "user",
-                                "id": "1"
                             }
                         }
                     },
@@ -449,6 +431,7 @@ Update a single news by `id`.
     + Headers
 
             Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
 
     + Body
 
@@ -472,28 +455,22 @@ Update a single news by `id`.
                     "attributes": {
                         "title": "Updated title",
                         "content": "3,2,1,0 START! :) Have Fun!",
-                        "date": "2007-10-26T00:00:00",
-                        "user-id": 1,
+                        "created-on-date-time": "2007-10-26T00:00:00",
                         "username": "someone else",
                         "comments-count": 0,
-                        "last-comment": null
+                        "last-comment-date-time": null
                     },
                     "relationships": {
-                        "comments": {
+                        "news-comments": {
                             "links": {
                                 "self": "/news/1/relationship/comments",
                                 "related": "/news/1/news-comments"
-                            },
-                            "data": []
+                            }
                         },
                         "author": {
                             "links": {
                                 "self": "/news/1/relationship/author",
                                 "related": "/users/1"
-                            },
-                            "data": {
-                                "type": "user",
-                                "id": "1"
                             }
                         }
                     },
@@ -519,6 +496,7 @@ Delete a single News.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json)
@@ -533,19 +511,13 @@ Delete a single News.
             }
 
 
-## Relationship Author [/v1/users/{user_id}/news{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+## Relationship Author [/v1/users/{user_id}/news]
 
 + Parameters
-    + user_id: 1 (integer) - ID of the user_id in the form of an integer
+    + user_id: 1 (integer) - ID of the user id in the form of an integer
 
 ### List News published by User [GET]
 Retrieve news list.
-
-+ Parameters
-    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
-    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
-    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 + Request
 
@@ -555,48 +527,48 @@ Retrieve news list.
 
 + Response 200 (application/vnd.api+json)
 
-        {
-            "meta": {
-                "count": 1
-            },
-            "data": [
-                {
-                    "type": "news",
-                    "id": "1",
-                    "attributes": {
-                        "title": "First news",
-                        "content": "3,2,1,0 START! :) Have Fun!",
-                        "date": "2007-10-26T18:31:20",
-                        "username": "someone",
-                        "comments-count": 0,
-                        "last-comment": null
-                    },
-                    "relationships": {
-                        "comments": {
-                            "links": {
-                                "self": "/news/1/relationship/comments",
-                                "related": "/news/1/news-comments"
+            {
+                "meta": {
+                    "count": 1
+                },
+                "data": [
+                    {
+                        "type": "news",
+                        "id": "1",
+                        "attributes": {
+                            "title": "First news",
+                            "content": "3,2,1,0 START! :) Have Fun!",
+                            "created-on-date-time": "2007-10-26T18:31:20",
+                            "username": "someone",
+                            "comments-count": 0,
+                            "last-comment-date-time": null
+                        },
+                        "relationships": {
+                            "news-comments": {
+                                "links": {
+                                    "self": "/news/1/relationship/comments",
+                                    "related": "/news/1/news-comments"
+                                }
+                            },
+                            "author": {
+                                "links": {
+                                    "self": "/news/1/relationship/author",
+                                    "related": "/users/1"
+                                }
                             }
                         },
-                        "author": {
-                            "links": {
-                                "self": "/news/1/relationship/author",
-                                "related": "/users/1"
-                            }
+                        "links": {
+                            "self": "/news/1"
                         }
-                    },
-                    "links": {
-                        "self": "/news/1"
                     }
+                ],
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news"
                 }
-            ],
-            "jsonapi": {
-                "version": "1.0"
-            },
-            "links": {
-                "self": "/news",
             }
-        }
 
 
 ## Relationship Author [/v1/news/{news_id}/relationship/author]
@@ -640,15 +612,16 @@ Create the author relation for a news.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
-                {
-                    "data": {
-                        "type": "user",
-                        "id": 1
-                    }
+            {
+                "data": {
+                    "type": "user",
+                    "id": 1
                 }
+            }
 
 
 + Response 200 (application/vnd.api+json)
@@ -661,10 +634,8 @@ Create the author relation for a news.
                         "attributes": {
                             "name": "kumy",
                             "email": "user@ema.il",
-                            "join-date": "2017-05-17T21:38:18+00:00",
                             "daily-mails": true,
                             "ip": "10.0.0.1",
-                            "timestamp": "2017-08-16T18:30:50+00:00",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -672,8 +643,10 @@ Create the author relation for a news.
                             "country": null,
                             "hour": 16,
                             "statpic-id": 6,
-                            "last-mail": null,
-                            "last-login": "2017-08-16T18:30:50",
+                            "join-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-mail-date-time": "2017-03-29T07:52:02",
+                            "last-login-date-time": "2017-03-14T22:04:05",
                             "secid": "xxxx"
                         },
                         "relationships": {
@@ -695,14 +668,13 @@ Create the author relation for a news.
                     "attributes": {
                         "title": "News title",
                         "content": "news content",
-                        "date": "2016-10-26T19:26:09",
-                        "user-id": 26422,
+                        "created-on-date-time": "2016-10-26T19:26:09",
                         "username": "Someone",
                         "comments-count": 0,
-                        "last-comment": null
+                        "last-comment-date-time": null
                     },
                     "relationships": {
-                        "comments": {
+                        "news-comments": {
                             "links": {
                                 "self": "/news/176/relationship/comments",
                                 "related": "/news/176/news-comments"
@@ -736,13 +708,14 @@ Change the author of a news.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
             {
                 "data": {
                     "type": "user",
-                    "id": 1
+                    "id": 2
                 }
             }
 
@@ -753,14 +726,12 @@ Change the author of a news.
                 "included": [
                     {
                         "type": "user",
-                        "id": 1,
+                        "id": 2,
                         "attributes": {
                             "name": "someone",
                             "email": "user@ema.il",
-                            "join-date": "2017-01-26T19:46:44+00:00",
                             "daily-mails": true,
                             "ip": "10.0.0.5",
-                            "timestamp": "2017-01-26T19:46:44+00:00",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -768,8 +739,10 @@ Change the author of a news.
                             "country": "fr",
                             "hour": 7,
                             "statpic-id": 4,
-                            "last-mail": "2017-03-29T07:52:02",
-                            "last-login": "2017-03-14T22:04:05",
+                            "join-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-mail-date-time": "2017-03-29T07:52:02",
+                            "last-login-date-time": "2017-03-14T22:04:05",
                             "secid": "abc123"
                         },
                         "relationships": {
@@ -791,14 +764,13 @@ Change the author of a news.
                     "attributes": {
                         "title": "News title",
                         "content": "news content",
-                        "date": "2016-10-26T19:26:09",
-                        "user-id": 26422,
+                        "created-on-date-time": "2016-10-26T19:26:09",
                         "username": "Someone",
                         "comments-count": 0,
-                        "last-comment": null
+                        "last-comment-date-time": null
                     },
                     "relationships": {
-                        "comments": {
+                        "news-comments": {
                             "links": {
                                 "self": "/news/176/relationship/comments",
                                 "related": "/news/176/news-comments"
@@ -838,6 +810,7 @@ Remove author of a news.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
@@ -857,14 +830,13 @@ Remove author of a news.
                     "attributes": {
                         "title": "News title",
                         "content": "news content",
-                        "date": "2016-10-26T19:26:09",
-                        "user-id": 26422,
+                        "created-on-date-time": "2016-10-26T19:26:09",
                         "username": "Someone",
                         "comments-count": 0,
-                        "last-comment": null
+                        "last-comment-date-time": null
                     },
                     "relationships": {
-                        "comments": {
+                        "news-comments": {
                             "links": {
                                 "self": "/news/176/relationship/comments",
                                 "related": "/news/176/news-comments"
@@ -905,15 +877,15 @@ Data related to all the news comments.
 
 ## NewsComments Collection [/v1/news-comments{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
 
-
-### List All NewsComments [GET]
-Retrieve NewsComment list.
-
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-date`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
+### List All NewsComments [GET]
+Retrieve NewsComment list.
 
 + Request
 
@@ -932,7 +904,7 @@ Retrieve NewsComment list.
                         "type": "news-comment",
                         "id": 1,
                         "attributes": {
-                            "created-on": "2017-08-21T00:54:53+00:00",
+                            "created-on-date": "2017-08-21T00:54:53+00:00",
                             "comment": "tutututututututuutu!",
                             "icon": 0
                         },
@@ -959,7 +931,7 @@ Retrieve NewsComment list.
                     "version": "1.0"
                 },
                 "links": {
-                    "self": "/news-comments/1",
+                    "self": "/news-comments/1"
                 }
             }
 
@@ -972,6 +944,7 @@ Create a new NewsComments.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
@@ -979,7 +952,7 @@ Create a new NewsComments.
               "data": {
                 "type": "news-comment",
                 "attributes": {
-                  "comment": "3,2,1,0 START! :) Have Fun!"
+                  "comment": "Have Fun!"
                 },
                 "relationships": {
                   "author": {
@@ -1000,50 +973,40 @@ Create a new NewsComments.
 
 + Response 201 (application/vnd.api+json)
 
-        {
-          "data": {
-            "type": "news",
-            "id": "1",
-            "attributes": {
-              "title": "First news",
-              "content": "3,2,1,0 START! :) Have Fun!",
-              "date": "2007-10-26T18:31:20",
-              "username": "someone",
-              "comments-count": 0,
-              "last-comment": null
-            },
-            "links": {
-              "self": "/news/1"
-            },
-            "relationships": {
-              "author": {
-                "links": {
-                  "related": "/users/1",
-                  "self": "/news/1/relationships/author"
+            {
+              "data": {
+                "type": "news-comment",
+                "id": 1,
+                "attributes": {
+                  "comment": "Have Fun!",
+                  "icon": 0,
+                  "created-on-date": "2016-10-26"
                 },
-                "data": [
-                  {
-                    "id": "1",
-                    "type": "user"
-                  }
-                ]
-              },
-              "comments": {
-                  "links": {
-                      "self": "/news/1/relationship/comments",
-                      "related": "/news/1/news-comments"
+                "relationships": {
+                  "author": {
+                    "links": {
+                      "self": "/v1/news-comments/1/relationship/author",
+                      "related": "/v1/users/1"
+                    }
                   },
-                "data": []
+                  "news": {
+                    "links": {
+                      "self": "/v1/news-comments/1/relationship/news",
+                      "related": "/v1/news/1"
+                    }
+                  }
+                },
+                "links": {
+                  "self": "/v1/news-comments/1"
+                }
               },
-            },
-          }
-          "jsonapi": {
-            "version": "1.0"
-          },
-          "links": {
-            "self": "/news/1"
-          }
-        }
+              "jsonapi": {
+                "version": "1.0"
+              },
+              "links": {
+                "self": "/v1/news-comments/1"
+              }
+            }
 
 
 ## NewsComments Details [/v1/news-comments/{newscomment_id}]
@@ -1068,9 +1031,7 @@ Get a single microlocation.
                     "type": "news-comment",
                     "id": 1,
                     "attributes": {
-                        "news-id": 1,
-                        "user-id": 1,
-                        "created-on": "2012-03-27T21:49:38+00:00",
+                        "created-on-date": "2012-03-27",
                         "comment": "Hey hey hey great news!",
                         "icon": 0
                     },
@@ -1105,6 +1066,7 @@ Update a single news by `id`.
     + Headers
 
             Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
 
     + Body
 
@@ -1131,7 +1093,38 @@ Update a single news by `id`.
 + Response 200 (application/vnd.api+json)
 
             {
-                "TODO":""
+                "data": {
+                    "type": "news-comment",
+                    "id": 1,
+                    "attributes": {
+                        "comment": "Yeah",
+                        "icon": 0,
+                        "created-on-date": "2010-11-01"
+                    },
+                    "relationships": {
+                        "author": {
+                            "links": {
+                                "self": "/v1/news-comments/1/relationship/author",
+                                "related": "/v1/users/2826"
+                            }
+                        },
+                        "news": {
+                            "links": {
+                                "self": "/v1/news-comments/1/relationship/news",
+                                "related": "/v1/news/108"
+                            }
+                        }
+                    },
+                    "links": {
+                        "self": "/v1/news-comments/1"
+                    }
+                },
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/v1/news-comments/1"
+                }
             }
 
 
@@ -1159,9 +1152,8 @@ Delete a single News.
 
 
 ## Published [/v1/users/{user_id}/news-comments]
-
 + Parameters
-    + user_id (integer, 1) - ID of the user_id in the form of an integer
+    + user_id: 1 (integer) - ID of the user id in the form of an integer
 
 ### List News Comments published by User [GET]
 Retrieve news list.
@@ -1174,48 +1166,48 @@ Retrieve news list.
 
 + Response 200 (application/vnd.api+json)
 
-        {
-            "meta": {
-                "count": 1
-            },
-            "data": [
-                {
-                    "type": "news",
-                    "id": "1",
-                    "attributes": {
-                        "title": "First news",
-                        "content": "3,2,1,0 START! :) Have Fun!",
-                        "date": "2007-10-26T18:31:20",
-                        "username": "someone",
-                        "comments-count": 0,
-                        "last-comment": null
-                    },
-                    "relationships": {
-                        "comments": {
-                            "links": {
-                                "self": "/news/1/relationship/comments",
-                                "related": "/news/1/news-comments"
+            {
+                "meta": {
+                    "count": 1
+                },
+                "data": [
+                    {
+                        "type": "news",
+                        "id": "1",
+                        "attributes": {
+                            "title": "First news",
+                            "content": "3,2,1,0 START! :) Have Fun!",
+                            "created-on-date-time": "2007-10-26T18:31:20",
+                            "username": "someone",
+                            "comments-count": 0,
+                            "last-comment-date-time": null
+                        },
+                        "relationships": {
+                            "news-comments": {
+                                "links": {
+                                    "self": "/news/1/relationship/comments",
+                                    "related": "/news/1/news-comments"
+                                }
+                            },
+                            "author": {
+                                "links": {
+                                    "self": "/news/1/relationship/author",
+                                    "related": "/users/1"
+                                }
                             }
                         },
-                        "author": {
-                            "links": {
-                                "self": "/news/1/relationship/author",
-                                "related": "/users/1"
-                            }
+                        "links": {
+                            "self": "/news/1"
                         }
-                    },
-                    "links": {
-                        "self": "/news/1"
                     }
+                ],
+                "jsonapi": {
+                    "version": "1.0"
+                },
+                "links": {
+                    "self": "/news"
                 }
-            ],
-            "jsonapi": {
-                "version": "1.0"
-            },
-            "links": {
-                "self": "/news",
             }
-        }
 
 
 ## Relationship Author [/v1/news-comments/{newscomment_id}/relationship/author]
@@ -1259,13 +1251,14 @@ Create the author relation for a news comment.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
             {
                 "data": {
                     "type": "user",
-                    "id": 1
+                    "id": 2
                 }
             }
 
@@ -1275,14 +1268,12 @@ Create the author relation for a news comment.
                 "included": [
                     {
                         "type": "user",
-                        "id": 1,
+                        "id": 2,
                         "attributes": {
                             "name": "someone",
                             "email": "user@ema.il",
-                            "join-date": "2017-01-26T19:46:44+00:00",
                             "daily-mails": true,
                             "ip": "10.0.0.5",
-                            "timestamp": "2017-01-26T19:46:44+00:00",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -1290,14 +1281,16 @@ Create the author relation for a news comment.
                             "country": "fr",
                             "hour": 7,
                             "statpic-id": 4,
-                            "last-mail": "2017-03-29T07:52:02",
-                            "last-login": "2017-03-14T22:04:05",
+                            "join-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-mail-date-time": "2017-03-29T07:52:02",
+                            "last-login-date-time": "2017-03-14T22:04:05",
                             "secid": "abc123"
                         },
                         "relationships": {
                             "news": {
                                 "links": {
-                                    "self": "/users/1/relationship/news",
+                                    "self": "/users/2/relationship/news",
                                     "related": "/users/1/news"
                                 }
                             }
@@ -1311,9 +1304,7 @@ Create the author relation for a news comment.
                     "type": "news-comment",
                     "id": 68,
                     "attributes": {
-                        "news-id": 109,
-                        "user-id": 1,
-                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "created-on-date": "2012-09-19",
                         "comment": "a comment on a news",
                         "icon": 0
                     },
@@ -1322,10 +1313,6 @@ Create the author relation for a news comment.
                             "links": {
                                 "self": "/news-comments/68/relationship/author",
                                 "related": "/users/1"
-                            },
-                            "data": {
-                                "type": "user",
-                                "id": "1"
                             }
                         }
                     },
@@ -1350,13 +1337,14 @@ Change the author of a news comment.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
             {
                 "data": {
                     "type": "user",
-                    "id": 1
+                    "id": 2
                 }
             }
 
@@ -1366,14 +1354,12 @@ Change the author of a news comment.
                 "included": [
                     {
                         "type": "user",
-                        "id": 26422,
+                        "id": 2,
                         "attributes": {
                             "name": "someone",
                             "email": "user@ema.il",
-                            "join-date": "2017-01-26T19:46:44+00:00",
                             "daily-mails": true,
                             "ip": "10.0.0.5",
-                            "timestamp": "2017-01-26T19:46:44+00:00",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -1381,20 +1367,22 @@ Change the author of a news comment.
                             "country": "fr",
                             "hour": 7,
                             "statpic-id": 4,
-                            "last-mail": "2017-03-29T07:52:02",
-                            "last-login": "2017-03-14T22:04:05",
+                            "join-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-update-date-time": "2017-01-26T19:46:44+00:00",
+                            "last-mail-date-time": "2017-03-29T07:52:02",
+                            "last-login-date-time": "2017-03-14T22:04:05",
                             "secid": "abc123"
                         },
                         "relationships": {
                             "news": {
                                 "links": {
-                                    "self": "/users/26422/relationship/news",
-                                    "related": "/users/26422/news"
+                                    "self": "/users/2/relationship/news",
+                                    "related": "/users/2/news"
                                 }
                             }
                         },
                         "links": {
-                            "self": "/users/26422"
+                            "self": "/users/2"
                         }
                     }
                 ],
@@ -1402,9 +1390,7 @@ Change the author of a news comment.
                     "type": "news-comment",
                     "id": 68,
                     "attributes": {
-                        "news-id": 109,
-                        "user-id": 26422,
-                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "created-on-date": "2012-09-19",
                         "comment": "a comment on a news",
                         "icon": 0
                     },
@@ -1413,10 +1399,6 @@ Change the author of a news comment.
                             "links": {
                                 "self": "/news-comments/68/relationship/author",
                                 "related": "/users/14185"
-                            },
-                            "data": {
-                                "type": "user",
-                                "id": "26422"
                             }
                         }
                     },
@@ -1440,6 +1422,7 @@ Remove author of a news comment.
     + Headers
 
             Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
 
     + Body
 
@@ -1457,9 +1440,7 @@ Remove author of a news comment.
                     "type": "news-comment",
                     "id": 68,
                     "attributes": {
-                        "news-id": 109,
-                        "user-id": 0,
-                        "created-on": "2012-09-19T16:25:33+00:00",
+                        "created-on-date": "2012-09-19",
                         "comment": "a comment on a news",
                         "icon": 0
                     },
@@ -1468,8 +1449,7 @@ Remove author of a news comment.
                             "links": {
                                 "self": "/news-comments/68/relationship/author",
                                 "related": "/users/0"
-                            },
-                            "data": null
+                            }
                         }
                     },
                     "links": {

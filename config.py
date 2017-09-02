@@ -41,6 +41,7 @@ class Config(object):
     SERVE_STATIC = env.bool('SERVE_STATIC', default=False)
     DATABASE_QUERY_TIMEOUT = 0.1
     SENTRY_DSN = env('SENTRY_DSN', default=None)
+    PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='')
 
     # API configs
     SOFT_DELETE = True
@@ -115,4 +116,3 @@ class TestingConfig(Config):
     BROKER_BACKEND = 'memory'
     SQLALCHEMY_DATABASE_URI = env('TEST_DATABASE_URL', default=None)
     PROPOGATE_ERROR = True
-    PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='unit_test')

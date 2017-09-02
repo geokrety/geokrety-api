@@ -13,19 +13,22 @@ python:
   # - 3.3
   # - 3.4
   # - 3.5
+before-install:
+  - npm -g install npm@latest
 install:
+  - npm install -g dredd@4.0.0
   - pip install -r requirements/tests.txt
 env:
   - >-
     APP_CONFIG="config.TestingConfig"
+    DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_unittest
+    TEST_DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_unittest
 addons:
   - mariadb: '10.0'
 before_script:
-  - mysql -e 'CREATE DATABASE geokrety_test;'
   - mysql -e 'CREATE DATABASE geokrety_unittest;'
-  - export DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_test
-  - export TEST_DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_unittest
 script:
   - nosetests tests/unittests -v --with-coverage
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
+  - dredd -l debug

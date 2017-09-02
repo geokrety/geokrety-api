@@ -19,6 +19,7 @@ class NewsSchema(Schema):
     # publication_date_time = fields.Date()
     title = fields.Str()
     content = fields.Str()
+    username = fields.Str()
     comments_count = fields.Integer(dump_only=True)
     created_on_date_time = fields.Date(dump_only=True)
     last_comment_date_time = fields.Date(dump_only=True)

@@ -10,14 +10,16 @@ class NewsCommentSchema(Schema):
         type_ = 'news-comment'
         self_view = 'v1.news_comment_details'
         self_view_kwargs = {'id': '<id>'}
-        self_view_many = 'v1.news_comment_list'
+        self_view_many = 'v1.news_comments_list'
         inflect = dasherize
         ordered = True
 
     id = fields.Integer(dump_only=True)
     comment = fields.Str()
     icon = fields.Integer(dump_only=True)
-    created_on_date_time = fields.Date(dump_only=True)
+    # news_id = fields.Integer()
+    # author_id = fields.Integer()
+    created_on_date = fields.Date(dump_only=True)
 
     author = Relationship(attribute='author',
                           self_view='v1.news_comments_author',

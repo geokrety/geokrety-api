@@ -12,6 +12,7 @@ from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 
+from flask_script import Manager
 from flask_login import current_user
 from flask_jwt import JWT
 
@@ -35,6 +36,8 @@ def create_app():
 
     app.config.from_object(env('APP_CONFIG', default='config.ProductionConfig'))
     db.init_app(app)
+
+    _manager = Manager(app)
 
     # TODO take this from config
     app.secret_key = 'super secret key'
@@ -68,9 +71,10 @@ def create_app():
     if 'SENTRY_DSN' in app.config:
         sentry.init_app(app, dsn=app.config['SENTRY_DSN'])
 
-    return app, db, _jwt
+    return app, _manager, db, _jwt
 
-current_app, database, jwt = create_app()
+
+current_app, manager, database, jwt = create_app()
 
 # @app.before_request
 # def track_user():
