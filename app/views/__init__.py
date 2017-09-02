@@ -1,7 +1,8 @@
 import flask_login as login
 import requests
+import phpass
+
 from flask import url_for, redirect, render_template, Blueprint, request, make_response
-# from flask_scrypt import generate_password_hash
 from wtforms import form, fields, validators
 from flask_admin import Admin, AdminIndexView, expose, helpers as admin_helpers
 from flask_admin.contrib.sqla import ModelView
@@ -33,11 +34,16 @@ class LoginForm(form.Form):
         if user is None:
             raise validators.ValidationError('User does not exist.')
 
-        # if user.password != generate_password_hash(self.password.data, user.salt):
-        #     raise validators.ValidationError('Credentials incorrect.')
-        #
-        # if not user.is_admin and not user.is_super_admin:
-        #     raise validators.ValidationError('Access Forbidden. Admin Rights Required')
+        t_hasher = phpass.PasswordHash(11, False)
+        auth_ok = t_hasher.check_password(
+            password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
+            user.password.encode('utf-8')
+        )
+        if not auth_ok:
+            raise validators.ValidationError('Credentials incorrect.')
+
+        if not user.is_admin and not user.is_super_admin:
+            raise validators.ValidationError('Access Forbidden. Admin Rights Required')
 
     def get_user(self):
         return User.query.filter_by(name=self.login.data).first()

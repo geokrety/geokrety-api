@@ -9,8 +9,6 @@ from tests.unittests.setup_database import Setup
 
 
 class TestDBHelperValidation(GeokretyTestCase):
-    def setUp(self):
-        self.app = Setup.create_app()
 
     def test_save_to_db(self):
         with app.test_request_context():
