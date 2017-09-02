@@ -6,8 +6,6 @@ from tests.unittests.setup_database import Setup
 
 
 class TestUtilitiesHelperValidation(GeokretyTestCase):
-    def setUp(self):
-        self.app = Setup.create_app()
 
     def test_dasherize(self):
         with app.test_request_context():

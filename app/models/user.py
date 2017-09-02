@@ -8,7 +8,7 @@ class User(db.Model):
     __tablename__ = 'gk-users'
 
     id = db.Column('userid', db.Integer, primary_key=True, key='id')
-    name = db.Column('user', db.String(80), key='name')
+    name = db.Column('user', db.String(80), key='name', nullable=False)
     _password = db.Column('haslo2', db.String(120), key='password')
     email = db.Column(db.String(150))
     daily_mails = db.Column('wysylacmaile', db.Boolean, key='daily_news')
