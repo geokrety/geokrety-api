@@ -31,4 +31,4 @@ script:
   - nosetests tests/unittests -v --with-coverage
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash dredd; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then dredd; fi'
