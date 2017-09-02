@@ -2,7 +2,7 @@ import json
 
 from app import current_app as app
 from tests.unittests.utils import GeokretyTestCase
-from app.models import db
+
 
 class TestUser(GeokretyTestCase):
 
@@ -24,7 +24,6 @@ class TestUser(GeokretyTestCase):
             }
         }
         self._check(payload, 500)
-
 
     def test_user_create(self):
 
