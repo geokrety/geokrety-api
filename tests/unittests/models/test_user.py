@@ -15,7 +15,7 @@ class TestUser(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            user = UserFactory(name="kumy")
+            user = UserFactory()
             db.session.add(user)
             db.session.commit()
             users = User.query.all()

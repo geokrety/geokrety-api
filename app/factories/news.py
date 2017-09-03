@@ -12,8 +12,8 @@ class NewsFactory(factory.alchemy.SQLAlchemyModelFactory):
     title = 'News title'
     content = 'News content'
     username = 'news_author'
-    author_id = 1
+    author_id = None
     comments_count = 0
-    last_comment_date_time = common.date_time_
+    last_comment_date_time = common.date_time_0_
     created_on_date_time = common.date_time_
-    czas_postu = "0000-00-00 00:00:00"
+    czas_postu = common.date_time_0_
