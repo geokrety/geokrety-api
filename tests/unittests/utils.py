@@ -40,7 +40,7 @@ class GeokretyTestCase(unittest.TestCase):
         raised = False
         try:
             data = json.loads(response.data)
-        except:
+        except Exception:
             raised = True
         self.assertFalse(raised, 'Failed to decode json')
         self.assertTrue('access_token' in data)
@@ -51,11 +51,10 @@ class GeokretyTestCase(unittest.TestCase):
         Add authentication header
         """
         headers['Authorization'] = \
-            'JWT %s' % self._login("kumy", "password", create=create)
+            'JWT %s' % self._login(user, password, create=create)
         return headers
 
-
-    def _send_post(self, endpoint, payload=None, code=200, content_type='application/vnd.api+json', auth=False):
+    def _send_post(self, endpoint, payload=None, code=200, user="kumy", password="password", content_type='application/vnd.api+json', auth=False, create=False):
         """
         Send a POST request to the api, and check expected response code.
         Properly set content-type
@@ -66,7 +65,8 @@ class GeokretyTestCase(unittest.TestCase):
 
         headers = {}
         if auth:
-            headers = self._add_auth_header(headers)
+            headers = self._add_auth_header(
+                headers, user=user, password=password, create=create)
 
         with app.test_request_context():
             response = self.app.post(endpoint,
@@ -84,10 +84,49 @@ class GeokretyTestCase(unittest.TestCase):
         """
         headers = {}
         if auth:
-            headers = self._add_auth_header(headers, user="kumy", password="password", create=create)
+            headers = self._add_auth_header(
+                headers, user=user, password=password, create=create)
 
         with app.test_request_context():
-            response = self.app.get(endpoint, headers=headers)
+            response = self.app.get(endpoint,
+                                    headers=headers)
+        self.assertEqual(response.status_code, code)
+        return response
+
+    def _send_delete(self, endpoint, payload=None, code=200, user="kumy", password="password", auth=False, create=False):
+        """
+        Send a DELETE request to the api, and check expected response code.
+        Properly set content-type
+        Also add an authentication token by default
+        """
+        headers = {}
+        if auth:
+            headers = self._add_auth_header(
+                headers, user=user, password=password, create=create)
+
+        with app.test_request_context():
+            response = self.app.delete(endpoint,
+                                       data=json.dumps(payload),
+                                       headers=headers)
+        self.assertEqual(response.status_code, code)
+        return response
+
+    def _send_patch(self, endpoint, payload=None, code=200, content_type='application/vnd.api+json', user="kumy", password="password", auth=False, create=False):
+        """
+        Send a PATCH request to the api, and check expected response code.
+        Properly set content-type
+        Also add an authentication token by default
+        """
+        headers = {}
+        if auth:
+            headers = self._add_auth_header(
+                headers, user=user, password=password, create=create)
+
+        with app.test_request_context():
+            response = self.app.patch(endpoint,
+                                      data=json.dumps(payload),
+                                      headers=headers,
+                                      content_type=content_type)
         self.assertEqual(response.status_code, code)
         return response
 

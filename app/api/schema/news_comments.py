@@ -17,8 +17,8 @@ class NewsCommentSchema(Schema):
     id = fields.Integer(dump_only=True)
     comment = fields.Str()
     icon = fields.Integer(dump_only=True)
-    # news_id = fields.Integer()
-    # author_id = fields.Integer()
+    news_id = fields.Integer(load_only=True)
+    author_id = fields.Integer(load_only=True)
     created_on_date = fields.Date(dump_only=True)
 
     author = Relationship(attribute='author',

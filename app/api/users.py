@@ -42,10 +42,7 @@ class UserDetail(ResourceDetail):
 
         if view_kwargs.get('newscomment_id') is not None:
             newscomment = safe_query(self, NewsComment, 'id', view_kwargs['newscomment_id'], 'newscomment_id')
-            if newscomment.author_id is not None:
-                view_kwargs['id'] = newscomment.author_id
-            else:
-                view_kwargs['id'] = None
+            view_kwargs['id'] = newscomment.author_id
 
         # restrict access to personnal data
         # self.schema = UserSchemaPublic

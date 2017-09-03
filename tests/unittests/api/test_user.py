@@ -3,6 +3,11 @@ import json
 from app import current_app as app
 from tests.unittests.utils import GeokretyTestCase
 
+from app.models import db
+from app.factories.news import NewsFactory
+from app.factories.news_comment import NewsCommentFactory
+from app.factories.user import UserFactory
+
 
 class TestUser(GeokretyTestCase):
 
@@ -106,3 +111,44 @@ class TestUser(GeokretyTestCase):
             self.assertTrue('attributes' in data['data'][1])
             self.assertTrue('name' in data['data'][1]['attributes'])
             self.assertEqual(data['data'][1]['attributes']['name'], "filips")
+
+    def test_get_news_no_author(self):
+        """
+        Check GET author from a news, no author
+        """
+
+        with app.test_request_context():
+            news = NewsFactory()
+            db.session.add(news)
+            db.session.commit()
+            self._send_get('/v1/news/1/author', code=404, auth=True, create=True)
+
+    def test_get_news_author(self):
+        """
+        Check GET author from a news
+        """
+
+        with app.test_request_context():
+            user = UserFactory()
+            db.session.add(user)
+            news = NewsFactory(author=user)
+            db.session.add(news)
+            db.session.commit()
+
+            self._send_get('/v1/news/1/author', code=200, auth=True, user=user.name)
+
+    def test_get_news_comment_author(self):
+        """
+        Check GET author from a news_comment
+        """
+
+        with app.test_request_context():
+            user = UserFactory()
+            db.session.add(user)
+            news = NewsFactory(author=user)
+            db.session.add(news)
+            newscomment = NewsCommentFactory(author=user, news=news)
+            db.session.add(newscomment)
+            db.session.commit()
+
+            self._send_get('/v1/news-comments/1/author', code=200, auth=True, user=user.name)

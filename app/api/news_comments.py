@@ -2,6 +2,7 @@ from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationshi
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 from sqlalchemy.orm.exc import NoResultFound
 
+from app.api.bootstrap import api
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
@@ -22,13 +23,15 @@ class NewsCommentList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
-        print("DEBUG A")
         if view_kwargs.get('news_id') is not None:
-            print("DEBUG B")
-            news = self.session.query(News).filter_by(id=view_kwargs['news_id']).one()
+            try:
+                news = self.session.query(News).filter_by(id=view_kwargs['news_id']).one()
+            except NoResultFound:
+                raise ObjectNotFound({'parameter': 'news_id'}, "News: {} not found".format(view_kwargs['news_id']))
             data['news_id'] = news.id
-        print("DEBUG C")
 
+
+    decorators = (api.has_permission('auth_required', methods="POST",), )
     schema = NewsCommentSchema
     data_layer = {'session': db.session,
                   'model': NewsComment,
@@ -43,6 +46,7 @@ class NewsCommentDetail(ResourceDetail):
 
 
 class NewsCommentRelationship(ResourceRelationship):
+    methods = ['GET', 'POST', 'PATCH']
     schema = NewsCommentSchema
     data_layer = {'session': db.session,
                   'model': NewsComment}

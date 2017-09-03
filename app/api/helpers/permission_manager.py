@@ -45,11 +45,11 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
     return view(*view_args, **view_kwargs)
 
 
-
 permissions = {
     'is_super_admin': is_super_admin,
     'is_admin': is_admin,
-    'is_user_itself': is_user_itself
+    'is_user_itself': is_user_itself,
+    'auth_required': auth_required
 }
 
 
@@ -121,7 +121,7 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
         if is_multiple(kwargs['fetch']):
             kwargs['fetch'] = [f.strip() for f in kwargs['fetch'].split(",")]
             for f in kwargs['fetch']:
-               if f in view_kwargs:
+                if f in view_kwargs:
                     fetched = view_kwargs.get(f)
                     break
         elif kwargs['fetch'] in view_kwargs:
@@ -153,7 +153,8 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
                 if not view_kwargs.get(f_url):
                     continue
                 try:
-                    data = mod.query.filter(getattr(mod, fetch_key_model) == view_kwargs[f_url]).one()
+                    data = mod.query.filter(
+                        getattr(mod, fetch_key_model) == view_kwargs[f_url]).one()
                 except NoResultFound:
                     pass
                 else:
@@ -170,7 +171,8 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
                         fetched = getattr(data, f)
                         break
             else:
-                fetched = getattr(data, fetch) if hasattr(data, fetch) else None
+                fetched = getattr(data, fetch) if hasattr(
+                    data, fetch) else None
 
         if fetched:
             kwargs[kwargs['fetch_as']] = fetched
@@ -192,7 +194,8 @@ def has_access(access_level, **kwargs):
     :return: bool: True if passes the access else False
     """
     if access_level in permissions:
-        auth = permissions[access_level](lambda *a, **b: True, (), {}, (), **kwargs)
+        auth = permissions[access_level](
+            lambda *a, **b: True, (), {}, (), **kwargs)
         if isinstance(auth, bool) and auth is True:
             return True
     return False

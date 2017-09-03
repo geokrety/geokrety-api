@@ -3,6 +3,7 @@ import factory
 # use camelCase for naming variables
 
 string_ = 'example'
+username_ = factory.Sequence(lambda n: 'user{0}'.format(n))
 email_ = factory.Sequence(lambda n: 'user{0}@example.com'.format(n))
 integer_ = 25
 url_ = 'http://example.com'

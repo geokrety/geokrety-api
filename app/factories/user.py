@@ -9,7 +9,7 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
         model = User
         sqlalchemy_session = db.session
 
-    name = 'someone'
+    name = common.username_
     password = 'password'
     email = common.email_
     daily_mails = True
