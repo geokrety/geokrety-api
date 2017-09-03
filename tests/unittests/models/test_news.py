@@ -1,4 +1,4 @@
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import OperationalError
 
 from tests.unittests.utils import GeokretyTestCase
 from app.models.news import News
