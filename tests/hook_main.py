@@ -113,7 +113,9 @@ def user_get_news_author(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -142,7 +144,9 @@ def news_get_list(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -165,7 +169,9 @@ def news_get_details(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -178,7 +184,9 @@ def news_patch_details(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -191,7 +199,9 @@ def news_delete_details(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -204,7 +214,9 @@ def news_published_by_author_get_list(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -217,7 +229,9 @@ def news_author_get_list(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -230,7 +244,9 @@ def news_author_post_relationship(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory(author_id=None)
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -272,7 +288,9 @@ def newscomment_get_list(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -287,7 +305,9 @@ def newscomment_post(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         db.session.commit()
 
@@ -300,7 +320,9 @@ def newscomment_get_detail(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -315,7 +337,9 @@ def newscomment_patch_detail(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -330,7 +354,9 @@ def newscomment_delete_detail(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -345,7 +371,9 @@ def newscomment_author_get_relationship(transaction):
     :return:
     """
     with stash['app'].app_context():
-        news = NewsFactory()
+        user = UserFactory()
+        db.session.add(user)
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -362,7 +390,7 @@ def newscomment_author_post_relationship(transaction):
     with stash['app'].app_context():
         user = UserFactory(name="anotheruser")
         db.session.add(user)
-        news = NewsFactory()
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -379,7 +407,7 @@ def newscomment_author_patch_relationship(transaction):
     with stash['app'].app_context():
         user = UserFactory(name="anotheruser")
         db.session.add(user)
-        news = NewsFactory()
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)
@@ -396,7 +424,7 @@ def newscomment_author_delete_relationship(transaction):
     with stash['app'].app_context():
         user = UserFactory(name="anotheruser")
         db.session.add(user)
-        news = NewsFactory()
+        news = NewsFactory(author=user)
         db.session.add(news)
         newscomment = NewsCommentFactory()
         db.session.add(newscomment)

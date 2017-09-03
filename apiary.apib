@@ -904,7 +904,7 @@ Retrieve NewsComment list.
                         "type": "news-comment",
                         "id": 1,
                         "attributes": {
-                            "created-on-date": "2017-08-21T00:54:53+00:00",
+                            "created-on-date": "2017-08-21",
                             "comment": "tutututututututuutu!",
                             "icon": 0
                         },
@@ -952,21 +952,9 @@ Create a new NewsComments.
               "data": {
                 "type": "news-comment",
                 "attributes": {
-                  "comment": "Have Fun!"
-                },
-                "relationships": {
-                  "author": {
-                      "data": {
-                          "type": "user",
-                          "id": "1"
-                      }
-                  },
-                  "news": {
-                      "data": {
-                          "type": "news",
-                          "id": "1"
-                      }
-                  }
+                  "comment": "Have Fun!",
+                  "author_id": 1,
+                  "news_id": 1
                 }
               }
             }
@@ -1399,56 +1387,6 @@ Change the author of a news comment.
                             "links": {
                                 "self": "/news-comments/68/relationship/author",
                                 "related": "/users/14185"
-                            }
-                        }
-                    },
-                    "links": {
-                        "self": "/news-comments/68"
-                    }
-                },
-                "jsonapi": {
-                    "version": "1.0"
-                },
-                "links": {
-                    "self": "/news-comments/68/relationship/author"
-                }
-            }
-
-### Delete Relationship [DELETE]
-Remove author of a news comment.
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-            Content-Type: application/vnd.api+json
-
-    + Body
-
-            {
-                "data": {
-                    "type": "user",
-                    "id": 1
-                }
-            }
-
-+ Response 200 (application/vnd.api+json)
-
-            {
-                "data": {
-                    "type": "news-comment",
-                    "id": 68,
-                    "attributes": {
-                        "created-on-date": "2012-09-19",
-                        "comment": "a comment on a news",
-                        "icon": 0
-                    },
-                    "relationships": {
-                        "author": {
-                            "links": {
-                                "self": "/news-comments/68/relationship/author",
-                                "related": "/users/0"
                             }
                         }
                     },
