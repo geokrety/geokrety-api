@@ -6,72 +6,103 @@ from tests.unittests.utils import GeokretyTestCase
 
 class TestUser(GeokretyTestCase):
 
-    def _check(self, payload, code, content_type='application/vnd.api+json'):
-        with app.test_request_context():
-            response = self.app.post('/v1/users',
-                                     data=json.dumps(payload),
-                                     content_type=content_type)
-        self.assertEqual(response.status_code, code)
-
-    def test_user_post_errors(self):
+    def test_post_content_types(self):
         """
-        Check error codes from api
+        Check accepted content types
         """
 
-        self._check("not a json", 415, content_type='application/json')
-        # self._check("not a json", 400, content_type='application/vnd.api+json')
-        self._check({}, 422)
-        self._check({"user": "kumy"}, 422)
+        self._send_post("/v1/users", "not a json", 415, content_type='application/json')  # Bad content_type
+        # self._send_post("/v1/users", "not a json", 400)  # Bad body
+        self._send_post("/v1/users", {}, 422)  # Bad body
+        self._send_post("/v1/users", {"user": "kumy"}, 422)  # Bad body
+
+    def test_create_incomplete(self):
+        """
+        Check incomplete create request
+        """
 
         payload = {
             "data": {
                 "type": "user"
             }
         }
-        self._check(payload, 500)
+        self._send_post("/v1/users", payload, 500)
 
-
-    def test_user_post(self):
+    def test_create(self):
         """
-        Check Create and Read back an user
+        Check complete create request
         """
 
-        # Test inserting first user
         payload = {
             "data": {
                 "type": "user",
-                "attributes": {
-                    "name": "kumy"
-                }
+                    "attributes": {
+                        "name": "kumy",
+                        "password": "password",
+                        "email": "email@email.email"
+                    }
             }
         }
-        self._check(payload, 201)
+        self._send_post("/v1/users", payload, 201)
 
-        # read it back
-        response = self.app.get('/v1/users')
-        data = json.loads(response.get_data(as_text=True))
+    def test_list_authenticated(self):
+        """
+        Check GET user listing must be authenticated
+        """
 
-        self.assertEqual(len(data['data']), 1)
-        self.assertTrue('attributes' in data['data'][0])
-        self.assertTrue('name' in data['data'][0]['attributes'])
-        self.assertEqual(data['data'][0]['attributes']['name'], "kumy")
+        # Unauthenticated
+        self._send_get('/v1/users', code=401, auth=False)
+        self._send_get('/v1/users', code=200, auth=True, create=True)
 
+    def test_create_user(self):
+        """
+        Check create and Read back an user
+        """
 
-        # Test inserting a second user
-        payload = {
-            "data": {
-                "type": "user",
-                "attributes": {
-                    "name": "filips"
+        with app.test_request_context():
+            # Test inserting first user
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                        "name": "kumy",
+                        "password": "password",
+                        "email": "kumy@email.email"
+                    }
                 }
             }
-        }
-        self._check(payload, 201)
+            self._send_post("/v1/users", payload, 201)
 
-        # read it back
-        response = self.app.get('/v1/users')
-        data = json.loads(response.get_data(as_text=True))
-        self.assertEqual(len(data['data']), 2)
-        self.assertTrue('attributes' in data['data'][1])
-        self.assertTrue('name' in data['data'][1]['attributes'])
-        self.assertEqual(data['data'][1]['attributes']['name'], "filips")
+            # authenticate with fresh user
+            self._login("kumy", "password")
+
+            # read user list
+            response = self._send_get('/v1/users', code=200, auth=True)
+            data = json.loads(response.get_data(as_text=True))
+
+            self.assertEqual(len(data['data']), 1)
+            self.assertTrue('attributes' in data['data'][0])
+            self.assertTrue('name' in data['data'][0]['attributes'])
+            self.assertEqual(data['data'][0]['attributes']['name'], "kumy")
+
+            # Test inserting a second user
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                        "name": "filips",
+                        "password": "password",
+                        "email": "filips@email.email"
+                    }
+                }
+            }
+            self._send_post("/v1/users", payload, 201)
+
+            # read it back
+            response = self._send_get('/v1/users', code=200, auth=True)
+
+            data = json.loads(response.get_data(as_text=True))
+            self.assertEqual(len(data['data']), 2)
+            self.assertTrue('attributes' in data['data'][1])
+            self.assertTrue('name' in data['data'][1]['attributes'])
+            self.assertEqual(data['data'][1]['attributes']['name'], "filips")

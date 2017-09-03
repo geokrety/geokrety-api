@@ -5,7 +5,6 @@ from flask_rest_jsonapi.exceptions import ObjectNotFound
 from app.models import db
 from app.models.user import User
 from app.factories.user import UserFactory
-from tests.unittests.setup_database import Setup
 
 
 class TestDBHelperValidation(GeokretyTestCase):
@@ -37,7 +36,7 @@ class TestDBHelperValidation(GeokretyTestCase):
             self.assertEqual(user.id, obj.id)
             self.assertFalse(is_created)
 
-            obj, is_created = get_or_create(User, name="new user")
+            obj, is_created = get_or_create(User, name="new user", password="password", email="email2@email.email")
             self.assertNotEqual(user.id, obj.id)
             self.assertTrue(is_created)
 

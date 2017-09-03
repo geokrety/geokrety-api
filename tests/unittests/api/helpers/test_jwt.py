@@ -5,7 +5,6 @@ from tests.unittests.utils import GeokretyTestCase
 from app.factories.user import UserFactory
 from app.api.helpers.jwt import jwt_authenticate, get_identity
 from app.models import db
-from tests.unittests.setup_database import Setup
 
 
 class TestJWTHelperValidation(GeokretyTestCase):

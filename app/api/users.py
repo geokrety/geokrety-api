@@ -14,6 +14,7 @@ from app.models.news_comment import NewsComment
 
 
 class UserList(ResourceList):
+    decorators = (api.has_permission('is_admin', methods="GET"),)
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User}
@@ -51,7 +52,6 @@ class UserDetail(ResourceDetail):
         if (has_access('is_user_itself', user_id=view_kwargs['id'])):
             self.schema = UserSchema
 
-    decorators = (api.has_permission('is_admin', methods="GET"),)
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,

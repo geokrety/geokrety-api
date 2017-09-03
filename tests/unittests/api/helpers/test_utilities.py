@@ -2,7 +2,6 @@ from app import current_app as app
 from app.api.helpers.exceptions import UnprocessableEntity
 from tests.unittests.utils import GeokretyTestCase
 from app.api.helpers.utilities import dasherize, require_relationship
-from tests.unittests.setup_database import Setup
 
 
 class TestUtilitiesHelperValidation(GeokretyTestCase):
