@@ -22,7 +22,7 @@ def save_to_db(item, msg="Saved to db", print_error=True):
         logging.info('added to session')
         db.session.commit()
         return True
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         if print_error:
             print(e)
             traceback.print_exc()
@@ -42,7 +42,8 @@ def safe_query(self, model, column_name, value, parameter_name):
     :return:
     """
     try:
-        record = self.session.query(model).filter(getattr(model, column_name) == value).one()
+        record = self.session.query(model).filter(
+            getattr(model, column_name) == value).one()
     except NoResultFound:
         raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},
                              "{}: {} not found".format(model.__name__, value))
