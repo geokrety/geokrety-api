@@ -17,14 +17,12 @@ def jwt_authenticate(username, password):
     if user is None:
         return None
 
-    if app.config['TESTING']:
-        auth_ok = user.password == password
-    else:
-        t_hasher = phpass.PasswordHash(11, False)
-        auth_ok = t_hasher.check_password(
-            password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
-            user.password.encode('utf-8')
-        )
+    t_hasher = phpass.PasswordHash(11, False)
+
+    auth_ok = t_hasher.check_password(
+        password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
+        user.password.encode('utf-8')
+    )
 
     if auth_ok:
         return user

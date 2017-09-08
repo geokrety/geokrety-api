@@ -1,15 +1,31 @@
 import json
 import unittest
 
+import phpass
 from app import current_app as app
 from app.factories.user import UserFactory
 from app.models import db
 from tests.unittests.setup_database import Setup
 
 
+def mock_hash_password(obj, password):
+    """
+    Mock hash_password from phpass.PasswordHash
+    """
+    return password
+
+def mock_check_password(obj, password_1, password_2):
+    """
+    Mock check_password from phpass.PasswordHash
+    """
+    return password_1 == password_2
+
+
 class GeokretyTestCase(unittest.TestCase):
     def setUp(self):
         self.app = Setup.create_app()
+        phpass.PasswordHash.hash_password = mock_hash_password
+        phpass.PasswordHash.check_password = mock_check_password
 
     def tearDown(self):
         Setup.drop_db()

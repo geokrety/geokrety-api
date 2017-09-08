@@ -58,10 +58,6 @@ class User(db.Model):
         :param password:
         :return:
         """
-        if app.config['TESTING']:
-            self._password = password
-            return
-
         t_hasher = phpass.PasswordHash(11, False)
         self._password = t_hasher.hash_password(
             password.encode('utf-8') + app.config['PASSWORD_HASH_SALT']
