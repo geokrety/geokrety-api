@@ -5,7 +5,7 @@ from app.models.user import User
 from flask_login import current_user
 
 
-class AuthManager:
+class AuthManager:  # pragma: no cover
     def __init__(self):
         pass
 

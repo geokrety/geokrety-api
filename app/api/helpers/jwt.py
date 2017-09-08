@@ -1,10 +1,9 @@
 import json
+
 import phpass
-
-from flask import current_app as app
 from app.models.user import User
+from flask import current_app as app
 from flask_jwt import _default_request_handler
-
 
 
 def jwt_authenticate(username, password):
@@ -17,11 +16,16 @@ def jwt_authenticate(username, password):
     user = User.query.filter_by(name=username).first()
     if user is None:
         return None
-    t_hasher = phpass.PasswordHash(11, False)
-    auth_ok = t_hasher.check_password(
-        password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
-        user.password.encode('utf-8')
-    )
+
+    if app.config['TESTING']:
+        auth_ok = user.password == password
+    else:
+        t_hasher = phpass.PasswordHash(11, False)
+        auth_ok = t_hasher.check_password(
+            password.encode('utf-8') + app.config['PASSWORD_HASH_SALT'],
+            user.password.encode('utf-8')
+        )
+
     if auth_ok:
         return user
     else:

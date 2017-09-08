@@ -12,22 +12,9 @@ def auth_required(view, view_args, view_kwargs, *args, **kwargs):
 
 
 @jwt_required
-def is_super_admin(view, view_args, view_kwargs, *args, **kwargs):
-    """
-    Permission function for things allowed exclusively to super admin.
-    Do not use this if the resource is also accessible by a normal admin, use the is_admin decorator instead.
-    :return:
-    """
-    user = current_identity
-    if not user.is_super_admin:
-        return ForbiddenError({'source': ''}, 'Super admin access is required').respond()
-    return view(*view_args, **view_kwargs)
-
-
-@jwt_required
 def is_admin(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
-    if not user.is_admin and not user.is_super_admin:
+    if not user.is_admin:
         return ForbiddenError({'source': ''}, 'Admin access is required').respond()
 
     return view(*view_args, **view_kwargs)
@@ -40,16 +27,15 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
     Otherwise the user can only access his/her resource.
     """
     user = current_identity
-    if not user.is_admin and not user.is_super_admin and user.id != kwargs['user_id']:
+    if not user.is_admin and user.id != kwargs['user_id']:
         return ForbiddenError({'source': ''}, 'Access Forbidden').respond()
     return view(*view_args, **view_kwargs)
 
 
 permissions = {
-    'is_super_admin': is_super_admin,
     'is_admin': is_admin,
     'is_user_itself': is_user_itself,
-    'auth_required': auth_required
+    'auth_required': auth_required,
 }
 
 
@@ -72,7 +58,6 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
     :param dict kwargs: decorator kwargs
     """
     methods = 'GET,POST,DELETE,PATCH'
-
     if 'id' in kwargs:
         view_kwargs['id'] = kwargs['id']
 

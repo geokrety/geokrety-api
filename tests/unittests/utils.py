@@ -1,11 +1,10 @@
-import unittest
 import json
-
-from tests.unittests.setup_database import Setup
+import unittest
 
 from app import current_app as app
-from app.models import db
 from app.factories.user import UserFactory
+from app.models import db
+from tests.unittests.setup_database import Setup
 
 
 class GeokretyTestCase(unittest.TestCase):
@@ -46,89 +45,98 @@ class GeokretyTestCase(unittest.TestCase):
         self.assertTrue('access_token' in data)
         return data['access_token']
 
-    def _add_auth_header(self, headers, user="kumy", password="password", create=False):
-        """
-        Add authentication header
-        """
-        headers['Authorization'] = \
-            'JWT %s' % self._login(user, password, create=create)
-        return headers
-
-    def _send_post(self, endpoint, payload=None, code=200, user="kumy", password="password", content_type='application/vnd.api+json', auth=False, create=False):
+    def _send(self,
+              method,
+              endpoint,
+              code=200,
+              parameters=None,
+              payload=None,
+              user=None,
+              content_type='application/vnd.api+json'):
         """
         Send a POST request to the api, and check expected response code.
-        Properly set content-type
-        Also add an authentication token by default
         """
+        if not parameters:
+            parameters = {}
+
         if not payload:
             payload = {}
 
         headers = {}
-        if auth:
-            headers = self._add_auth_header(
-                headers, user=user, password=password, create=create)
+        if user:
+            headers['Authorization'] = \
+                'JWT %s' % self._login(user.name, user.password)
 
         with app.test_request_context():
-            response = self.app.post(endpoint,
-                                     data=json.dumps(payload),
-                                     headers=headers,
-                                     content_type=content_type)
+            response = getattr(self.app, method)(endpoint,
+                                                 data=json.dumps(payload),
+                                                 headers=headers,
+                                                 content_type=content_type)
         self.assertEqual(response.status_code, code)
-        return response
+        data = response.get_data(as_text=True)
+        if response.content_type in ['application/vnd.api+json', 'application/json'] and data:
+            return json.loads(data)
+        return data
 
-    def _send_get(self, endpoint, code=200, user="kumy", password="password", auth=False, create=False):
-        """
-        Send a POST request to the api, and check expected response code.
-        Properly set content-type
-        Also add an authentication token by default
-        """
-        headers = {}
-        if auth:
-            headers = self._add_auth_header(
-                headers, user=user, password=password, create=create)
+    def _send_post(self,
+                   endpoint,
+                   code=200,
+                   parameters=None,
+                   payload=None,
+                   user=None,
+                   content_type='application/vnd.api+json'):
+        return self._send('post',
+                          endpoint,
+                          code=code,
+                          payload=payload,
+                          parameters=parameters,
+                          user=user,
+                          content_type=content_type)
 
-        with app.test_request_context():
-            response = self.app.get(endpoint,
-                                    headers=headers)
-        self.assertEqual(response.status_code, code)
-        return response
+    def _send_get(self,
+                  endpoint,
+                  code=200,
+                  parameters=None,
+                  payload=None,
+                  user=None,
+                  content_type='application/vnd.api+json'):
+        return self._send('get',
+                          endpoint,
+                          code=code,
+                          payload=payload,
+                          parameters=parameters,
+                          user=user,
+                          content_type=content_type)
 
-    def _send_delete(self, endpoint, payload=None, code=200, user="kumy", password="password", auth=False, create=False):
-        """
-        Send a DELETE request to the api, and check expected response code.
-        Properly set content-type
-        Also add an authentication token by default
-        """
-        headers = {}
-        if auth:
-            headers = self._add_auth_header(
-                headers, user=user, password=password, create=create)
+    def _send_patch(self,
+                    endpoint,
+                    code=200,
+                    parameters=None,
+                    payload=None,
+                    user=None,
+                    content_type='application/vnd.api+json'):
+        return self._send('patch',
+                          endpoint,
+                          code=code,
+                          payload=payload,
+                          parameters=parameters,
+                          user=user,
+                          content_type=content_type)
 
-        with app.test_request_context():
-            response = self.app.delete(endpoint,
-                                       data=json.dumps(payload),
-                                       headers=headers)
-        self.assertEqual(response.status_code, code)
-        return response
-
-    def _send_patch(self, endpoint, payload=None, code=200, content_type='application/vnd.api+json', user="kumy", password="password", auth=False, create=False):
-        """
-        Send a PATCH request to the api, and check expected response code.
-        Properly set content-type
-        Also add an authentication token by default
-        """
-        headers = {}
-        if auth:
-            headers = self._add_auth_header(
-                headers, user=user, password=password, create=create)
-
-        with app.test_request_context():
-            response = self.app.patch(endpoint,
-                                      data=json.dumps(payload),
-                                      headers=headers,
-                                      content_type=content_type)
-        self.assertEqual(response.status_code, code)
-        return response
+    def _send_delete(self,
+                     endpoint,
+                     code=200,
+                     parameters=None,
+                     payload=None,
+                     user=None,
+                     content_type='application/vnd.api+json'):
+        return self._send('delete',
+                          endpoint,
+                          code=code,
+                          payload=payload,
+                          parameters=parameters,
+                          user=user,
+                          content_type=content_type)
 
     def _check_commit_and_raise(self, obj, exc):
         with app.test_request_context():
@@ -148,3 +156,15 @@ class GeokretyTestCase(unittest.TestCase):
             self.assertFalse(raised, 'Exception raised when it should not')
 
             db.session.rollback()
+
+    def assertDateTimeEqual(self, datetime_str, datetime_obj):
+        if isinstance(datetime_obj, str):
+            self.assertEqual(datetime_str, datetime_obj)
+        else:
+            self.assertEqual(datetime_str, datetime_obj.strftime("%Y-%m-%dT%H:%M:%S"))
+
+    def assertDateEqual(self, date_str, date_obj):
+        if isinstance(datetime_obj, str):
+            self.assertEqual(date_str, date_obj)
+        else:
+            self.assertEqual(date_str, date_obj.strftime("%Y-%m-%d"))

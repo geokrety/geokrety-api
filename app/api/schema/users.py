@@ -16,10 +16,12 @@ class UserSchemaPublic(Schema):
 
     id = fields.Integer(dump_only=True)
     name = fields.Str()
+    email = fields.Str(load_only=True)
+    password = fields.Str(load_only=True)
     language = fields.Str()
     country = fields.Str()
 
-    join_date_time = fields.Date()
+    join_date_time = fields.Date(dump_only=True)
     statpic_id = fields.Integer()
 
     # statpic = Relationship()
@@ -55,11 +57,9 @@ class UserSchema(UserSchemaPublic):
         ordered = True
 
     email = fields.Str()
-    password = fields.Str(load_only=True)
     latitude = fields.Float()
     longitude = fields.Float()
     daily_mails = fields.Boolean()
-    ip = fields.Str()
     observation_radius = fields.Integer()
     hour = fields.Integer()
     secid = fields.Str()

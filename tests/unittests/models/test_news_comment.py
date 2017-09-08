@@ -1,12 +1,11 @@
-from sqlalchemy.exc import OperationalError
-
-from tests.unittests.utils import GeokretyTestCase
-from app.models.news_comment import NewsComment
-from app.models import db
 from app import current_app as app
 from app.factories.news import NewsFactory
-from app.factories.user import UserFactory
 from app.factories.news_comment import NewsCommentFactory
+from app.factories.user import UserFactory
+from app.models import db
+from app.models.news_comment import NewsComment
+from sqlalchemy.exc import OperationalError
+from tests.unittests.utils import GeokretyTestCase
 
 
 def _create_news_comment():
@@ -26,6 +25,7 @@ def _create_news_comment():
         db.session.commit()
 
     return newscomment, news, user
+
 
 class TestNewsComment(GeokretyTestCase):
 
@@ -54,7 +54,7 @@ class TestNewsComment(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            newscomment, news, user = _create_news_comment()
+            newscomment = _create_news_comment()[0]
 
             allnewscomment = NewsComment.query.all()
             self.assertTrue(newscomment in allnewscomment)
@@ -66,7 +66,7 @@ class TestNewsComment(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            newscomment, news, user = _create_news_comment()
+            user = _create_news_comment()[2]
 
             news_comment_1 = NewsComment.query.first()
             self.assertEqual(news_comment_1.author, user)
@@ -77,7 +77,7 @@ class TestNewsComment(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            newscomment, news, user = _create_news_comment()
+            news = _create_news_comment()[1]
 
             news_comment_1 = NewsComment.query.first()
             self.assertEqual(news_comment_1.news, news)
@@ -102,7 +102,7 @@ class TestNewsComment(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            newscomment, news, user = _create_news_comment()
+            news = _create_news_comment()[1]
 
             payload = {
                 "data": {
@@ -134,7 +134,7 @@ class TestNewsComment(GeokretyTestCase):
         """
 
         with app.test_request_context():
-            newscomment, news, user = _create_news_comment()
+            user = _create_news_comment()[2]
 
             payload = {
                 "data": {

@@ -12,7 +12,7 @@ from app.models import db
 from app.models.user import User
 
 
-class AdminModelView(ModelView):
+class AdminModelView(ModelView):  # pragma: no cover
     def is_accessible(self):
         return login.current_user.is_authenticated
 
@@ -21,7 +21,7 @@ class AdminModelView(ModelView):
         return redirect(url_for('admin.index', next=request.url))
 
 
-class LoginForm(form.Form):
+class LoginForm(form.Form):  # pragma: no cover
     login = fields.TextField(validators=[validators.required()], render_kw={"placeholder": "yourname"})
     password = fields.PasswordField(validators=[validators.required()], render_kw={"placeholder": "xyzzy"})
 
@@ -51,7 +51,7 @@ class LoginForm(form.Form):
         return User.query.filter_by(name=self.login.data).first()
 
 
-class MyAdminIndexView(AdminIndexView):
+class MyAdminIndexView(AdminIndexView):  # pragma: no cover
     @expose('/')
     def index(self):
         """
@@ -90,7 +90,7 @@ home_routes = Blueprint('home', __name__)
 
 # Flask views
 @home_routes.route('/')
-def index():
+def index():  # pragma: no cover
     """
     Index route
     :return:
@@ -101,7 +101,7 @@ def index():
     return response
 
 
-class BlueprintsManager:
+class BlueprintsManager:  # pragma: no cover
     def __init__(self):
         pass
 

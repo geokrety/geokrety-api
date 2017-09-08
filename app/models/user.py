@@ -1,9 +1,12 @@
 import datetime
+import random
 
-from app.models import db
-from sqlalchemy.ext.hybrid import hybrid_property
 import phpass
+from app.models import db
 from flask import current_app as app
+from flask import request
+from sqlalchemy import event
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class User(db.Model):
@@ -30,12 +33,11 @@ class User(db.Model):
                                     default="0000-00-00 00:00:00")
     last_login_date_time = db.Column(
         'ostatni_login', db.DateTime, key='last_login_date_time',
-                                    default="0000-00-00 00:00:00")
-    join_date_time = db.Column('joined', db.DateTime, key='join_date_time',
-                                    default=datetime.datetime.utcnow)
+        default="0000-00-00 00:00:00")
+    join_date_time = db.Column('joined', db.DateTime, key='join_date_time')
     last_update_date_time = db.Column(
         'timestamp', db.DateTime, key='last_update_date_time',
-                                    default=datetime.datetime.utcnow)
+        default=datetime.datetime.utcnow)
     secid = db.Column(db.String(128))
 
     news = db.relationship('News', backref="author")
@@ -56,6 +58,10 @@ class User(db.Model):
         :param password:
         :return:
         """
+        if app.config['TESTING']:
+            self._password = password
+            return
+
         t_hasher = phpass.PasswordHash(11, False)
         self._password = t_hasher.hash_password(
             password.encode('utf-8') + app.config['PASSWORD_HASH_SALT']
@@ -77,3 +83,11 @@ class User(db.Model):
     @property
     def is_admin(self):
         return self.id in [1, 26422]
+
+
+@event.listens_for(User, 'init')
+def receive_init(target, args, kwargs):
+    target.hour = random.randrange(0, 23)
+    target.secid = "todo"
+    target.join_date_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    target.ip = request.remote_addr
