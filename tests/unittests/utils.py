@@ -1,23 +1,33 @@
 import json
 import unittest
 
+import pprint
 import phpass
 from app import current_app as app
 from app.factories.user import UserFactory
 from app.models import db
 from tests.unittests.setup_database import Setup
+from datetime import date, datetime
+
+
+# https://stackoverflow.com/a/22238613/944936
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, datetime):
+        return obj.strftime('%Y-%m-%d %H:%M:%S')
+    if isinstance(obj, date):
+        return obj.strftime('%Y-%m-%d')
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 def mock_hash_password(obj, password):
-    """
-    Mock hash_password from phpass.PasswordHash
-    """
+    """Mock hash_password from phpass.PasswordHash"""
     return password
 
+
 def mock_check_password(obj, password_1, password_2):
-    """
-    Mock check_password from phpass.PasswordHash
-    """
+    """Mock check_password from phpass.PasswordHash"""
     return password_1 == password_2
 
 
@@ -85,11 +95,13 @@ class GeokretyTestCase(unittest.TestCase):
 
         with app.test_request_context():
             response = getattr(self.app, method)(endpoint,
-                                                 data=json.dumps(payload),
+                                                 data=json.dumps(payload, default=json_serial),
                                                  headers=headers,
                                                  content_type=content_type)
-        self.assertEqual(response.status_code, code)
         data = response.get_data(as_text=True)
+        pprint.pprint(json.dumps(payload, default=json_serial))
+        pprint.pprint(data)
+        self.assertEqual(response.status_code, code)
         if response.content_type in ['application/vnd.api+json', 'application/json'] and data:
             return json.loads(data)
         return data

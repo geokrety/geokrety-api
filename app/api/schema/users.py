@@ -19,7 +19,7 @@ class UserSchemaPublic(Schema):
     email = fields.Str(load_only=True)
     password = fields.Str(load_only=True)
     language = fields.Str()
-    country = fields.Str()
+    country = fields.Str(dump_only=True)
 
     join_date_time = fields.Date(dump_only=True)
     statpic_id = fields.Integer()
@@ -63,6 +63,6 @@ class UserSchema(UserSchemaPublic):
     observation_radius = fields.Integer()
     hour = fields.Integer()
     secid = fields.Str()
-    last_update_date_time = fields.Date()
-    last_mail_date_time = fields.Date()
-    last_login_date_time = fields.Date()
+    last_update_date_time = fields.Date(dump_only=True)
+    last_mail_date_time = fields.Date(dump_only=True)
+    last_login_date_time = fields.Date(dump_only=True)

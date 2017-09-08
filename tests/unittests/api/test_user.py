@@ -38,10 +38,8 @@ class TestUser(GeokretyTestCase):
         self.assertTrue('language' in attributes)
         self.assertTrue('statpic-id' in attributes)
         self.assertTrue('join-date-time' in attributes)
-
         self.assertFalse('password' in attributes)
         self.assertFalse('ip' in attributes)
-
         self.assertEqual(attributes['name'], user.name)
         self.assertEqual(attributes['language'], user.language)
         self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
@@ -63,7 +61,6 @@ class TestUser(GeokretyTestCase):
         self.assertTrue('last-login-date-time' in attributes)
         self.assertTrue('last-mail-date-time' in attributes)
         self.assertTrue('last-update-date-time' in attributes)
-
         self.assertEqual(attributes['email'], user.email)
 
         if check_values:
@@ -85,7 +82,6 @@ class TestUser(GeokretyTestCase):
         attributes = data['data']['attributes']
 
         self.assertFalse('email' in attributes)
-
         self.assertFalse('hour' in attributes)
         self.assertFalse('latitude' in attributes)
         self.assertFalse('longitude' in attributes)
@@ -115,9 +111,9 @@ class TestUser(GeokretyTestCase):
         }
         self._send_post("/v1/users", payload=payload, code=500)  # TODO should not be a 500
 
-    def test_create(self):
+    def test_create_minimal(self):
         """
-        Check complete create request
+        Check create request minimal informations
         """
         with app.test_request_context():
             with mixer.ctx(commit=False):
@@ -141,6 +137,39 @@ class TestUser(GeokretyTestCase):
             user = users[0]
             self.assertEqual(someone.name, user.name)
             self._check_user_with_private(response, user)
+
+    def test_create_complete(self):
+        """
+        Check create request full informations
+        """
+        with app.test_request_context():
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                            "name": someone.name,
+                            "password": someone.password,
+                            "email": someone.email,
+                            "hour": someone.hour,
+                            "latitude": someone.latitude,
+                            "longitude": someone.longitude,
+                            "observation-radius": someone.observation_radius,
+                            "secid": someone.secid,
+                            "statpic-id": someone.statpic_id
+                    }
+                }
+            }
+            response = self._send_post("/v1/users", payload=payload, code=201)
+            self._check_user_with_private(response, someone, check_values=True)
+
+            users = User.query.all()
+            self.assertEqual(len(users), 1)
+            user = users[0]
+            self.assertEqual(someone.name, user.name)
+            self._check_user_with_private(response, user, check_values=True)
 
     def test_create_user(self):
         """
