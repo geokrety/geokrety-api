@@ -11,14 +11,10 @@ from tests.unittests.utils import GeokretyTestCase
 
 
 class TestUser(GeokretyTestCase):
-    """
-    Test User CRUD operations
-    """
+    """Test User CRUD operations"""
 
     def _blend(self):
-        """
-        Create mocked User/News/NewsComments
-        """
+        """Create mocked User/News/NewsComments"""
         mixer.init_app(app)
         self.admin = mixer.blend(User)
         self.user1 = mixer.blend(User)
@@ -92,17 +88,13 @@ class TestUser(GeokretyTestCase):
         self.assertFalse('last-update-date-time' in attributes)
 
     def test_post_content_types(self):
-        """
-        Check accepted content types
-        """
+        """Check accepted content types"""
         self._send_post("/v1/users", payload="not a json", code=415, content_type='application/json')
         self._send_post("/v1/users", payload={}, code=422)
         self._send_post("/v1/users", payload={"user": "kumy"}, code=422)
 
     def test_create_incomplete(self):
-        """
-        Check incomplete create request
-        """
+        """Check incomplete create request"""
 
         payload = {
             "data": {
@@ -112,9 +104,7 @@ class TestUser(GeokretyTestCase):
         self._send_post("/v1/users", payload=payload, code=500)  # TODO should not be a 500
 
     def test_create_minimal(self):
-        """
-        Check create request minimal informations
-        """
+        """Check create request minimal informations"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -139,9 +129,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user)
 
     def test_create_complete(self):
-        """
-        Check create request full informations
-        """
+        """Check create request full informations"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -172,9 +160,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user, check_values=True)
 
     def test_create_user(self):
-        """
-        Check create and Read back an user
-        """
+        """Check create and Read back an user"""
 
         with app.test_request_context():
             mixer.init_app(app)
@@ -208,21 +194,15 @@ class TestUser(GeokretyTestCase):
             self._check_user_without_private(response, user1)
 
     def test_list_authenticated(self):
-        """
-        Check GET user listing must be authenticated
-        """
+        """Check GET user listing must be authenticated"""
 
         with app.test_request_context():
             self._blend()
-            # Unauthenticated
             self._send_get('/v1/users', code=401)
             self._send_get('/v1/users', code=200, user=self.admin)
 
     def test_get_news_no_author(self):
-        """
-        Check GET author from a news, no author
-        """
-
+        """Check GET author from a news, no author"""
         with app.test_request_context():
             news = NewsFactory()
             db.session.add(news)
@@ -231,9 +211,7 @@ class TestUser(GeokretyTestCase):
             self._send_get('/v1/news/1/author', code=404, user=self.user1)
 
     def test_get_news_author(self):
-        """
-        Check GET author from a news
-        """
+        """Check GET author from a news"""
 
         with app.test_request_context():
             user = UserFactory()
@@ -246,9 +224,7 @@ class TestUser(GeokretyTestCase):
             self._send_get('/v1/news/1/author', code=200, user=self.user1)
 
     def test_get_news_comment_author(self):
-        """
-        Check GET author from a news_comment
-        """
+        """Check GET author from a news_comment"""
 
         with app.test_request_context():
             user = UserFactory()
@@ -259,5 +235,4 @@ class TestUser(GeokretyTestCase):
             db.session.add(newscomment)
             db.session.commit()
             self._blend()
-
             self._send_get('/v1/news-comments/1/author', code=200, user=self.user1)
