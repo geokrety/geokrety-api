@@ -51,7 +51,7 @@ class Config(object):
     API_PROPOGATE_UNCAUGHT_EXCEPTIONS = env.bool('API_PROPOGATE_UNCAUGHT_EXCEPTIONS', default=True)
     ETAG = True
 
-    if not SQLALCHEMY_DATABASE_URI:
+    if not SQLALCHEMY_DATABASE_URI:  # pragma: no cover
         print('`DATABASE_URL` either not exported or empty')
         exit()
 
@@ -66,7 +66,7 @@ class Config(object):
         STATIC_ROOT = 'staticfiles'
         STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
-    if FORCE_SSL:
+    if FORCE_SSL:  # pragma: no cover
         PREFERRED_URL_SCHEME = 'https'
 
 

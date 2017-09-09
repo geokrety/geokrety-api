@@ -11,7 +11,7 @@ from datetime import date, datetime
 
 
 # https://stackoverflow.com/a/22238613/944936
-def json_serial(obj):
+def json_serial(obj):  # pragma: no cover
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, datetime):
@@ -40,16 +40,10 @@ class GeokretyTestCase(unittest.TestCase):
     def tearDown(self):
         Setup.drop_db()
 
-    def _login(self, username="kumy", password="password", create=False):
+    def _login(self, username="kumy", password="password"):
         """
         Obtain a JWT token to authenticate next requests
         """
-        if create:
-            with app.test_request_context():
-                user = UserFactory(name=username, password=password)
-                db.session.add(user)
-                db.session.commit()
-
         response = self.app.post('/auth/session',
                                  headers={
                                      'content-type': 'application/json'
@@ -65,7 +59,7 @@ class GeokretyTestCase(unittest.TestCase):
         raised = False
         try:
             data = json.loads(response.data)
-        except Exception:
+        except Exception:  # pragma: no cover
             raised = True
         self.assertFalse(raised, 'Failed to decode json')
         self.assertTrue('access_token' in data)
