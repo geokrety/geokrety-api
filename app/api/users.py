@@ -8,6 +8,7 @@ from app.models.news_comment import NewsComment
 from app.models.user import User
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
+from flask_jwt import current_identity
 
 
 class UserList(ResourceList):
@@ -38,17 +39,18 @@ class UserDetail(ResourceDetail):
             view_kwargs['id'] = newscomment.author_id
 
     def before_marshmallow(self, args, kwargs):
-        if 'id' in kwargs and (has_access('is_user_itself', user_id=kwargs.get('id'))):
-            self.schema = UserSchema
+        if current_identity:
+            if 'id' in kwargs and (has_access('is_user_itself', user_id=kwargs.get('id'))):
+                self.schema = UserSchema
 
+    current_identity = current_identity
     decorators = (
         api.has_permission('is_admin', methods="DELETE"),
         api.has_permission('is_user_itself', methods="PATCH",
                            fetch="id", fetch_as="user_id",
-                           model=User,
-                           fetch_key_url="id"),
+                           model=User, fetch_key_url="id"),
+        api.has_permission('public', methods="GET"),
     )
-
     schema = UserSchemaPublic
     data_layer = {'session': db.session,
                   'model': User,

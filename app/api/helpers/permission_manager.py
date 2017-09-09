@@ -1,9 +1,8 @@
-from flask_jwt import current_identity
-from sqlalchemy.orm.exc import NoResultFound
-from flask import request
-
 from app.api.helpers.errors import ForbiddenError, NotFoundError
 from app.api.helpers.permissions import jwt_required
+from flask import request
+from flask_jwt import current_identity
+from sqlalchemy.orm.exc import NoResultFound
 
 
 @jwt_required

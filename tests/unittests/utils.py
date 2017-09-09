@@ -99,6 +99,7 @@ class GeokretyTestCase(unittest.TestCase):
                                                  headers=headers,
                                                  content_type=content_type)
         data = response.get_data(as_text=True)
+        print("Endpoint: %s" % endpoint)
         pprint.pprint(json.dumps(payload, default=json_serial))
         pprint.pprint(data)
         self.assertEqual(response.status_code, code)
@@ -187,12 +188,24 @@ class GeokretyTestCase(unittest.TestCase):
 
     def assertDateTimeEqual(self, datetime_str, datetime_obj):
         if isinstance(datetime_obj, str):
-            self.assertEqual(datetime_str, datetime_obj)
+            # Check date is parsable
+            raised = False
+            try:
+                datetime.strptime(datetime_obj, "%Y-%m-%dT%H:%M:%S")
+            except Exception:
+                raised = True
+            self.assertFalse(raised, 'Date is not parsable')
         else:
             self.assertEqual(datetime_str, datetime_obj.strftime("%Y-%m-%dT%H:%M:%S"))
 
     def assertDateEqual(self, date_str, date_obj):
-        if isinstance(datetime_obj, str):
-            self.assertEqual(date_str, date_obj)
+        if isinstance(date_obj, str):
+            # Check date is parsable
+            raised = False
+            try:
+                datetime.strptime(date_obj, "%Y-%m-%d")
+            except Exception:
+                raised = True
+            self.assertFalse(raised, 'Date is not parsable')
         else:
             self.assertEqual(date_str, date_obj.strftime("%Y-%m-%d"))

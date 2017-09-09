@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import os
 import logging
+import os
 import sys
-
-from envparse import env
 from datetime import timedelta
 
-from flask import Flask, json, make_response
-from flask_cors import CORS
-
-from flask_script import Manager
-from flask_jwt import JWT
-from flask_rest_jsonapi.errors import jsonapi_errors
-from flask_rest_jsonapi.exceptions import JsonApiException
-
-from app.views import BlueprintsManager
 from app.api.helpers.auth import AuthManager
 from app.api.helpers.jwt import jwt_authenticate, jwt_identity
 from app.models import db
+from app.views import BlueprintsManager
 from app.views.sentry import sentry
+from envparse import env
+from flask import Flask, json, make_response
+from flask_cors import CORS
+from flask_jwt import JWT
+from flask_rest_jsonapi.errors import jsonapi_errors
+from flask_script import Manager
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,6 +24,7 @@ template_dir = os.path.dirname(__file__) + "/templates"
 app = Flask(__name__, static_folder=static_dir, template_folder=template_dir)
 
 env.read_envfile()
+
 
 def create_app():
     BlueprintsManager.register(app)
@@ -52,13 +49,11 @@ def create_app():
     CORS(app, resources={r"/*": {"origins": "*"}})
     AuthManager.init_login(app)
 
-
     with app.app_context():
         from app.api.bootstrap import api_v1
         # from app.api.auth import auth_routes
         app.register_blueprint(api_v1)
         # app.register_blueprint(auth_routes)
-
 
     if app.config['SERVE_STATIC']:
         app.add_url_rule('/static/<path:filename>',
@@ -79,6 +74,22 @@ current_app, manager, database, jwt = create_app()
 #     if current_user.is_authenticated():
 #         current_user.last_seen = datetime.utcnow()
 
+
+@app.before_request
+def push_to_ctx():
+    from flask_jwt import _jwt
+    from flask import _request_ctx_stack
+    import jwt
+
+    token = _jwt.request_callback()
+    try:
+        payload = _jwt.jwt_decode_callback(token)
+    except jwt.exceptions.DecodeError:
+        pass
+    else:
+        _request_ctx_stack.top.current_identity = _jwt.identity_callback(payload)
+
+
 @app.errorhandler(500)
 def internal_server_error(error):
     if current_app.config['PROPOGATE_ERROR'] is True:
@@ -86,7 +97,7 @@ def internal_server_error(error):
     else:
         exc = JsonApiException({'pointer': ''}, 'Unknown error')
     return make_response(json.dumps(jsonapi_errors([exc.to_dict()])), exc.status,
-        {'Content-Type': 'application/vnd.api+json'})
+                         {'Content-Type': 'application/vnd.api+json'})
 
 
 if __name__ == '__main__':

@@ -1,10 +1,10 @@
 from app import current_app as app
-from app.factories.news import NewsFactory
-from app.factories.news_comment import NewsCommentFactory
-from app.factories.user import UserFactory
+# from app.factories.news import NewsFactory
+# from app.factories.news_comment import NewsCommentFactory
+# from app.factories.user import UserFactory
 from app.models import db
-# from app.models.news import News
-# from app.models.news_comment import NewsComment
+from app.models.news import News
+from app.models.news_comment import NewsComment
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
@@ -18,10 +18,11 @@ class TestUser(GeokretyTestCase):
         mixer.init_app(app)
         self.admin = mixer.blend(User)
         self.user1 = mixer.blend(User)
-        # self.user2 = mixer.blend(User)
-        # self.news1 = mixer.blend(News)
+        self.user2 = mixer.blend(User)
+        self.news1 = mixer.blend(News, author=self.user1)
         # self.news2 = mixer.blend(News)
-        # self.newscomment1 = mixer.blend(NewsComment, author=self.user1, news=self.news1)
+        self.orphan_news = mixer.blend(News, author=None)
+        self.newscomment1 = mixer.blend(NewsComment, author=self.user1, news=self.news1)
         # self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
     def _check_user(self, data, user, check_values=False):
@@ -95,7 +96,6 @@ class TestUser(GeokretyTestCase):
 
     def test_create_incomplete(self):
         """Check incomplete create request"""
-
         payload = {
             "data": {
                 "type": "user"
@@ -161,7 +161,6 @@ class TestUser(GeokretyTestCase):
 
     def test_create_user(self):
         """Check create and Read back an user"""
-
         with app.test_request_context():
             mixer.init_app(app)
             admin = mixer.blend(User)
@@ -184,6 +183,9 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user1)
             user1.id = response['data']['id']
 
+            response = self._send_get('/v1/users/%d' % user1.id, code=200)
+            self._check_user_without_private(response, user1)
+
             response = self._send_get('/v1/users/%d' % user1.id, code=200, user=user1)
             self._check_user_with_private(response, user1)
 
@@ -195,44 +197,60 @@ class TestUser(GeokretyTestCase):
 
     def test_list_authenticated(self):
         """Check GET user listing must be authenticated"""
-
         with app.test_request_context():
             self._blend()
             self._send_get('/v1/users', code=401)
             self._send_get('/v1/users', code=200, user=self.admin)
 
-    def test_get_news_no_author(self):
-        """Check GET author from a news, no author"""
+    def test_get_user_details(self):
+        """Check GET user details"""
         with app.test_request_context():
-            news = NewsFactory()
-            db.session.add(news)
-            db.session.commit()
             self._blend()
-            self._send_get('/v1/news/1/author', code=404, user=self.user1)
+            url = '/v1/users/%d' % self.user1.id
+
+            response = self._send_get(url, code=200)
+            self._check_user_without_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.admin)
+            self._check_user_with_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.user1)
+            self._check_user_with_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_user_without_private(response, self.user1)
 
     def test_get_news_author(self):
-        """Check GET author from a news"""
-
+        """Check GET author details from a news"""
         with app.test_request_context():
-            user = UserFactory()
-            db.session.add(user)
-            news = NewsFactory(author=user)
-            db.session.add(news)
-            db.session.commit()
             self._blend()
+            url = '/v1/news/%d/author' % self.news1.id
 
-            self._send_get('/v1/news/1/author', code=200, user=self.user1)
+            response = self._send_get(url, code=200)
+
+            self._check_user_without_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.admin)
+            self._check_user_with_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.user1)
+            self._check_user_with_private(response, self.user1)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_user_without_private(response, self.user1)
+
+    def test_get_news_orphan(self):
+        """Check GET author details from an orphan news"""
+        with app.test_request_context():
+            self._blend()
+            orphan_url = '/v1/news/%d/author' % self.orphan_news.id
+
+            self._send_get(orphan_url, code=404, user=self.admin)
+            self._send_get(orphan_url, code=404, user=self.user1)
+            self._send_get(orphan_url, code=404, user=self.user2)
 
     def test_get_news_comment_author(self):
         """Check GET author from a news_comment"""
-
         with app.test_request_context():
-            user = UserFactory()
-            db.session.add(user)
-            news = NewsFactory(author=user)
-            db.session.add(news)
-            newscomment = NewsCommentFactory(author=user, news=news)
-            db.session.add(newscomment)
-            db.session.commit()
             self._blend()
             self._send_get('/v1/news-comments/1/author', code=200, user=self.user1)
