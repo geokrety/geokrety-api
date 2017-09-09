@@ -12,9 +12,7 @@ from tests.unittests.utils import GeokretyTestCase
 
 
 def _payload(comment="My news comment", news_id=1, author_id=1):
-    """
-    Build a base payload
-    """
+    """Build a base payload"""
     attributes = {}
     if comment is not None:
         attributes["comment"] = comment
@@ -32,9 +30,7 @@ def _payload(comment="My news comment", news_id=1, author_id=1):
 
 
 class TestNewsComment(GeokretyTestCase):
-    """
-    Test News Comment CRUD operations
-    """
+    """Test News Comment CRUD operations"""
 
     def _blend(self):
         """
@@ -50,9 +46,7 @@ class TestNewsComment(GeokretyTestCase):
         self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
     def test_post_content_types(self):
-        """
-        Check accepted content types
-        """
+        """Check accepted content types"""
         with app.test_request_context():
             self._blend()
             # Bad content_type
@@ -72,9 +66,7 @@ class TestNewsComment(GeokretyTestCase):
                             user=self.user1)
 
     def test_create_incomplete(self):
-        """
-        Check incomplete create request
-        """
+        """Check incomplete create request"""
         with app.test_request_context():
             self._blend()
             payload = _payload(author_id=None, news_id=None)
@@ -88,9 +80,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.user2)
 
     def test_create_news_comment(self):
-        """
-        Check create news_comment
-        """
+        """Check create news_comment"""
         with app.test_request_context():
             self._blend()
             payload = _payload()
@@ -112,9 +102,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.user2)
 
     def test_create_news_comment_from_news(self):
-        """
-        Check create news comment from news
-        """
+        """Check create news comment from news"""
         with app.test_request_context():
             self._blend()
             payload = _payload(news_id=None)
@@ -162,9 +150,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user2)
 
     def test_public_access_list(self):
-        """
-        Check GET news-comments listing is public
-        """
+        """Check GET news-comments listing is public"""
         with app.test_request_context():
             self._blend()
 
@@ -189,9 +175,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_get('/v1/news/3/news-comments', code=404, user=self.user2)
 
     def test_public_access_details(self):
-        """
-        Check GET news-comments details is public
-        """
+        """Check GET news-comments details is public"""
         with app.test_request_context():
             self._blend()
             self._send_get('/v1/news-comments/1', code=200)
@@ -213,9 +197,7 @@ class TestNewsComment(GeokretyTestCase):
     # TODO PATCH
 
     def test_delete_anonymous(self):
-        """
-        Check delete Anonymous
-        """
+        """Check delete Anonymous"""
         with app.test_request_context():
             self._blend()
             payload = _payload()
@@ -225,9 +207,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_delete("/v1/news-comments/3", payload=payload, code=404)
 
     def test_delete_admin(self):
-        """
-        Check delete Admin
-        """
+        """Check delete Admin"""
         with app.test_request_context():
             self._blend()
             payload = _payload()
@@ -237,9 +217,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_delete("/v1/news-comments/3", payload=payload, code=404, user=self.admin)
 
     def test_delete_user1(self):
-        """
-        Check delete User1
-        """
+        """Check delete User1"""
         with app.test_request_context():
             self._blend()
             payload = _payload()
@@ -249,9 +227,7 @@ class TestNewsComment(GeokretyTestCase):
             self._send_delete("/v1/news-comments/3", payload=payload, code=404, user=self.user1)
 
     def test_delete_user2(self):
-        """
-        Check delete User2
-        """
+        """Check delete User2"""
         with app.test_request_context():
             self._blend()
             payload = _payload()
