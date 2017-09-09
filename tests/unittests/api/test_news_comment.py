@@ -210,6 +210,8 @@ class TestNewsComment(GeokretyTestCase):
             self._send_get('/v1/news-comments/2', code=200, user=self.user2)
             self._send_get('/v1/news-comments/3', code=404, user=self.user2)
 
+    # TODO PATCH
+
     def test_delete_anonymous(self):
         """
         Check delete Anonymous

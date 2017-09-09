@@ -201,6 +201,8 @@ class TestUser(GeokretyTestCase):
             self._blend()
             self._send_get('/v1/users', code=401)
             self._send_get('/v1/users', code=200, user=self.admin)
+            self._send_get('/v1/users', code=403, user=self.user1)
+            self._send_get('/v1/users', code=403, user=self.user2)
 
     def test_get_user_details(self):
         """Check GET user details"""
@@ -227,17 +229,22 @@ class TestUser(GeokretyTestCase):
             url = '/v1/news/%d/author' % self.news1.id
 
             response = self._send_get(url, code=200)
-
             self._check_user_without_private(response, self.user1)
-
             response = self._send_get(url, code=200, user=self.admin)
             self._check_user_with_private(response, self.user1)
-
             response = self._send_get(url, code=200, user=self.user1)
             self._check_user_with_private(response, self.user1)
-
             response = self._send_get(url, code=200, user=self.user2)
             self._check_user_without_private(response, self.user1)
+
+    def test_get_unexistent_news_author(self):
+        """Check GET author details from an unexistent news"""
+        with app.test_request_context():
+            self._blend()
+
+            self._send_get('/v1/news/666/author', code=404, user=self.admin)
+            self._send_get('/v1/news/666/author', code=404, user=self.user1)
+            self._send_get('/v1/news/666/author', code=404, user=self.user2)
 
     def test_get_news_orphan(self):
         """Check GET author details from an orphan news"""
@@ -253,4 +260,63 @@ class TestUser(GeokretyTestCase):
         """Check GET author from a news_comment"""
         with app.test_request_context():
             self._blend()
-            self._send_get('/v1/news-comments/1/author', code=200, user=self.user1)
+            response = self._send_get('/v1/news-comments/1/author', code=200, user=self.admin)
+            self._check_user_with_private(response, self.user1)
+            response = self._send_get('/v1/news-comments/1/author', code=200, user=self.user1)
+            self._check_user_with_private(response, self.user1)
+            response = self._send_get('/v1/news-comments/1/author', code=200, user=self.user2)
+            self._check_user_without_private(response, self.user1)
+
+            self._send_get('/v1/news-comments/666/author', code=404, user=self.admin)
+            self._send_get('/v1/news-comments/666/author', code=404, user=self.user1)
+            self._send_get('/v1/news-comments/666/author', code=404, user=self.user2)
+
+    # TODO PATCH
+
+    def test_delete_anonymous(self):
+        """
+        Check delete Anonymous
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_delete("/v1/users", code=405)
+            self._send_delete("/v1/users/1", code=405)
+            self._send_delete("/v1/users/2", code=405)
+            self._send_delete("/v1/users/3", code=405)
+            self._send_delete("/v1/users/4", code=405)
+
+    def test_delete_admin(self):
+        """
+        Check delete Admin
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_delete("/v1/users", code=405, user=self.admin)
+            self._send_delete("/v1/users/1", code=405, user=self.admin)
+            self._send_delete("/v1/users/2", code=405, user=self.admin)
+            self._send_delete("/v1/users/3", code=405, user=self.admin)
+            self._send_delete("/v1/users/4", code=405, user=self.admin)
+
+    def test_delete_user1(self):
+        """
+        Check delete User1
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_delete("/v1/users", code=405, user=self.user1)
+            self._send_delete("/v1/users/1", code=405, user=self.user1)
+            self._send_delete("/v1/users/2", code=405, user=self.user1)
+            self._send_delete("/v1/users/3", code=405, user=self.user1)
+            self._send_delete("/v1/users/4", code=405, user=self.user1)
+
+    def test_delete_user2(self):
+        """
+        Check delete User2
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_delete("/v1/users", code=405, user=self.user2)
+            self._send_delete("/v1/users/1", code=405, user=self.user2)
+            self._send_delete("/v1/users/2", code=405, user=self.user2)
+            self._send_delete("/v1/users/3", code=405, user=self.user2)
+            self._send_delete("/v1/users/4", code=405, user=self.user2)
