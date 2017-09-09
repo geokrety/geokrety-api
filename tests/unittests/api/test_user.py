@@ -25,7 +25,7 @@ class TestUser(GeokretyTestCase):
         self.newscomment1 = mixer.blend(NewsComment, author=self.user1, news=self.news1)
         # self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
-    def _check_user(self, data, user, check_values=False):
+    def _check_user(self, data, user, check_private_values=True):
         self.assertTrue('attributes' in data['data'])
         self.assertTrue('name' in data['data']['attributes'])
         attributes = data['data']['attributes']
@@ -41,12 +41,12 @@ class TestUser(GeokretyTestCase):
         self.assertEqual(attributes['language'], user.language)
         self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
 
-        if check_values:
+        if check_private_values:
             self.assertEqual(attributes['country'], user.country)
             self.assertEqual(attributes['statpic-id'], user.statpic_id)
 
-    def _check_user_with_private(self, data, user, check_values=False):
-        self._check_user(data, user, check_values)
+    def _check_user_with_private(self, data, user, check_private_values=True):
+        self._check_user(data, user, check_private_values)
         attributes = data['data']['attributes']
 
         self.assertTrue('email' in attributes)
@@ -60,7 +60,7 @@ class TestUser(GeokretyTestCase):
         self.assertTrue('last-update-date-time' in attributes)
         self.assertEqual(attributes['email'], user.email)
 
-        if check_values:
+        if check_private_values:
             self.assertEqual(attributes['hour'], user.hour)
             self.assertEqual(attributes['latitude'], user.latitude)
             self.assertEqual(attributes['longitude'], user.longitude)
@@ -74,8 +74,8 @@ class TestUser(GeokretyTestCase):
             if attributes['last-update-date-time']:
                 self.assertDateTimeEqual(attributes['last-update-date-time'], user.last_update_date_time)
 
-    def _check_user_without_private(self, data, user, check_values=False):
-        self._check_user(data, user, check_values)
+    def _check_user_without_private(self, data, user, check_private_values=True):
+        self._check_user(data, user, check_private_values)
         attributes = data['data']['attributes']
 
         self.assertFalse('email' in attributes)
@@ -120,7 +120,7 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/users", payload=payload, code=201)
-            self._check_user_with_private(response, someone)
+            self._check_user_with_private(response, someone, check_private_values=False)
 
             users = User.query.all()
             self.assertEqual(len(users), 1)
@@ -151,13 +151,13 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/users", payload=payload, code=201)
-            self._check_user_with_private(response, someone, check_values=True)
+            self._check_user_with_private(response, someone, check_private_values=False)
 
             users = User.query.all()
             self.assertEqual(len(users), 1)
             user = users[0]
             self.assertEqual(someone.name, user.name)
-            self._check_user_with_private(response, user, check_values=True)
+            self._check_user_with_private(response, user)
 
     def test_create_user(self):
         """Check create and Read back an user"""
@@ -180,20 +180,20 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post('/v1/users', payload=payload, code=201)
-            self._check_user_with_private(response, user1)
+            self._check_user_with_private(response, user1, check_private_values=False)
             user1.id = response['data']['id']
 
             response = self._send_get('/v1/users/%d' % user1.id, code=200)
-            self._check_user_without_private(response, user1)
+            self._check_user_without_private(response, user1, check_private_values=False)
 
             response = self._send_get('/v1/users/%d' % user1.id, code=200, user=user1)
-            self._check_user_with_private(response, user1)
+            self._check_user_with_private(response, user1, check_private_values=False)
 
             response = self._send_get('/v1/users/%d' % user1.id, code=200, user=admin)
-            self._check_user_with_private(response, user1)
+            self._check_user_with_private(response, user1, check_private_values=False)
 
             response = self._send_get('/v1/users/%d' % user1.id, code=200, user=someone)
-            self._check_user_without_private(response, user1)
+            self._check_user_without_private(response, user1, check_private_values=False)
 
     def test_list_authenticated(self):
         """Check GET user listing must be authenticated"""
