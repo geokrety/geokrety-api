@@ -35,7 +35,7 @@ class TestUser(GeokretyTestCase):
         self.assertFalse('ip' in attributes)
         self.assertEqual(attributes['name'], user.name)
         self.assertEqual(attributes['language'], user.language)
-        self.assertDateEqual(attributes['join-date-time'], user.join_date_time)
+        self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
 
         if check_private_values:
             self.assertEqual(attributes['country'], user.country)

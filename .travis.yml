@@ -23,7 +23,7 @@ env:
     APP_CONFIG="config.TestingConfig"
     DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_unittest
     TEST_DATABASE_URL=mysql+mysqldb://root@localhost/geokrety_unittest
-    SERVER_STATIC=true
+    SERVE_STATIC=true
 addons:
   - mariadb: '10.0'
 before_script:

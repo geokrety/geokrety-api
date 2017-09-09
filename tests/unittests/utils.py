@@ -92,7 +92,7 @@ class GeokretyTestCase(unittest.TestCase):
                                                  headers=headers,
                                                  content_type=content_type)
         data = response.get_data(as_text=True)
-        if response.status_code != code:
+        if response.status_code != code:  # pragma: no cover
             print("Endpoint: %s" % endpoint)
             pprint.pprint(json.dumps(payload, default=json_serial))
             pprint.pprint(data)
@@ -175,7 +175,7 @@ class GeokretyTestCase(unittest.TestCase):
             raised = False
             try:
                 db.session.commit()
-            except Exception:
+            except Exception:  # pragma: no cover
                 raised = True
             self.assertFalse(raised, 'Exception raised when it should not')
 
@@ -187,20 +187,20 @@ class GeokretyTestCase(unittest.TestCase):
             raised = False
             try:
                 datetime.strptime(datetime_obj, "%Y-%m-%dT%H:%M:%S")
-            except Exception:
+            except Exception:  # pragma: no cover
                 raised = True
             self.assertFalse(raised, 'Date is not parsable')
         else:
             self.assertEqual(datetime_str, datetime_obj.strftime("%Y-%m-%dT%H:%M:%S"))
 
-    def assertDateEqual(self, date_str, date_obj):
-        if isinstance(date_obj, str):
-            # Check date is parsable
-            raised = False
-            try:
-                datetime.strptime(date_obj, "%Y-%m-%d")
-            except Exception:
-                raised = True
-            self.assertFalse(raised, 'Date is not parsable')
-        else:
-            self.assertEqual(date_str, date_obj.strftime("%Y-%m-%d"))
+    # def assertDateEqual(self, date_str, date_obj):
+    #     if isinstance(date_obj, str):
+    #         # Check date is parsable
+    #         raised = False
+    #         try:
+    #             datetime.strptime(date_obj, "%Y-%m-%d")
+    #         except Exception:  # pragma: no cover
+    #             raised = True
+    #         self.assertFalse(raised, 'Date is not parsable')
+    #     else:
+    #         self.assertEqual(date_str, date_obj.strftime("%Y-%m-%d"))
