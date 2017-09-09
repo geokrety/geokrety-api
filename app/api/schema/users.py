@@ -1,10 +1,24 @@
-from marshmallow_jsonapi import fields
-from marshmallow_jsonapi.flask import Schema, Relationship
-
+from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.utilities import dasherize
+from app.models.user import User
+from marshmallow import validates
+from marshmallow_jsonapi import fields
+from marshmallow_jsonapi.flask import Relationship, Schema
 
 
 class UserSchemaPublic(Schema):
+
+    @validates('name')
+    def validate_username_uniqueness(self, data):
+        if User.query.filter_by(name=data).count():
+            raise UnprocessableEntity({'pointer': '/data/attributes/name'},
+                                      "Username already taken")
+
+    @validates('email')
+    def validate_email_uniqueness(self, data):
+        if User.query.filter_by(email=data).count():
+            raise UnprocessableEntity({'pointer': '/data/attributes/email'},
+                                      "Email already taken")
 
     class Meta:
         type_ = 'user'
@@ -14,7 +28,7 @@ class UserSchemaPublic(Schema):
         inflect = dasherize
         ordered = True
 
-    id = fields.Integer(dump_only=True)
+    id = fields.Str(dump_only=True)
     name = fields.Str()
     email = fields.Str(load_only=True)
     password = fields.Str(load_only=True)
@@ -34,14 +48,15 @@ class UserSchemaPublic(Schema):
                         type_='news')
 
     news_comments = Relationship(self_view='v1.user_news_comments',
-                            self_view_kwargs={'id': '<id>'},
-                            related_view='v1.news_comments_list',
-                            related_view_kwargs={'author_id': '<id>'},
-                            many=True,
-                            schema='NewsCommentSchema',
-                            type_='news-comment',
-                            # include_resource_linkage=True
-                            )
+                                 self_view_kwargs={'id': '<id>'},
+                                 related_view='v1.news_comments_list',
+                                 related_view_kwargs={'author_id': '<id>'},
+                                 many=True,
+                                 schema='NewsCommentSchema',
+                                 type_='news-comment',
+                                 # include_resource_linkage=True
+                                 )
+
 
 class UserSchema(UserSchemaPublic):
 

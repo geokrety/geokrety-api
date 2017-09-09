@@ -1,8 +1,4 @@
 from app import current_app as app
-# from app.factories.news import NewsFactory
-# from app.factories.news_comment import NewsCommentFactory
-# from app.factories.user import UserFactory
-from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.user import User
@@ -183,19 +179,59 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user1, check_private_values=False)
             user1.id = response['data']['id']
 
-            response = self._send_get('/v1/users/%d' % user1.id, code=200)
+            response = self._send_get('/v1/users/%s' % user1.id, code=200)
             self._check_user_without_private(response, user1, check_private_values=False)
 
-            response = self._send_get('/v1/users/%d' % user1.id, code=200, user=user1)
+            response = self._send_get('/v1/users/%s' % user1.id, code=200, user=user1)
             self._check_user_with_private(response, user1, check_private_values=False)
 
-            response = self._send_get('/v1/users/%d' % user1.id, code=200, user=admin)
+            response = self._send_get('/v1/users/%s' % user1.id, code=200, user=admin)
             self._check_user_with_private(response, user1, check_private_values=False)
 
-            response = self._send_get('/v1/users/%d' % user1.id, code=200, user=someone)
+            response = self._send_get('/v1/users/%s' % user1.id, code=200, user=someone)
             self._check_user_without_private(response, user1, check_private_values=False)
 
-    def test_list_authenticated(self):
+    def test_create_user_name_uniqueness(self):
+        """Check create user, name uniqueness"""
+        with app.test_request_context():
+            self._blend()
+            with mixer.ctx(commit=False):
+                user1 = mixer.blend(User)
+
+            # Test inserting first user
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                        "name": self.user1.name,
+                        "password": user1.password,
+                        "email": user1.email
+                    }
+                }
+            }
+            self._send_post('/v1/users', payload=payload, code=422)
+
+    def test_create_user_email_uniqueness(self):
+        """Check create user, email uniqueness"""
+        with app.test_request_context():
+            self._blend()
+            with mixer.ctx(commit=False):
+                user1 = mixer.blend(User)
+
+            # Test inserting first user
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                        "name": user1.name,
+                        "password": user1.password,
+                        "email": self.user1.email
+                    }
+                }
+            }
+            self._send_post('/v1/users', payload=payload, code=422)
+
+    def test_get_user_list(self):
         """Check GET user listing must be authenticated"""
         with app.test_request_context():
             self._blend()
@@ -271,7 +307,233 @@ class TestUser(GeokretyTestCase):
             self._send_get('/v1/news-comments/666/author', code=404, user=self.user1)
             self._send_get('/v1/news-comments/666/author', code=404, user=self.user2)
 
-    # TODO PATCH
+    def test_patch_list(self):
+        """
+        Check patch list cannot be patched
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_patch("/v1/users", code=405)
+            self._send_patch("/v1/users", code=405, user=self.admin)
+            self._send_patch("/v1/users", code=405, user=self.user1)
+            self._send_patch("/v1/users", code=405, user=self.user2)
+
+    def test_patch_anonymous(self):
+        """
+        Check patch anonymously is forbidden
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_patch("/v1/users", code=405)
+            self._send_patch("/v1/users/1", code=401)
+            self._send_patch("/v1/users/2", code=401)
+            self._send_patch("/v1/users/3", code=401)
+            self._send_patch("/v1/users/4", code=401)
+
+    def test_patch_full_admin_someone(self):
+        """
+        Check patch admin can update everyone - Admin
+        """
+        with app.test_request_context():
+            self._blend()
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": None,
+                    "attributes": {
+                            "name": None,
+                            "password": someone.password,
+                            "email": None,
+                            "hour": someone.hour,
+                            "latitude": someone.latitude,
+                            "longitude": someone.longitude,
+                            "observation-radius": someone.observation_radius,
+                            "secid": someone.secid,
+                            "statpic-id": someone.statpic_id
+                    }
+                }
+            }
+
+            payload["data"]["id"] = "1"
+            payload["data"]["attributes"]["name"] = "someone_1"
+            payload["data"]["attributes"]["email"] = "someone_1@email.email"
+            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+
+            payload["data"]["id"] = "2"
+            payload["data"]["attributes"]["name"] = "someone_2"
+            payload["data"]["attributes"]["email"] = "someone_2@email.email"
+            self._send_patch("/v1/users/2", payload=payload, code=200, user=self.admin)
+
+            payload["data"]["id"] = "3"
+            payload["data"]["attributes"]["name"] = "someone_3"
+            payload["data"]["attributes"]["email"] = "someone_3@email.email"
+            self._send_patch("/v1/users/3", payload=payload, code=200, user=self.admin)
+
+            payload["data"]["id"] = "4"
+            payload["data"]["attributes"]["name"] = "someone_4"
+            payload["data"]["attributes"]["email"] = "someone_4@email.email"
+            self._send_patch("/v1/users/4", payload=payload, code=404, user=self.admin)
+
+    def test_patch_full_user1_someone(self):
+        """
+        Check patch user can only update himself - User1
+        """
+        with app.test_request_context():
+            self._blend()
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": "2",
+                    "attributes": {
+                            "name": someone.name,
+                            "password": someone.password,
+                            "email": someone.email,
+                            "hour": someone.hour,
+                            "latitude": someone.latitude,
+                            "longitude": someone.longitude,
+                            "observation-radius": someone.observation_radius,
+                            "secid": someone.secid,
+                            "statpic-id": someone.statpic_id
+                    }
+                }
+            }
+
+            payload["data"]["id"] = "1"
+            payload["data"]["attributes"]["name"] = "someone_1"
+            payload["data"]["attributes"]["email"] = "someone_1@email.email"
+            self._send_patch("/v1/users/1", payload=payload, code=403, user=self.user1)
+
+            payload["data"]["id"] = "2"
+            payload["data"]["attributes"]["name"] = "someone_2"
+            payload["data"]["attributes"]["email"] = "someone_2@email.email"
+            self._send_patch("/v1/users/2", payload=payload, code=200, user=self.user1)
+
+            payload["data"]["id"] = "3"
+            payload["data"]["attributes"]["name"] = "someone_3"
+            payload["data"]["attributes"]["email"] = "someone_3@email.email"
+            self._send_patch("/v1/users/3", payload=payload, code=403, user=self.user1)
+
+            payload["data"]["id"] = "4"
+            payload["data"]["attributes"]["name"] = "someone_4"
+            payload["data"]["attributes"]["email"] = "someone_4@email.email"
+            self._send_patch("/v1/users/4", payload=payload, code=403, user=self.user1)
+
+    def test_patch_same_username_admin(self):
+        """
+        Check patch username uniqueness - Admin
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": "1",
+                    "attributes": {
+                        "name": "someone"
+                    }
+                }
+            }
+            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            payload["data"]["id"] = "2"
+            self._send_patch("/v1/users/2", payload=payload, code=422, user=self.admin)
+            payload["data"]["id"] = "3"
+            self._send_patch("/v1/users/3", payload=payload, code=422, user=self.admin)
+            payload["data"]["id"] = "4"
+            self._send_patch("/v1/users/4", payload=payload, code=422, user=self.admin)
+
+    def test_patch_same_username_user1(self):
+        """
+        Check patch username uniqueness - User1
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": self.user1.id,
+                    "attributes": {
+                        "name": self.user2.name
+                    }
+                }
+            }
+            self._send_patch("/v1/users/%s" % self.user1.id, payload=payload, code=422, user=self.user1)
+
+    def test_patch_same_email_admin(self):
+        """
+        Check patch email uniqueness - Admin
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": "1",
+                    "attributes": {
+                        "email": "someone@email.email"
+                    }
+                }
+            }
+            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            payload["data"]["id"] = "2"
+            self._send_patch("/v1/users/2", payload=payload, code=422, user=self.admin)
+            payload["data"]["id"] = "3"
+            self._send_patch("/v1/users/3", payload=payload, code=422, user=self.admin)
+            payload["data"]["id"] = "4"
+            self._send_patch("/v1/users/4", payload=payload, code=422, user=self.admin)
+
+    def test_patch_same_email_user1(self):
+        """
+        Check patch email uniqueness - User1
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": self.user1.id,
+                    "attributes": {
+                        "email": self.user2.email
+                    }
+                }
+            }
+            self._send_patch("/v1/users/%s" % self.user1.id, payload=payload, code=422, user=self.user1)
+
+    def test_patch_id_must_match(self):
+        """
+        Check patch id must match
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": "1",
+                    "attributes": {
+                        "secid": "some ultra secret string"
+                    }
+                }
+            }
+            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            self._send_patch("/v1/users/2", payload=payload, code=400, user=self.admin)
+            self._send_patch("/v1/users/3", payload=payload, code=400, user=self.admin)
+            self._send_patch("/v1/users/4", payload=payload, code=400, user=self.admin)
+
+    def test_delete_list(self):
+        """
+        Check delete list
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_delete("/v1/users", code=405)
+            self._send_delete("/v1/users", code=405, user=self.admin)
+            self._send_delete("/v1/users", code=405, user=self.user1)
+            self._send_delete("/v1/users", code=405, user=self.user2)
 
     def test_delete_anonymous(self):
         """
@@ -279,7 +541,6 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users", code=405)
             self._send_delete("/v1/users/1", code=405)
             self._send_delete("/v1/users/2", code=405)
             self._send_delete("/v1/users/3", code=405)
@@ -291,7 +552,6 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users", code=405, user=self.admin)
             self._send_delete("/v1/users/1", code=405, user=self.admin)
             self._send_delete("/v1/users/2", code=405, user=self.admin)
             self._send_delete("/v1/users/3", code=405, user=self.admin)
@@ -303,7 +563,6 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users", code=405, user=self.user1)
             self._send_delete("/v1/users/1", code=405, user=self.user1)
             self._send_delete("/v1/users/2", code=405, user=self.user1)
             self._send_delete("/v1/users/3", code=405, user=self.user1)
@@ -315,7 +574,6 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users", code=405, user=self.user2)
             self._send_delete("/v1/users/1", code=405, user=self.user2)
             self._send_delete("/v1/users/2", code=405, user=self.user2)
             self._send_delete("/v1/users/3", code=405, user=self.user2)

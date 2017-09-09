@@ -1,13 +1,12 @@
 import json
-import unittest
-
 import pprint
+import unittest
+from datetime import date, datetime
+
 import phpass
 from app import current_app as app
-from app.factories.user import UserFactory
 from app.models import db
 from tests.unittests.setup_database import Setup
-from datetime import date, datetime
 
 
 # https://stackoverflow.com/a/22238613/944936
@@ -93,9 +92,11 @@ class GeokretyTestCase(unittest.TestCase):
                                                  headers=headers,
                                                  content_type=content_type)
         data = response.get_data(as_text=True)
-        print("Endpoint: %s" % endpoint)
-        pprint.pprint(json.dumps(payload, default=json_serial))
-        pprint.pprint(data)
+        if response.status_code != code:
+            print("Endpoint: %s" % endpoint)
+            pprint.pprint(json.dumps(payload, default=json_serial))
+            pprint.pprint(data)
+
         self.assertEqual(response.status_code, code)
         if response.content_type in ['application/vnd.api+json', 'application/json'] and data:
             return json.loads(data)
