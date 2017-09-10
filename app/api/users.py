@@ -14,7 +14,9 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 class UserList(ResourceList):
 
     schema = UserSchema
-    decorators = (api.has_permission('is_admin', methods="GET"),)
+    decorators = (
+        api.has_permission('is_admin', methods="GET"),
+    )
     data_layer = {'session': db.session,
                   'model': User}
 
@@ -48,7 +50,7 @@ class UserDetail(ResourceDetail):
         api.has_permission('is_user_itself', methods="PATCH",
                            fetch="id", fetch_as="user_id",
                            model=User, fetch_key_url="id"),
-        api.has_permission('public', methods="GET"),
+        # api.has_permission('public', methods="GET"),
     )
     methods = ('GET', 'PATCH')
     schema = UserSchemaPublic

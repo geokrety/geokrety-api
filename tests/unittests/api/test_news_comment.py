@@ -75,10 +75,6 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news-comments", payload=payload, code=500, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=500, user=self.user2)
 
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.user1)
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.user2)
-
     def test_create_news_comment(self):
         """Check create news_comment"""
         with app.test_request_context():
@@ -100,54 +96,6 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.user2)
-
-    def test_create_news_comment_from_news(self):
-        """Check create news comment from news"""
-        with app.test_request_context():
-            self._blend()
-            payload = _payload(news_id=None)
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=401)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=401)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=401)
-
-            payload['data']['attributes']['author_id'] = self.admin.id
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.admin)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=403, user=self.user1)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=403, user=self.user1)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user1)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=403, user=self.user2)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=403, user=self.user2)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user2)
-
-            payload['data']['attributes']['author_id'] = self.user1.id
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.admin)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.user1)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=201, user=self.user1)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user1)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=403, user=self.user2)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=403, user=self.user2)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user2)
-
-            payload['data']['attributes']['author_id'] = self.user2.id
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=201, user=self.admin)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.admin)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=403, user=self.user1)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=403, user=self.user1)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user1)
-
-            self._send_post("/v1/news/1/news-comments", payload=payload, code=201, user=self.user2)
-            self._send_post("/v1/news/2/news-comments", payload=payload, code=201, user=self.user2)
-            self._send_post("/v1/news/3/news-comments", payload=payload, code=404, user=self.user2)
 
     def test_public_access_list(self):
         """Check GET news-comments listing is public"""
@@ -194,7 +142,49 @@ class TestNewsComment(GeokretyTestCase):
             self._send_get('/v1/news-comments/2', code=200, user=self.user2)
             self._send_get('/v1/news-comments/3', code=404, user=self.user2)
 
-    # TODO PATCH
+    def test_patch_list(self):
+        """
+        Check patch list cannot be patched
+        """
+        with app.test_request_context():
+            self._blend()
+            self._send_patch("/v1/news-comments", code=405)
+            self._send_patch("/v1/news-comments", code=405, user=self.admin)
+            self._send_patch("/v1/news-comments", code=405, user=self.user1)
+            self._send_patch("/v1/news-comments", code=405, user=self.user2)
+
+    def test_patch_title(self):
+        """
+        Check patch title
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "news-comment",
+                    "attributes": {
+                        "comment": "Fresh News comment"
+                    }
+                }
+            }
+
+            payload["data"]["id"] = "1"
+            self._send_patch("/v1/news-comments/1", payload=payload, code=401)
+            self._send_patch("/v1/news-comments/1", payload=payload, code=200, user=self.admin)
+            self._send_patch("/v1/news-comments/1", payload=payload, code=200, user=self.user1)
+            self._send_patch("/v1/news-comments/1", payload=payload, code=403, user=self.user2)
+
+            payload["data"]["id"] = "2"
+            self._send_patch("/v1/news-comments/2", payload=payload, code=401)
+            self._send_patch("/v1/news-comments/2", payload=payload, code=200, user=self.admin)
+            self._send_patch("/v1/news-comments/2", payload=payload, code=403, user=self.user1)
+            self._send_patch("/v1/news-comments/2", payload=payload, code=200, user=self.user2)
+
+            payload["data"]["id"] = "3"
+            self._send_patch("/v1/news-comments/3", payload=payload, code=404)
+            self._send_patch("/v1/news-comments/3", payload=payload, code=404, user=self.admin)
+            self._send_patch("/v1/news-comments/3", payload=payload, code=404, user=self.user1)
+            self._send_patch("/v1/news-comments/3", payload=payload, code=404, user=self.user2)
 
     def test_delete_anonymous(self):
         """Check delete Anonymous"""
