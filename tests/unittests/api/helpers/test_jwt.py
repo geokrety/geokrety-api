@@ -1,22 +1,20 @@
-from flask_jwt import _default_jwt_encode_handler
-
 from app import current_app as app
+from app.api.helpers.jwt import get_identity, jwt_authenticate
+from app.models.user import User
+from flask_jwt import _default_jwt_encode_handler
+from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
-from app.factories.user import UserFactory
-from app.api.helpers.jwt import jwt_authenticate, get_identity
-from app.models import db
 
 
 class TestJWTHelperValidation(GeokretyTestCase):
 
     def test_jwt_authenticate(self):
         with app.test_request_context():
-            user = UserFactory()
-            db.session.add(user)
-            db.session.commit()
+            mixer.init_app(app)
+            user = mixer.blend(User)
 
             # Valid Authentication
-            authenticated_user = jwt_authenticate(user.name, 'password')
+            authenticated_user = jwt_authenticate(user.name, user.password)
             self.assertEqual(authenticated_user.name, user.name)
 
             # Invalid Authentication
@@ -25,9 +23,8 @@ class TestJWTHelperValidation(GeokretyTestCase):
 
     def test_get_identity(self):
         with app.test_request_context():
-            user = UserFactory()
-            db.session.add(user)
-            db.session.commit()
+            mixer.init_app(app)
+            user = mixer.blend(User)
 
             # Authenticate User
             self.auth = {'Authorization': "JWT " + _default_jwt_encode_handler(user)}

@@ -49,6 +49,7 @@ Retrieve users list.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json)
@@ -65,7 +66,6 @@ Retrieve users list.
                         "name": "someone",
                         "email": "user@ema.il",
                         "daily-mails": true,
-                        "ip": "10.0.0.5",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -113,6 +113,7 @@ Get the author for a news.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json)
@@ -125,7 +126,6 @@ Get the author for a news.
                         "name": "someone",
                         "email": "user@ema.il",
                         "daily-mails": true,
-                        "ip": "10.0.0.5",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -173,6 +173,7 @@ Get the author for a news comment.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json)
@@ -185,7 +186,6 @@ Get the author for a news comment.
                         "name": "someone",
                         "email": "user@ema.il",
                         "daily-mails": true,
-                        "ip": "10.0.0.5",
                         "language": "fr",
                         "latitude": 48.86471,
                         "longitude": 2.34901,
@@ -301,6 +301,7 @@ Create a new News.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Content-Type: application/vnd.api+json
             Accept: application/vnd.api+json
 
@@ -491,7 +492,6 @@ Update a single news by `id`.
 ### Delete News [DELETE]
 Delete a single News.
 
-
 + Request
 
     + Headers
@@ -611,6 +611,7 @@ Create the author relation for a news.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -619,7 +620,7 @@ Create the author relation for a news.
             {
                 "data": {
                     "type": "user",
-                    "id": 1
+                    "id": 2
                 }
             }
 
@@ -635,7 +636,6 @@ Create the author relation for a news.
                             "name": "kumy",
                             "email": "user@ema.il",
                             "daily-mails": true,
-                            "ip": "10.0.0.1",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -707,6 +707,7 @@ Change the author of a news.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -731,7 +732,6 @@ Change the author of a news.
                             "name": "someone",
                             "email": "user@ema.il",
                             "daily-mails": true,
-                            "ip": "10.0.0.5",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -809,6 +809,7 @@ Remove author of a news.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -943,6 +944,7 @@ Create a new NewsComments.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -1125,6 +1127,7 @@ Delete a single News.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
 
 + Response 200 (application/vnd.api+json)
@@ -1155,47 +1158,45 @@ Retrieve news list.
 + Response 200 (application/vnd.api+json)
 
             {
-                "meta": {
-                    "count": 1
-                },
-                "data": [
-                    {
-                        "type": "news",
-                        "id": "1",
-                        "attributes": {
-                            "title": "First news",
-                            "content": "3,2,1,0 START! :) Have Fun!",
-                            "created-on-date-time": "2007-10-26T18:31:20",
-                            "username": "someone",
-                            "comments-count": 0,
-                            "last-comment-date-time": null
-                        },
-                        "relationships": {
-                            "news-comments": {
-                                "links": {
-                                    "self": "/news/1/relationship/comments",
-                                    "related": "/news/1/news-comments"
-                                }
-                            },
-                            "author": {
-                                "links": {
-                                    "self": "/news/1/relationship/author",
-                                    "related": "/users/1"
-                                }
-                            }
-                        },
-                        "links": {
-                            "self": "/news/1"
-                        }
+              "meta": {
+                "count": 1
+              },
+              "data": [
+                {
+                  "type": "news-comment",
+                  "id": "1",
+                  "attributes": {
+                    "comment": "3,2,1,0 START! :) Have Fun!",
+                    "icon": 0,
+                    "created-on-date": "2017-09-10"
+                  },
+                  "relationships": {
+                    "author": {
+                      "links": {
+                        "self": "/v1/news-comments/1/relationship/author",
+                        "related": "/v1/users/1"
+                      }
+                    },
+                    "news": {
+                      "links": {
+                        "self": "/v1/news-comments/1/relationship/news",
+                        "related": "/v1/news/1"
+                      }
                     }
-                ],
-                "jsonapi": {
-                    "version": "1.0"
-                },
-                "links": {
-                    "self": "/news"
+                  },
+                  "links": {
+                    "self": "/v1/news-comments/1"
+                  }
                 }
+              ],
+              "jsonapi": {
+                "version": "1.0"
+              },
+              "links": {
+                "self": "/v1/news-comments"
+              }
             }
+
 
 
 ## Relationship Author [/v1/news-comments/{newscomment_id}/relationship/author]
@@ -1238,6 +1239,7 @@ Create the author relation for a news comment.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -1261,7 +1263,6 @@ Create the author relation for a news comment.
                             "name": "someone",
                             "email": "user@ema.il",
                             "daily-mails": true,
-                            "ip": "10.0.0.5",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,
@@ -1324,6 +1325,7 @@ Change the author of a news comment.
 
     + Headers
 
+            Authorization: JWT <Auth Key>
             Accept: application/vnd.api+json
             Content-Type: application/vnd.api+json
 
@@ -1347,7 +1349,6 @@ Change the author of a news comment.
                             "name": "someone",
                             "email": "user@ema.il",
                             "daily-mails": true,
-                            "ip": "10.0.0.5",
                             "language": "fr",
                             "latitude": 48.86471,
                             "longitude": 2.34901,

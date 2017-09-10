@@ -16,4 +16,4 @@ class News(db.Model):
     czas_postu = db.Column(db.DateTime, default="0000-00-00 00:00:00")
 
     # author = db.relationship('User', backref=db.backref('news'))
-    news_comments = db.relationship('NewsComment', backref="news")
+    news_comments = db.relationship('NewsComment', backref="news", cascade="all,delete")

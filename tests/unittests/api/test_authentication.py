@@ -1,8 +1,8 @@
 import json
 
 from app import current_app as app
-from app.models import db
-from app.factories.user import UserFactory
+from app.models.user import User
+from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
 
 
@@ -11,81 +11,46 @@ class TestAuthentication(GeokretyTestCase):
     password = "password"
     password_bad = "bad_password"
 
+    def setUp(self):
+        super(TestAuthentication, self).setUp()
+        with app.test_request_context():
+            mixer.init_app(app)
+            mixer.blend(User, name=self.username, _password=self.password)
+
+    def _check_login(self, name, password):
+        return self.app.post('/auth/session',
+                             headers={
+                                 'content-type': 'application/json'
+                             },
+                             data=json.dumps({
+                                 "username": name,
+                                 "password": password
+                             }), follow_redirects=True)
+
     def test_auth_nonexistent_user(self):
         """
         Check can't login with non-existent user
         """
-
-        response = self.app.post('/auth/session',
-                                 headers={
-                                     'content-type': 'application/json'
-                                 },
-                                 data=json.dumps({
-                                     "username": self.username,
-                                     "password": self.password
-                                 }), follow_redirects=True)
-
+        response = self._check_login("someone", "else")
         self.assertEqual(response.status_code, 401)
 
     def test_auth(self):
         """
         Check can login with existent user
         """
-
-        with app.test_request_context():
-            user = UserFactory(name=self.username, password=self.password)
-            db.session.add(user)
-            db.session.commit()
-
-        response = self.app.post('/auth/session',
-                                 headers={
-                                     'content-type': 'application/json'
-                                 },
-                                 data=json.dumps({
-                                     "username": self.username,
-                                     "password": self.password
-                                 }), follow_redirects=True)
-
+        response = self._check_login(self.username, self.password)
         self.assertEqual(response.status_code, 200)
 
     def test_auth_bad_password(self):
         """
         Check can't login with bad password
         """
-
-        with app.test_request_context():
-            user = UserFactory(name=self.username, password=self.password)
-            db.session.add(user)
-            db.session.commit()
-
-        response = self.app.post('/auth/session',
-                                 headers={
-                                     'content-type': 'application/json'
-                                 },
-                                 data=json.dumps({
-                                     "username": self.username,
-                                     "password": self.password_bad
-                                 }), follow_redirects=True)
-
+        response = self._check_login(self.username, self.password_bad)
         self.assertEqual(response.status_code, 401)
 
     def test_auth_bad_username(self):
         """
         Check can't login with bad username
         """
-
-        with app.test_request_context():
-            user = UserFactory(name=self.username, password=self.password)
-            db.session.add(user)
-            db.session.commit()
-
-        response = self.app.post('/auth/session',
-                                 headers={
-                                     'content-type': 'application/json'
-                                 },
-                                 data=json.dumps({
-                                     "username": self.username+"_bad",
-                                     "password": self.password
-                                 }), follow_redirects=True)
-
+        response = self._check_login(self.username + "_bad", self.password)
         self.assertEqual(response.status_code, 401)
