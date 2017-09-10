@@ -142,6 +142,36 @@ class TestNewsComment(GeokretyTestCase):
             self._send_get('/v1/news-comments/2', code=200, user=self.user2)
             self._send_get('/v1/news-comments/3', code=404, user=self.user2)
 
+    def test_get_list_from_user(self):
+        """Check GET news-comments listing from user"""
+        with app.test_request_context():
+            self._blend()
+
+            self._send_get('/v1/users/%s/news-comments' % self.user1.id, code=200)
+            self._send_get('/v1/users/%s/news-comments' % self.user1.id, code=200, user=self.admin)
+            self._send_get('/v1/users/%s/news-comments' % self.user1.id, code=200, user=self.user1)
+            self._send_get('/v1/users/%s/news-comments' % self.user1.id, code=200, user=self.user2)
+
+            self._send_get('/v1/users/666/news-comments', code=404)
+            self._send_get('/v1/users/666/news-comments', code=404, user=self.admin)
+            self._send_get('/v1/users/666/news-comments', code=404, user=self.user1)
+            self._send_get('/v1/users/666/news-comments', code=404, user=self.user2)
+
+    def test_get_list_from_news(self):
+        """Check GET news-comments listing from news"""
+        with app.test_request_context():
+            self._blend()
+
+            self._send_get('/v1/news/%s/news-comments' % self.news1.id, code=200)
+            self._send_get('/v1/news/%s/news-comments' % self.news1.id, code=200, user=self.admin)
+            self._send_get('/v1/news/%s/news-comments' % self.news1.id, code=200, user=self.user1)
+            self._send_get('/v1/news/%s/news-comments' % self.news1.id, code=200, user=self.user2)
+
+            self._send_get('/v1/news/666/news-comments', code=404)
+            self._send_get('/v1/news/666/news-comments', code=404, user=self.admin)
+            self._send_get('/v1/news/666/news-comments', code=404, user=self.user1)
+            self._send_get('/v1/news/666/news-comments', code=404, user=self.user2)
+
     def test_patch_list(self):
         """
         Check patch list cannot be patched

@@ -1,9 +1,11 @@
 from app.api.bootstrap import api
+from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import ForbiddenException
 from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
+from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
@@ -18,14 +20,12 @@ class NewsCommentList(ResourceList):
         query_ = self.session.query(NewsComment)
 
         if view_kwargs.get('news_id') is not None:
-            try:
-                self.session.query(News).filter_by(id=view_kwargs['news_id']).one()
-            except NoResultFound:
-                raise ObjectNotFound({'parameter': 'news_id'}, "News: {} not found".format(view_kwargs['news_id']))
-            else:
-                query_ = query_.join(News).filter(News.id == view_kwargs['news_id'])
+            safe_query(self, News, 'id', view_kwargs['news_id'], 'news_id')
+            query_ = query_.join(News).filter(News.id == view_kwargs['news_id'])
 
-        # TODO find comments from a user
+        if view_kwargs.get('author_id') is not None:
+            safe_query(self, User, 'id', view_kwargs['author_id'], 'author_id')
+            query_ = query_.join(User).filter(User.id == view_kwargs['author_id'])
 
         return query_
 
