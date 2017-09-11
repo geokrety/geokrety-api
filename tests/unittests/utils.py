@@ -5,7 +5,6 @@ from datetime import date, datetime
 
 import phpass
 from app import current_app as app
-from app.models import db
 from tests.unittests.setup_database import Setup
 
 
@@ -161,25 +160,6 @@ class GeokretyTestCase(unittest.TestCase):
                           parameters=parameters,
                           user=user,
                           content_type=content_type)
-
-    def _check_commit_and_raise(self, obj, exc):
-        with app.test_request_context():
-            db.session.add(obj)
-
-            with self.assertRaises(exc):
-                db.session.commit()
-            db.session.rollback()
-
-    def _check_commit_and_not_raise(self, obj):
-        with app.test_request_context():
-            raised = False
-            try:
-                db.session.commit()
-            except Exception:  # pragma: no cover
-                raised = True
-            self.assertFalse(raised, 'Exception raised when it should not')
-
-            db.session.rollback()
 
     def assertDateTimeEqual(self, datetime_str, datetime_obj):
         if isinstance(datetime_obj, str):
