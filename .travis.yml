@@ -6,6 +6,11 @@ addons:
     packages:
       - python-dev
       - libmysqlclient-dev
+cache:
+  pip: true
+  directories:
+    - $HOME/.nvm/versions/node/v8.4.0/lib
+    - $HOME/.nvm/versions/node/v8.4.0/bin/
 python:
   - pypy
   - 2.7
@@ -16,7 +21,7 @@ python:
 before-install:
   - npm -g install npm@latest
 install:
-  - npm install -g dredd@4.0.0
+  - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
   - pip install -r requirements/tests.txt
 env:
   - >-
