@@ -11,7 +11,7 @@ api.route(UserRelationship, 'user_news_comments', '/users/<int:id>/relationship/
 
 api.route(NewsList, 'news_list', '/news', '/users/<int:author_id>/news')
 api.route(NewsDetail, 'news_details', '/news/<int:id>', '/news-comments/<int:newscomment_id>/news')
-api.route(NewsRelationship, 'news_comments', '/news/<int:id>/relationship/comments')
+api.route(NewsRelationship, 'news_comments', '/news/<int:id>/relationship/news-comments')
 api.route(NewsRelationship, 'news_author', '/news/<int:id>/relationship/author')
 
 api.route(NewsCommentList, 'news_comments_list', '/news-comments', '/users/<int:author_id>/news-comments', '/news/<int:news_id>/news-comments')

@@ -65,7 +65,7 @@ class NewsCommentDetail(ResourceDetail):
 
 
 class NewsCommentRelationship(ResourceRelationship):
-    methods = ['GET', 'POST', 'PATCH']
+    methods = ['GET']
     schema = NewsCommentSchema
     data_layer = {'session': db.session,
                   'model': NewsComment}

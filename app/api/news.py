@@ -63,6 +63,7 @@ class NewsDetail(ResourceDetail):
 
 
 class NewsRelationship(ResourceRelationship):
+    methods = ['GET']
     schema = NewsSchema
     data_layer = {'session': db.session,
                   'model': News}

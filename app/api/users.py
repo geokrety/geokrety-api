@@ -58,6 +58,7 @@ class UserDetail(ResourceDetail):
 
 
 class UserRelationship(ResourceRelationship):
+    methods = ['GET']
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User}
