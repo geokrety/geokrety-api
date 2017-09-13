@@ -9,8 +9,6 @@ from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
-from flask_rest_jsonapi.exceptions import ObjectNotFound
-from sqlalchemy.orm.exc import NoResultFound
 
 
 class NewsCommentList(ResourceList):
