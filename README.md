@@ -6,6 +6,9 @@
 GeoKrety API Server enable to track GeoKrety objects. The system provides API endpoints to fetch the data, to modify and update it.
 
 
+# Documentation
+
+[Api documentation](https://geokretymap.github.io/geokrety-api/api.html) is available online.
 
 # License
 
