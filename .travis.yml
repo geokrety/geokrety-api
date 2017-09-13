@@ -40,7 +40,7 @@ after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then dredd; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then python-codacy-coverage -r coverage.xml; fi'
-  - aglio -i apiary.apib -o docs/output.html --theme-variables slate
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then aglio -i apiary.apib -o docs/output.html --theme-variables slate; fi'
 deploy:
   provider: pages
   skip_cleanup: true
