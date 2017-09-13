@@ -22,6 +22,7 @@ before-install:
   - npm -g install npm@latest
 install:
   - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
+  - npm list -g aglio --depth=0 || npm install -g aglio
   - pip install -r requirements/tests.txt
 env:
   - >-
@@ -39,3 +40,12 @@ after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then dredd; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then python-codacy-coverage -r coverage.xml; fi'
+  - aglio -i apiary.apib -o docs/output.html --theme-variables slate
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: docs/
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  target_branch: gh-pages
+  on:
+    branch: master
