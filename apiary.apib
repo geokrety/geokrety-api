@@ -141,43 +141,6 @@ Retrieve users list.
     + Attributes (User Public)
 
 
-+ Response 200 (application/vnd.api+json)
-
-    + Attributes (User)
-
-        {
-            "meta": {
-                "count": 1
-            },
-            "data": [
-                {
-                    "type": "user",
-                    "id": 1,
-                    "attributes": {
-                    
-                    },
-                    "relationships": {
-                        "news": {
-                            "links": {
-                                "self": "/users/1/relationship/news",
-                                "related": "/users/1/news"
-                            }
-                        }
-                    },
-                    "links": {
-                        "self": "/users/1"
-                    }
-                }
-            ],
-            "jsonapi": {
-                "version": "1.0"
-            },
-            "links": {
-                "self": "/users"
-            }
-        }
-
-
 ## News Author [/v1/news/{news_id}/author]
 + Parameters
     + news_id: 1 (integer) - ID of the news in the form of an integer
