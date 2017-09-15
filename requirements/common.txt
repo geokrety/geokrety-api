@@ -1,4 +1,4 @@
-git+https://github.com/kumy/flask-rest-jsonapi.git@geokrety#egg=flask-rest-jsonapi
+git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety#egg=flask-rest-jsonapi
 gunicorn
 Flask-SQLAlchemy
 flask-cors
