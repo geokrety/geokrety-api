@@ -38,7 +38,7 @@ script:
   - nosetests tests/unittests -v --with-coverage
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then dredd; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cat docs/*.apib > apiary.apib; dredd; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then python-codacy-coverage -r coverage.xml; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then aglio -i apiary.apib -o docs/output.html --theme-variables slate; fi'
 deploy:

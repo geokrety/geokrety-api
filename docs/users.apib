@@ -1,0 +1,389 @@
+# Group Users
+Resources related to users in the API.
+
+---
+
+**User endpoints permissions:**
+
+| Privilege level     | List    | View -- | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✗ [1]   | ✓ [1]   | ✓       | ✗       | ✗       |
+| Authenticated       | ✓ [1]   | ✓ [1,2] | ✗       | ✓ [2]   | ✗       |
+| Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
+
+ - 1. Only public informations
+ - 2. Only self-owned informations
+---
+
+**User attributes:**
+
+| Parameter               | Description                            | Type    | Required | Readonly | Public  |
+|:------------------------|----------------------------------------|---------|----------|----------|---------|
+| `name`                  | User name                              | string  | **yes**  | -        | **yes** |
+| `email`                 | User email                             | string  | **yes**  | -        |         |
+| `password`              | User password                          | string  | **only on create**  | -        | **Cannot be read** |
+| `language`              | User primary spoken language           | string  | -        | -        | **yes** |
+| `country`               | User home country                      | string  | -        | **yes**  | **yes** |
+| `latitude`              | User home latitude                     | float   | -        | -        |         |
+| `longitude`             | User home longitude                    | float   | -        | -        |         |
+| `daily-mails`           | User want to receive daily mail digest | boolean | -        | -        |         |
+| `observation-radius`    | Observation area in kilometers         | integer | -        | -        |         |
+| `hour`                  | Send mail at this hour                 | integer | -        | **yes**  |         |
+| `secid`                 | User secret id for legacy API          | string  | -        | -        |         |
+| `joined-date-time`      | News creation date                     | date    | -        | **yes**  | **yes** |
+| `last-update-date-time` | Date of last account update            | date    | -        | **yes**  |         |
+| `last-mail-date-time`   | Date of last sent mail (daily mail)    | date    | -        | **yes**  |         |
+| `last-login-date-time`  | Date of last login                     | date    | -        | **yes**  |         |
+
+---
+
+**User Relations:**
+
+| Parameter       | Type         | Description              |
+|:----------------|--------------|--------------------------|
+| `news`          | news         | Posted news list         |
+| `news-comments` | news-comment | Posted news comment list |
+
+---
+
+
+
+## User Details [/v1/users/{id}]
+
++ Parameters
+    + id: 1 (integer) - ID of the user
+
+
+### Get user [GET]
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+### Update user [PATCH]
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
+
+    + Attributes (object)
+        + `data` (user-data-type, required)
+            + `attributes` (user-attributes-write)
+                - `name`: `someone else` (string, required)
+
++ Response 200 (application/vnd.api+json)
+User himself or Administrators
+
+    + Attributes (object)
+        + `data` (user-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
++ Response 422 (application/vnd.api+json)
+Username already taken
+
+    + Attributes (Error 422)
+
+
+
+### Delete user [DELETE]
+
+
++ Request Authenticated - Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Users Collection [/v1/users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
+
+### Create User [POST]
+Create a user account.
+
++ Request
+    Unauthenticated
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
+    + Attributes (object)
+        + `attributes` (user-attributes-write)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
+
+
+
+### List All Users [GET]
+Retrieve users list.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+    Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[user-data-public])
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
+
+## News Author [/v1/news/{news_id}/author]
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### Get News Author [GET]
+Get the author for a news.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+
+## NewsComment Author [/v1/news-comments/{news_id}/author]
++ Parameters
+    + news_id: 1 (integer) - ID of the news in the form of an integer
+
+
+### Get NewsComment Author [GET]
+Get the author for a news comment.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (user-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (user-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+# Data Structures
+
+## `user-data-type` (object)
+- `type`: `user` (string, required)
+- `id`: `1` (string, required)
+
+## `user-links` (object)
+- `self`: `/users/1` (string, required)
+
+## `user-attributes` (object)
+- `name`: `someone` (string, required)
+
+## `user-attributes-write` (object)
+- `name`: `someone` (string)
+- `email`: `user@ema.il` (string)
+- `password`: `strong password` (string)
+- `language`: `fr` (string)
+- `latitude`: `48.86471` (number)
+- `longitude`: `2.34901` (number)
+- `observation-radius`: `7` (number)
+- `secid`: `abc123` (string)
+- `statpic-id`: `4` (number)
+
+## `user-attributes-private` (user-attributes)
+- `email`: `user@ema.il` (string, required)
+- `daily-mails`: `true` (boolean)
+- `language`: `fr` (string)
+- `latitude`: `48.86471` (number)
+- `longitude`: `2.34901` (number)
+- `observation-radius`: `7` (number)
+- `country`: `fr` (string)
+- `hour`: `7` (number)
+- `statpic-id`: `4` (number)
+- `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
+- `last-update-date-time`: `2017-01-26T19:46:44+00:00` (string)
+- `last-mail-date-time`: `2017-03-29T07:52:02` (string)
+- `last-login-date-time`: `2017-03-14T22:04:05` (string)
+- `secid`: `abc123` (string)
+
+## `user-attributes-public` (user-attributes)
+- `language`: `fr` (string)
+- `country`: `fr` (string)
+- `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
+
+
+## `news` (object)
+- `links` (user-links)
+  - `related`: /users/1/relationship/news (string)
+
+## `news-comment` (object)
+- `links` (user-links)
+  - `related`: `/users/1/relationship/news-comments` (string)
+
+## `user-relationships` (object)
+- `news` (news)
+- `news-comments` (news-comment)
+
+## `meta` (object)
+- `count`: `1` (number, required)
+
+## `user-data-private` (user-data-type)
+- `attributes` (user-attributes-private, required)
+- `relationships` (user-relationships)
+- `links` (user-links, required)
+
+## `user-data-public` (user-data-type)
+- `attributes` (user-attributes-public)
+- `relationships` (user-relationships)
+- `links` (user-links, required)

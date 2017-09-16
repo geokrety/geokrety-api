@@ -18,8 +18,8 @@ from mixer.backend.flask import mixer
 
 
 stash = {}
-api_username = "your_username"
-api_password = "your_password"
+api_username = "someone"
+api_password = "strong password"
 api_uri = "http://localhost:5000/auth/session"
 
 
