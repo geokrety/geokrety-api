@@ -358,23 +358,26 @@ class TestUser(GeokretyTestCase):
             }
 
             payload["data"]["id"] = "1"
-            payload["data"]["attributes"]["name"] = "someone_1"
-            payload["data"]["attributes"]["email"] = "someone_1@email.email"
-            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            payload["data"]["attributes"]["name"] = someone.name = "someone_1"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_1@email.email"
+            response = self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            self._check_user_with_private(response, someone)
 
             payload["data"]["id"] = "2"
-            payload["data"]["attributes"]["name"] = "someone_2"
-            payload["data"]["attributes"]["email"] = "someone_2@email.email"
-            self._send_patch("/v1/users/2", payload=payload, code=200, user=self.admin)
+            payload["data"]["attributes"]["name"] = someone.name = "someone_2"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_2@email.email"
+            response = self._send_patch("/v1/users/2", payload=payload, code=200, user=self.admin)
+            self._check_user_with_private(response, someone)
 
             payload["data"]["id"] = "3"
-            payload["data"]["attributes"]["name"] = "someone_3"
-            payload["data"]["attributes"]["email"] = "someone_3@email.email"
-            self._send_patch("/v1/users/3", payload=payload, code=200, user=self.admin)
+            payload["data"]["attributes"]["name"] = someone.name = "someone_3"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_3@email.email"
+            response = self._send_patch("/v1/users/3", payload=payload, code=200, user=self.admin)
+            self._check_user_with_private(response, someone)
 
             payload["data"]["id"] = "4"
-            payload["data"]["attributes"]["name"] = "someone_4"
-            payload["data"]["attributes"]["email"] = "someone_4@email.email"
+            payload["data"]["attributes"]["name"] = someone.name = "someone_4"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_4@email.email"
             self._send_patch("/v1/users/4", payload=payload, code=404, user=self.admin)
 
     def test_patch_full_user1_someone(self):
@@ -405,23 +408,24 @@ class TestUser(GeokretyTestCase):
             }
 
             payload["data"]["id"] = "1"
-            payload["data"]["attributes"]["name"] = "someone_1"
-            payload["data"]["attributes"]["email"] = "someone_1@email.email"
+            payload["data"]["attributes"]["name"] = someone.name = "someone_1"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_1@email.email"
             self._send_patch("/v1/users/1", payload=payload, code=403, user=self.user1)
 
             payload["data"]["id"] = "2"
-            payload["data"]["attributes"]["name"] = "someone_2"
-            payload["data"]["attributes"]["email"] = "someone_2@email.email"
-            self._send_patch("/v1/users/2", payload=payload, code=200, user=self.user1)
+            payload["data"]["attributes"]["name"] = someone.name = "someone_2"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_2@email.email"
+            response = self._send_patch("/v1/users/2", payload=payload, code=200, user=self.user1)
+            self._check_user_with_private(response, someone)
 
             payload["data"]["id"] = "3"
-            payload["data"]["attributes"]["name"] = "someone_3"
-            payload["data"]["attributes"]["email"] = "someone_3@email.email"
+            payload["data"]["attributes"]["name"] = someone.name = "someone_3"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_3@email.email"
             self._send_patch("/v1/users/3", payload=payload, code=403, user=self.user1)
 
             payload["data"]["id"] = "4"
-            payload["data"]["attributes"]["name"] = "someone_4"
-            payload["data"]["attributes"]["email"] = "someone_4@email.email"
+            payload["data"]["attributes"]["name"] = someone.name = "someone_4"
+            payload["data"]["attributes"]["email"] = someone.email = "someone_4@email.email"
             self._send_patch("/v1/users/4", payload=payload, code=403, user=self.user1)
 
     def test_patch_same_username_admin(self):
