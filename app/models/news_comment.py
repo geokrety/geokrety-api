@@ -31,7 +31,8 @@ class NewsComment(db.Model):
         default=datetime.datetime.now().date()
     )
     comment = db.Column(
-        db.String(1000)
+        db.String(1000),
+        nullable=False
     )
     icon = db.Column(
         db.Integer,

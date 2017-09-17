@@ -5,7 +5,7 @@ from app.models import db
 
 class News(db.Model):
     __tablename__ = 'gk-news'
-    
+
     id = db.Column(
         'news_id',
         db.Integer,
@@ -46,6 +46,7 @@ class News(db.Model):
         'ostatni_komentarz',
         db.DateTime,
         key='last_comment_date_time',
+        nullable=False,
         default="0000-00-00 00:00:00"
     )
     created_on_date_time = db.Column(

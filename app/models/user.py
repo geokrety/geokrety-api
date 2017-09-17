@@ -49,7 +49,9 @@ class User(db.Model):
     language = db.Column(
         'lang',
         db.String(2),
-        key='language'
+        key='language',
+        nullable=False,
+        default=""
     )
     latitude = db.Column(
         'lat',
