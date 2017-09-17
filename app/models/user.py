@@ -12,68 +12,112 @@ from sqlalchemy.ext.hybrid import hybrid_property
 class User(db.Model):
     __tablename__ = 'gk-users'
 
-    id = db.Column('userid',
-                   db.Integer,
-                   primary_key=True,
-                   key='id')
-    name = db.Column('user',
-                     db.String(80),
-                     key='name',
-                     nullable=False,
-                     unique=True)
-    _password = db.Column('haslo2',
-                          db.String(120),
-                          key='password',
-                          nullable=False)
-    email = db.Column(db.String(150),
-                      nullable=False,
-                      unique=True)
-    daily_mails = db.Column('wysylacmaile',
-                            db.Boolean,
-                            key='daily_news',
-                            nullable=False,
-                            default=True)
-    ip = db.Column(db.String(39))
-    language = db.Column('lang',
-                         db.String(2),
-                         key='language')
-    latitude = db.Column('lat',
-                         db.Float,
-                         key='latitude',
-                         default=48.8566)
-    longitude = db.Column('lon',
-                          db.Float,
-                          key='longitude',
-                          default=2.3522)
-    observation_radius = db.Column('promien',
-                                   db.Integer,
-                                   key='observation_radius', default=0)
-    country = db.Column(db.String(3))
-    hour = db.Column('godzina',
-                     db.Integer,
-                     key='hour')
-    statpic_id = db.Column('statpic',
-                           db.Integer,
-                           key='statpic_id',
-                           default=1)
-    join_date_time = db.Column('joined', db.DateTime, key='join_date_time')
-    last_mail_date_time = db.Column('ostatni_mail',
-                                    db.DateTime,
-                                    nullable=True,
-                                    key='last_mail_date_time')
-    last_login_date_time = db.Column('ostatni_login',
-                                     db.DateTime,
-                                     nullable=False,
-                                     key='last_login_date_time',
-                                     default=datetime.datetime.utcnow)
-    last_update_date_time = db.Column('timestamp',
-                                      db.DateTime,
-                                      key='last_update_date_time',
-                                      default=datetime.datetime.utcnow)
-    secid = db.Column(db.String(128))
+    id = db.Column(
+        'userid',
+        db.Integer,
+        primary_key=True,
+        key='id'
+    )
+    name = db.Column(
+        'user',
+        db.String(80),
+        key='name',
+        nullable=False,
+        unique=True
+    )
+    _password = db.Column(
+        'haslo2',
+        db.String(120),
+        key='password',
+        nullable=False
+    )
+    email = db.Column(
+        db.String(150),
+        nullable=False,
+        unique=True
+    )
+    daily_mails = db.Column(
+        'wysylacmaile',
+        db.Boolean,
+        key='daily_news',
+        nullable=False,
+        default=True
+    )
+    ip = db.Column(
+        db.String(39)
+    )
+    language = db.Column(
+        'lang',
+        db.String(2),
+        key='language'
+    )
+    latitude = db.Column(
+        'lat',
+        db.Float,
+        key='latitude',
+        default=48.8566
+    )
+    longitude = db.Column(
+        'lon',
+        db.Float,
+        key='longitude',
+        default=2.3522
+    )
+    observation_radius = db.Column(
+        'promien',
+        db.Integer,
+        key='observation_radius',
+        default=0
+    )
+    country = db.Column(
+        db.String(3)
+    )
+    hour = db.Column(
+        'godzina',
+        db.Integer,
+        key='hour'
+    )
+    statpic_id = db.Column(
+        'statpic',
+        db.Integer,
+        key='statpic_id',
+        default=1
+    )
+    join_date_time = db.Column(
+        'joined',
+        db.DateTime, key='join_date_time'
+    )
+    last_mail_date_time = db.Column(
+        'ostatni_mail',
+        db.DateTime,
+        nullable=True,
+        key='last_mail_date_time'
+    )
+    last_login_date_time = db.Column(
+        'ostatni_login',
+        db.DateTime,
+        nullable=False,
+        key='last_login_date_time',
+        default=datetime.datetime.utcnow
+    )
+    last_update_date_time = db.Column(
+        'timestamp',
+        db.DateTime,
+        key='last_update_date_time',
+        default=datetime.datetime.utcnow
+    )
+    secid = db.Column(
+        db.String(128)
+    )
 
-    news = db.relationship('News', backref="author")
-    news_comments = db.relationship('NewsComment', backref="author")
+    news = db.relationship(
+        'News',
+        backref="author"
+    )
+    news_comments = db.relationship(
+        'NewsComment',
+        backref="author"
+    )
 
     @hybrid_property
     def password(self):
