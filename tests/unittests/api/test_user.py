@@ -338,6 +338,9 @@ class TestUser(GeokretyTestCase):
             self._blend()
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
+                someone.last_login_date_time = self.user1.last_login_date_time
+                someone.last_mail_date_time = self.user1.last_mail_date_time
+                someone.last_update_date_time = self.user1.last_update_date_time
 
             payload = {
                 "data": {
@@ -352,7 +355,7 @@ class TestUser(GeokretyTestCase):
                             "longitude": someone.longitude,
                             "observation-radius": someone.observation_radius,
                             "secid": someone.secid,
-                            "statpic-id": someone.statpic_id
+                            "statpic-id": someone.statpic_id,
                     }
                 }
             }
@@ -388,6 +391,9 @@ class TestUser(GeokretyTestCase):
             self._blend()
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
+                someone.last_login_date_time = self.user1.last_login_date_time
+                someone.last_mail_date_time = self.user1.last_mail_date_time
+                someone.last_update_date_time = self.user1.last_update_date_time
 
             payload = {
                 "data": {
