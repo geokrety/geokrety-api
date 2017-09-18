@@ -180,7 +180,9 @@ Create a user account.
             Accept: application/vnd.api+json
 
     + Attributes (object)
-        + `attributes` (user-attributes-write)
+        + `data` (object)
+            + `type`: `user` (string, required)
+            + `attributes` (user-attributes-write)
 
 + Response 200 (application/vnd.api+json)
 

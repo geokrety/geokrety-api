@@ -1,4 +1,6 @@
 from app import current_app as app
+from app.api.helpers.db import safe_query
+from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.user import User
@@ -21,28 +23,8 @@ class TestUser(GeokretyTestCase):
         self.newscomment1 = mixer.blend(NewsComment, author=self.user1, news=self.news1)
         # self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
-    def _check_user(self, data, user, check_private_values=True):
-        self.assertTrue('attributes' in data['data'])
-        self.assertTrue('name' in data['data']['attributes'])
-        attributes = data['data']['attributes']
-
-        self.assertTrue('name' in attributes)
-        self.assertTrue('country' in attributes)
-        self.assertTrue('language' in attributes)
-        self.assertTrue('statpic-id' in attributes)
-        self.assertTrue('join-date-time' in attributes)
-        self.assertFalse('password' in attributes)
-        self.assertFalse('ip' in attributes)
-        self.assertEqual(attributes['name'], user.name)
-        self.assertEqual(attributes['language'], user.language)
-        self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
-
-        if check_private_values:
-            self.assertEqual(attributes['country'], user.country)
-            self.assertEqual(attributes['statpic-id'], user.statpic_id)
-
-    def _check_user_with_private(self, data, user, check_private_values=True):
-        self._check_user(data, user, check_private_values)
+    def _check_user_with_private(self, data, user, skip_check=None):
+        skip_check = skip_check or []
         attributes = data['data']['attributes']
 
         self.assertTrue('email' in attributes)
@@ -51,18 +33,20 @@ class TestUser(GeokretyTestCase):
         self.assertTrue('longitude' in attributes)
         self.assertTrue('observation-radius' in attributes)
         self.assertTrue('secid' in attributes)
+        self.assertTrue('statpic-id' in attributes)
         self.assertTrue('last-login-date-time' in attributes)
         self.assertTrue('last-mail-date-time' in attributes)
         self.assertTrue('last-update-date-time' in attributes)
+
         self.assertEqual(attributes['email'], user.email)
+        self.assertTrue(isinstance(attributes['hour'], int))
+        self.assertEqual(attributes['latitude'], user.latitude)
+        self.assertEqual(attributes['longitude'], user.longitude)
+        self.assertEqual(attributes['observation-radius'], user.observation_radius)
+        self.assertEqual(attributes['secid'], user.secid)
+        self.assertEqual(attributes['statpic-id'], user.statpic_id)
 
-        if check_private_values:
-            self.assertEqual(attributes['hour'], user.hour)
-            self.assertEqual(attributes['latitude'], user.latitude)
-            self.assertEqual(attributes['longitude'], user.longitude)
-            self.assertEqual(attributes['observation-radius'], user.observation_radius)
-            self.assertEqual(attributes['secid'], user.secid)
-
+        if 'times' not in skip_check:
             if attributes['last-login-date-time']:
                 self.assertDateTimeEqual(attributes['last-login-date-time'], user.last_login_date_time)
             if attributes['last-mail-date-time']:
@@ -70,19 +54,34 @@ class TestUser(GeokretyTestCase):
             if attributes['last-update-date-time']:
                 self.assertDateTimeEqual(attributes['last-update-date-time'], user.last_update_date_time)
 
-    def _check_user_without_private(self, data, user, check_private_values=True):
-        self._check_user(data, user, check_private_values)
+    def _check_user_without_private(self, data, user, skip_check=None):
+        skip_check = skip_check or []
+        self.assertTrue('attributes' in data['data'])
+        self.assertTrue('name' in data['data']['attributes'])
         attributes = data['data']['attributes']
 
-        self.assertFalse('email' in attributes)
+        self.assertTrue('name' in attributes)
+        self.assertTrue('country' in attributes)
+        self.assertTrue('language' in attributes)
+        self.assertTrue('join-date-time' in attributes)
+
+        self.assertFalse('password' in attributes)
+        self.assertFalse('ip' in attributes)
+        self.assertFalse('statpic-id' in attributes)
         self.assertFalse('hour' in attributes)
+        self.assertFalse('email' in attributes)
         self.assertFalse('latitude' in attributes)
         self.assertFalse('longitude' in attributes)
-        self.assertFalse('observation-radius' in attributes)
-        self.assertFalse('secid' in attributes)
         self.assertFalse('last-login-date-time' in attributes)
         self.assertFalse('last-mail-date-time' in attributes)
         self.assertFalse('last-update-date-time' in attributes)
+
+        self.assertEqual(attributes['name'], user.name)
+        self.assertEqual(attributes['country'], user.country)
+        self.assertEqual(attributes['language'], user.language)
+
+        if 'times' not in skip_check:
+            self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
 
     def test_post_content_types(self):
         """Check accepted content types"""
@@ -97,7 +96,58 @@ class TestUser(GeokretyTestCase):
                 "type": "user"
             }
         }
-        self._send_post("/v1/users", payload=payload, code=500)  # TODO should not be a 500
+        self._send_post("/v1/users", payload=payload, code=422)
+
+    def test_create_without_username(self):
+        """Check create request without username"""
+        with app.test_request_context():
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                            "password": someone.password,
+                            "email": someone.email
+                    }
+                }
+            }
+            self._send_post("/v1/users", payload=payload, code=422)
+
+    def test_create_without_password(self):
+        """Check create request without password"""
+        with app.test_request_context():
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                            "name": someone.name,
+                            "email": someone.email
+                    }
+                }
+            }
+            self._send_post("/v1/users", payload=payload, code=422)
+
+    def test_create_without_email(self):
+        """Check create request without email"""
+        with app.test_request_context():
+            with mixer.ctx(commit=False):
+                someone = mixer.blend(User)
+
+            payload = {
+                "data": {
+                    "type": "user",
+                    "attributes": {
+                            "name": someone.name,
+                            "password": someone.password
+                    }
+                }
+            }
+            self._send_post("/v1/users", payload=payload, code=422)
 
     def test_create_minimal(self):
         """Check create request minimal informations"""
@@ -116,7 +166,7 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/users", payload=payload, code=201)
-            self._check_user_with_private(response, someone, check_private_values=False)
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             users = User.query.all()
             self.assertEqual(len(users), 1)
@@ -147,7 +197,7 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/users", payload=payload, code=201)
-            self._check_user_with_private(response, someone, check_private_values=False)
+            self._check_user_with_private(response, someone, skip_check=['time'])
 
             users = User.query.all()
             self.assertEqual(len(users), 1)
@@ -176,20 +226,20 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post('/v1/users', payload=payload, code=201)
-            self._check_user_with_private(response, user1, check_private_values=False)
+            self._check_user_with_private(response, user1, skip_check=['times'])
             user1.id = response['data']['id']
 
             response = self._send_get('/v1/users/%s' % user1.id, code=200)
-            self._check_user_without_private(response, user1, check_private_values=False)
+            self._check_user_without_private(response, user1, skip_check=['times'])
 
             response = self._send_get('/v1/users/%s' % user1.id, code=200, user=user1)
-            self._check_user_with_private(response, user1, check_private_values=False)
+            self._check_user_with_private(response, user1, skip_check=['times'])
 
             response = self._send_get('/v1/users/%s' % user1.id, code=200, user=admin)
-            self._check_user_with_private(response, user1, check_private_values=False)
+            self._check_user_with_private(response, user1, skip_check=['times'])
 
             response = self._send_get('/v1/users/%s' % user1.id, code=200, user=someone)
-            self._check_user_without_private(response, user1, check_private_values=False)
+            self._check_user_without_private(response, user1, skip_check=['times'])
 
     def test_create_user_name_uniqueness(self):
         """Check create user, name uniqueness"""
@@ -338,9 +388,6 @@ class TestUser(GeokretyTestCase):
             self._blend()
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
-                someone.last_login_date_time = self.user1.last_login_date_time
-                someone.last_mail_date_time = self.user1.last_mail_date_time
-                someone.last_update_date_time = self.user1.last_update_date_time
 
             payload = {
                 "data": {
@@ -364,19 +411,19 @@ class TestUser(GeokretyTestCase):
             payload["data"]["attributes"]["name"] = someone.name = "someone_1"
             payload["data"]["attributes"]["email"] = someone.email = "someone_1@email.email"
             response = self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
-            self._check_user_with_private(response, someone)
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["name"] = someone.name = "someone_2"
             payload["data"]["attributes"]["email"] = someone.email = "someone_2@email.email"
             response = self._send_patch("/v1/users/2", payload=payload, code=200, user=self.admin)
-            self._check_user_with_private(response, someone)
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = someone.name = "someone_3"
             payload["data"]["attributes"]["email"] = someone.email = "someone_3@email.email"
             response = self._send_patch("/v1/users/3", payload=payload, code=200, user=self.admin)
-            self._check_user_with_private(response, someone)
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             payload["data"]["id"] = "4"
             payload["data"]["attributes"]["name"] = someone.name = "someone_4"
@@ -391,9 +438,6 @@ class TestUser(GeokretyTestCase):
             self._blend()
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
-                someone.last_login_date_time = self.user1.last_login_date_time
-                someone.last_mail_date_time = self.user1.last_mail_date_time
-                someone.last_update_date_time = self.user1.last_update_date_time
 
             payload = {
                 "data": {
@@ -422,7 +466,7 @@ class TestUser(GeokretyTestCase):
             payload["data"]["attributes"]["name"] = someone.name = "someone_2"
             payload["data"]["attributes"]["email"] = someone.email = "someone_2@email.email"
             response = self._send_patch("/v1/users/2", payload=payload, code=200, user=self.user1)
-            self._check_user_with_private(response, someone)
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = someone.name = "someone_3"
@@ -533,6 +577,25 @@ class TestUser(GeokretyTestCase):
             self._send_patch("/v1/users/2", payload=payload, code=400, user=self.admin)
             self._send_patch("/v1/users/3", payload=payload, code=400, user=self.admin)
             self._send_patch("/v1/users/4", payload=payload, code=400, user=self.admin)
+
+    def test_patch_hour_is_read_only(self):
+        """
+        Check patch hour is read only
+        """
+        with app.test_request_context():
+            self._blend()
+            payload = {
+                "data": {
+                    "type": "user",
+                    "id": "1",
+                    "attributes": {
+                        "hour": 42
+                    }
+                }
+            }
+            self._send_patch("/v1/users/1", payload=payload, code=200, user=self.admin)
+            obj = safe_query(db, User, 'id', '1', 'user_id')
+            self.assertNotEqual(obj.hour, 42)
 
     def test_delete_list(self):
         """

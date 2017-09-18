@@ -42,6 +42,10 @@ class UserDetail(ResourceDetail):
             if 'id' in kwargs and (has_access('is_user_itself', user_id=kwargs.get('id'))):
                 self.schema = UserSchema
 
+    def before_patch(self, args, kwargs, data):
+        self.schema = UserSchema
+
+
     current_identity = current_identity
     decorators = (
         api.has_permission('is_user_itself', methods="PATCH",

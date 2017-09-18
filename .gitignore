@@ -1,6 +1,8 @@
 ### GeoKrety
 src
 .env*
+
+/apiary.apib
 ### GeoKrety
 
 # Byte-compiled / optimized / DLL files

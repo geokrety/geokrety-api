@@ -162,12 +162,12 @@ class GeokretyTestCase(unittest.TestCase):
                           content_type=content_type)
 
     def assertDateTimeEqual(self, datetime_str, datetime_obj):
-        if isinstance(datetime_obj, str):
+        if isinstance(datetime_obj, str):   # pragma: no cover
             # Check date is parsable
             raised = False
             try:
                 datetime.strptime(datetime_obj, "%Y-%m-%dT%H:%M:%S")
-            except Exception:  # pragma: no cover
+            except Exception:
                 raised = True
             self.assertFalse(raised, 'Date is not parsable')
         else:
