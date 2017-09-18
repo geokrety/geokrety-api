@@ -4,6 +4,8 @@ from app.models.news_comment import NewsComment
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
+from app.api.helpers.db import safe_query
+from app.models import db
 
 
 # TODO
@@ -96,6 +98,21 @@ class TestNewsComment(GeokretyTestCase):
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.user2)
+
+    def test_create_news_comment_increment_news(self):
+        """Check create news_comment increment count on news"""
+        with app.test_request_context():
+            self._blend()
+            payload = _payload(news_id=2)
+            payload['data']['attributes']['author_id'] = self.admin.id
+
+            obj = safe_query(db, News, 'id', '2', 'news_id')
+            self.assertEqual(obj.comments_count, 0)
+
+            self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
+
+            obj = safe_query(db, News, 'id', '2', 'news_id')
+            self.assertEqual(obj.comments_count, 1)
 
     def test_public_access_list(self):
         """Check GET news-comments listing is public"""
@@ -255,3 +272,23 @@ class TestNewsComment(GeokretyTestCase):
             self._send_delete("/v1/news-comments/1", payload=payload, code=403, user=self.user2)
             self._send_delete("/v1/news-comments/2", payload=payload, code=200, user=self.user2)
             self._send_delete("/v1/news-comments/3", payload=payload, code=404, user=self.user2)
+
+    def test_delete_news_comment_decrement_news(self):
+        """Check delete news_comment decrement count on news"""
+        with app.test_request_context():
+            self._blend()
+            news_id = 2
+            payload = _payload(news_id=news_id)
+
+            obj = safe_query(db, News, 'id', news_id, 'news_id')
+            self.assertEqual(obj.comments_count, 0)
+
+            news_comment = self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
+
+            obj = safe_query(db, News, 'id', news_id, 'news_id')
+            self.assertEqual(obj.comments_count, 1)
+
+            self._send_delete("/v1/news-comments/%s" % news_comment['data']['id'], code=200, user=self.admin)
+
+            obj = safe_query(db, News, 'id', news_id, 'news_id')
+            self.assertEqual(obj.comments_count, 0)

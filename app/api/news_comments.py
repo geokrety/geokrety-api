@@ -1,5 +1,5 @@
 from app.api.bootstrap import api
-from app.api.helpers.db import safe_query
+from app.api.helpers.db import safe_query, save_to_db
 from app.api.helpers.exceptions import ForbiddenException
 from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
@@ -38,6 +38,12 @@ class NewsCommentList(ResourceList):
             raise ForbiddenException({'parameter': 'author_id'}, 'Author {} must be yourself ({})'.format(
                 data['author_id'], user.id))
 
+    def after_create_object(self, obj, data, view_kwargs):
+        # Increment comment count on news
+        news = safe_query(self, News, 'id', obj.news_id, 'id')
+        news.comments_count += 1
+        save_to_db(news)
+
     decorators = (
         api.has_permission('auth_required', methods="POST"),
     )
@@ -47,19 +53,32 @@ class NewsCommentList(ResourceList):
         'model': NewsComment,
         'methods': {
             'query': query,
-            'before_create_object': before_create_object
+            'before_create_object': before_create_object,
+            'after_create_object': after_create_object
         }
     }
 
 
 class NewsCommentDetail(ResourceDetail):
+
+    def after_delete_object(self, obj, view_kwargs):
+        # Decrement comment count on news
+        news = safe_query(self, News, 'id', obj.news_id, 'id')
+        news.comments_count -= 1
+        save_to_db(news)
+
     decorators = (
         api.has_permission('is_user_itself', methods="PATCH,DELETE",
                            fetch="author_id", fetch_as="user_id", model=NewsComment),
     )
     schema = NewsCommentSchema
-    data_layer = {'session': db.session,
-                  'model': NewsComment}
+    data_layer = {
+        'session': db.session,
+        'model': NewsComment,
+        'methods': {
+            'after_delete_object': after_delete_object
+        }
+    }
 
 
 class NewsCommentRelationship(ResourceRelationship):
