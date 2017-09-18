@@ -8,10 +8,10 @@ GeoKrety API Server enable to track GeoKrety objects. The system provides API en
 
 # Documentation
 
-[Api documentation](https://geokretymap.github.io/geokrety-api/api.html) is available online.
+[Api documentation](https://geokrety.github.io/geokrety-api/) is available online.
 
 # License
 
-This project is currently licensed under the GNU General Public License v3. A copy of LICENSE.md should be present along with the source code. 
+This project is currently licensed under the GNU General Public License v3. A copy of LICENSE.md should be present along with the source code.
 
 Code is based on fossasia/open-event-orga-server https://github.com/fossasia/open-event-orga-server
