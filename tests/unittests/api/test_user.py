@@ -197,7 +197,7 @@ class TestUser(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/users", payload=payload, code=201)
-            self._check_user_with_private(response, someone, skip_check=['time'])
+            self._check_user_with_private(response, someone, skip_check=['times'])
 
             users = User.query.all()
             self.assertEqual(len(users), 1)
