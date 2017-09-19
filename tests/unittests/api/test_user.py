@@ -287,8 +287,8 @@ class TestUser(GeokretyTestCase):
             self._blend()
             self._send_get('/v1/users', code=401)
             self._send_get('/v1/users', code=200, user=self.admin)
-            self._send_get('/v1/users', code=403, user=self.user1)
-            self._send_get('/v1/users', code=403, user=self.user2)
+            self._send_get('/v1/users', code=200, user=self.user1)
+            self._send_get('/v1/users', code=200, user=self.user2)
 
     def test_get_user_details(self):
         """Check GET user details"""

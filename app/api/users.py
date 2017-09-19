@@ -15,7 +15,7 @@ class UserList(ResourceList):
 
     schema = UserSchema
     decorators = (
-        api.has_permission('is_admin', methods="GET"),
+        api.has_permission('auth_required', methods="GET"),
     )
     data_layer = {'session': db.session,
                   'model': User}
