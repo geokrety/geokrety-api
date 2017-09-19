@@ -1,5 +1,6 @@
 from app.api.bootstrap import api
 from app.api.helpers.db import safe_query
+from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.users import UserSchema, UserSchemaPublic
 from app.models import db
@@ -45,19 +46,23 @@ class UserDetail(ResourceDetail):
     def before_patch(self, args, kwargs, data):
         self.schema = UserSchema
 
+    def before_delete(self, args, kwargs):
+        # Restrict deleting to admin only
+        if not has_access('is_admin'):
+            raise ForbiddenException({'source': ''}, 'Access Forbidden')
 
     current_identity = current_identity
     decorators = (
-        api.has_permission('is_user_itself', methods="PATCH",
+        api.has_permission('is_user_itself', methods="PATCH,DELETE",
                            fetch="id", fetch_as="user_id",
                            model=User, fetch_key_url="id"),
     )
-    methods = ('GET', 'PATCH')
+    methods = ('GET', 'PATCH', 'DELETE')
     schema = UserSchemaPublic
     data_layer = {'session': db.session,
                   'model': User,
                   'methods': {
-                      'before_get_object': before_get_object
+                      'before_get_object': before_get_object,
                   }}
 
 

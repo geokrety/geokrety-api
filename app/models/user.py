@@ -114,11 +114,13 @@ class User(db.Model):
 
     news = db.relationship(
         'News',
-        backref="author"
+        backref="author",
+        cascade="all,delete"
     )
     news_comments = db.relationship(
         'NewsComment',
-        backref="author"
+        backref="author",
+        cascade="all,delete"
     )
 
     @hybrid_property

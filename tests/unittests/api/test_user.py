@@ -614,10 +614,10 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users/1", code=405)
-            self._send_delete("/v1/users/2", code=405)
-            self._send_delete("/v1/users/3", code=405)
-            self._send_delete("/v1/users/4", code=405)
+            self._send_delete("/v1/users/1", code=401)
+            self._send_delete("/v1/users/2", code=401)
+            self._send_delete("/v1/users/3", code=401)
+            self._send_delete("/v1/users/4", code=401)
 
     def test_delete_admin(self):
         """
@@ -625,10 +625,10 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users/1", code=405, user=self.admin)
-            self._send_delete("/v1/users/2", code=405, user=self.admin)
-            self._send_delete("/v1/users/3", code=405, user=self.admin)
-            self._send_delete("/v1/users/4", code=405, user=self.admin)
+            # self._send_delete("/v1/users/1", code=200, user=self.admin)
+            self._send_delete("/v1/users/2", code=200, user=self.admin)
+            self._send_delete("/v1/users/3", code=200, user=self.admin)
+            self._send_delete("/v1/users/4", code=404, user=self.admin)
 
     def test_delete_user1(self):
         """
@@ -636,10 +636,10 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users/1", code=405, user=self.user1)
-            self._send_delete("/v1/users/2", code=405, user=self.user1)
-            self._send_delete("/v1/users/3", code=405, user=self.user1)
-            self._send_delete("/v1/users/4", code=405, user=self.user1)
+            self._send_delete("/v1/users/1", code=403, user=self.user1)
+            self._send_delete("/v1/users/2", code=403, user=self.user1)
+            self._send_delete("/v1/users/3", code=403, user=self.user1)
+            self._send_delete("/v1/users/4", code=403, user=self.user1)
 
     def test_delete_user2(self):
         """
@@ -647,7 +647,7 @@ class TestUser(GeokretyTestCase):
         """
         with app.test_request_context():
             self._blend()
-            self._send_delete("/v1/users/1", code=405, user=self.user2)
-            self._send_delete("/v1/users/2", code=405, user=self.user2)
-            self._send_delete("/v1/users/3", code=405, user=self.user2)
-            self._send_delete("/v1/users/4", code=405, user=self.user2)
+            self._send_delete("/v1/users/1", code=403, user=self.user2)
+            self._send_delete("/v1/users/2", code=403, user=self.user2)
+            self._send_delete("/v1/users/3", code=403, user=self.user2)
+            self._send_delete("/v1/users/4", code=403, user=self.user2)
