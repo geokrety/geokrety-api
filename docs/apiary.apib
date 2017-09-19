@@ -63,52 +63,7 @@ This is **not yet the production service**. See https://geokrety.org/api.php for
 + jsonapi (jsonapi, required)
 
 
-## User Public (object)
-+ name: Boba Fett (string, required) - User name
-+ language: fr (string, optional) - User spoken language
-+ country: fr (string, optional) - User home country
-    + Default: Country derived from user home coordinates
-+ `join-date-time`: `2017-01-14T22:57:44` (string, required) - Joining date
-    + Default: now
 
-## User (User Public)
-+ `statpic-id`: 4 (number, required) - Statpic template id
-    + Default: 0
-+ email: ser@ema.il (string, required) - User mail address
-+ `daily-mail`: true (boolean, required) - `True` if the user want to receive daily digest
-    + Default: true
-+ latitude: 48.86471 (number, optional) - Home latitude (Home location)
-+ longitude: 2.34901 (number, optional) - Home longitude (Home location)
-+ `observation-radius`: 7 (string, required) - How far from home location to look for moves
-+ hour: 7 (string, required) - Send mail at this hour
-+ `last-update-date-time`: `2017-01-26T19:46:44` (string, required) - Date of last account update
-+ `last-mail-date-time`: `2017-03-29T07:52:02` (string, required) - Date of last sent mail (daily mail)
-+ `last-login-date-time`: `2017-09-14T22:04:05` (string, required) - Date of last login
-+ secid: abc123 (string, optional) - User secret id for legacy API
-
-## News (object)
-+ title: New doc online (string, required) - The news title
-+ content: Hi guys, the news API documentation is now available online. See Github page... (string, required) - The news text
-+ username: someone (string, optional) - Override author username
-
-## News Comment (object)
-+ comment: New API is really nice!!! (string, required) - The user posted comment
-+ icon: 0 (number, required) - Icon template `id` illustrating the comment
-+ created-on-date-time: 2017-09-15T08:12:10 (string, required) - Creation date time
-+ author (User) - Author of the news comment post.
-+ news (News) - News which was commented.
-
-## RelationshipsAuthor (object)
-+ author (object)
-    + data (object)
-        + type: user (string, fixed-type, required)
-        + id: 26422 (string, required) - User id
-
-## RelationshipsNewsComment (object)
-+ news-comments (object)
-    + data (object)
-        + type: news-comment (string, fixed-type, required)
-        + id: 806 (string, required) - News comment id
 
 
 
