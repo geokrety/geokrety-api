@@ -1,4 +1,4 @@
-# Group NewsComments
+# Group News Comments
 Resources related to news comments in the API.
 
 ---
@@ -12,7 +12,7 @@ Resources related to news comments in the API.
 | Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
 
  - 1. Only self-owned informations
- - 1. Except relationships
+ - 2. Except relationships
 ---
 
 **News Comment attributes:**
@@ -29,7 +29,7 @@ Resources related to news comments in the API.
 
 | Parameter       | Type         | Description              |
 |:----------------|--------------|--------------------------|
-| `author`        | users        | News Comment author              |
+| `author`        | users        | News Comment author      |
 | `news`          | news         | Commented news           |
 
 ---
@@ -79,7 +79,7 @@ Update a single news by `id`.
         + `data` (news-comments-data-type, required)
           + `attributes` (news-comments-attributes-write)
           - `relationships` (object)
-              - `author` (object, required)
+              - `author` (object)
                   - `data` (object)
                       - `type`: `user` (string, required, fixed)
                       - `id`: 1 (string, required)
@@ -95,6 +95,10 @@ Update a single news by `id`.
         + `data` (news-comments-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (news-comments-links, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 + Response 403 (application/json)
 
@@ -120,6 +124,10 @@ Delete a single News.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 + Response 403 (application/json)
 
@@ -163,6 +171,10 @@ Delete a single News.
         + `data` (news-comments-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (news-comments-links, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 
 ### List All NewsComments [GET]
@@ -235,7 +247,6 @@ Retrieve news list.
 
 ## `news-comments-attributes` (news-comments-attributes-write)
 - `created-on-date-time`: `2007-10-26T18:31:20` (string)
-
 
 ## `news-comments-news` (object)
 - `links` (news-comments-links)
