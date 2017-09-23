@@ -14,6 +14,7 @@ from app.models import db
 from app.models.user import User
 from app.models.news import News
 from app.models.news_comment import NewsComment
+from app.models.news_subscription import NewsSubscription
 from mixer.backend.flask import mixer
 
 
@@ -62,6 +63,7 @@ def before_each(transaction):
                 news = mixer.blend(News, author=user)
                 news2 = mixer.blend(News, author=None)
                 news_comment = mixer.blend(NewsComment, author=user, news=news)
+                new_subscription1 = mixer.blend(NewsSubscription, user=user, news=news)
 
                 user2 = mixer.blend(User)
         db.session.add(user)
@@ -69,6 +71,7 @@ def before_each(transaction):
         db.session.add(news)
         db.session.add(news2)
         db.session.add(news_comment)
+        db.session.add(new_subscription1)
         db.session.commit()
 
     if 'token' not in stash:
