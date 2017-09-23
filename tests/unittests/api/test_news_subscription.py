@@ -212,6 +212,48 @@ class TestNewsSubscription(GeokretyTestCase):
             payload['data']['relationships']['user']['data']['id'] = self.user2.id
             self._subscribe(payload, code=201, expected_count=2, user=self.admin)
 
+    def test_unsubscribe(self):
+        """Check create with subscribed=false autodelete rows"""
+        payload = {
+            "data": {
+                "type": "news-subscription",
+                "attributes": {
+                    "subscribed": None
+                },
+                "relationships": {
+                    "news": {
+                        "data": {
+                            "type": "news",
+                            "id": "1"
+                        }
+                    }
+                }
+            }
+        }
+        with app.test_request_context():
+            self._blend()
+            payload["data"]["attributes"]["subscribed"] = False
+            self._subscribe(payload, code=201, expected_count=0, user=self.admin)
+
+            payload["data"]["attributes"]["subscribed"] = True
+            self._subscribe(payload, code=201, expected_count=1, user=self.admin)
+
+            payload["data"]["attributes"]["subscribed"] = False
+            payload["data"]["relationships"]["news"]["data"]["id"] = 2
+            self._subscribe(payload, code=201, expected_count=1, user=self.admin)
+
+            payload["data"]["attributes"]["subscribed"] = True
+            payload["data"]["relationships"]["news"]["data"]["id"] = 2
+            self._subscribe(payload, code=201, expected_count=2, user=self.admin)
+
+            payload["data"]["attributes"]["subscribed"] = False
+            payload["data"]["relationships"]["news"]["data"]["id"] = 1
+            self._subscribe(payload, code=201, expected_count=1, user=self.admin)
+
+            payload["data"]["attributes"]["subscribed"] = False
+            payload["data"]["relationships"]["news"]["data"]["id"] = 2
+            self._subscribe(payload, code=201, expected_count=0, user=self.admin)
+
     def test_get_list(self):
         """Check GET news-subscriptions listing"""
         with app.test_request_context():

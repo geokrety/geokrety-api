@@ -41,13 +41,19 @@ class NewsSubscriptionList(ResourceList):
         if 'user' not in data:
             data['user'] = user.id
 
-        import pprint
-        print("before_create_object")
-        pprint.pprint(data)
         # Check author_id
         if not user.is_admin and data['user'] != user.id:
             raise ForbiddenException({'parameter': 'user'}, 'User {} must be yourself ({})'.format(
                 data['user'], user.id))
+
+    def after_create_object(self, obj, data, view_kwargs):
+        # Delete row if subscribe is false
+        print(obj.user_id, obj.news_id)
+        if not obj.subscribed:
+            self.session.query(NewsSubscription).filter(
+                NewsSubscription.user_id == obj.user_id,
+                NewsSubscription.news_id == obj.news_id
+            ).delete()
 
     decorators = (
         api.has_permission('auth_required', methods="GET,POST"),
@@ -60,7 +66,7 @@ class NewsSubscriptionList(ResourceList):
         'methods': {
             'query': query,
             'before_create_object': before_create_object,
-            # 'after_create_object': after_create_object
+            'after_create_object': after_create_object
         }
     }
 
