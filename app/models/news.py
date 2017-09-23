@@ -62,3 +62,4 @@ class News(db.Model):
 
     # author = db.relationship('User', backref=db.backref('news'))
     news_comments = db.relationship('NewsComment', backref="news", cascade="all,delete")
+    news_subscriptions = db.relationship('NewsSubscription', backref="news", cascade="all,delete")

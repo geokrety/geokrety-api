@@ -122,6 +122,11 @@ class User(db.Model):
         backref="author",
         cascade="all,delete"
     )
+    news_subscriptions = db.relationship(
+        'NewsSubscription',
+        backref="user",
+        cascade="all,delete"
+    )
 
     @hybrid_property
     def password(self):

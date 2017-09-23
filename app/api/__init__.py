@@ -3,6 +3,7 @@ from app.api.bootstrap import api
 from app.api.users import UserList, UserDetail, UserRelationship
 from app.api.news import NewsList, NewsDetail, NewsRelationship
 from app.api.news_comments import NewsCommentList, NewsCommentDetail, NewsCommentRelationship
+from app.api.news_subscriptions import NewsSubscriptionList, NewsSubscriptionDetail, NewsSubscriptionRelationship
 
 api.route(UserList, 'users_list', '/users')
 api.route(UserDetail, 'user_details', '/users/<int:id>', '/news/<int:news_id>/author', '/news-comments/<int:newscomment_id>/author')
@@ -18,3 +19,8 @@ api.route(NewsCommentList, 'news_comments_list', '/news-comments', '/users/<int:
 api.route(NewsCommentDetail, 'news_comment_details', '/news-comments/<int:id>')
 api.route(NewsCommentRelationship, 'news_comments_author', '/news-comments/<int:id>/relationship/author')
 api.route(NewsCommentRelationship, 'news_comments_news', '/news-comments/<int:id>/relationship/news')
+
+api.route(NewsSubscriptionList, 'news_subscriptions_list', '/news-subscriptions', '/users/<int:user_id>/news-subscriptions', '/news/<int:news_id>/news-subscriptions')
+api.route(NewsSubscriptionDetail, 'news_subscription_details', '/news-subscriptions/<int:id>')
+api.route(NewsSubscriptionRelationship, 'news_subscription_user', '/news-subscriptions/<int:id>/relationship/user')
+api.route(NewsSubscriptionRelationship, 'news_subscription_news', '/news-subscriptions/<int:id>/relationship/news')
