@@ -7,7 +7,7 @@ from tests.unittests.utils import GeokretyTestCase
 
 
 class TestNews(GeokretyTestCase):
-    """Test User CRUD operations"""
+    """Test News CRUD operations"""
 
     # def setUp(self):
     #     super(TestNews, self).setUp()
