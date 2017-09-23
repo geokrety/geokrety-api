@@ -30,19 +30,28 @@ class TestNews(GeokretyTestCase):
         # self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
     def _check_news_details(self, data, news):
-        import pprint
-        pprint.pprint(data)
-        print(news.id, news.title, news.content)
         self.assertTrue('attributes' in data['data'])
         attributes = data['data']['attributes']
+        relationships = data['data']['relationships']
 
         self.assertTrue('title' in attributes)
         self.assertTrue('content' in attributes)
-        self.assertTrue('username' in attributes)
+        # self.assertTrue('username' in attributes)
 
         self.assertEqual(attributes['title'], news.title)
         self.assertEqual(attributes['content'], news.content)
-        self.assertEqual(attributes['username'], news.username)
+        if 'username' in attributes:
+            self.assertEqual(attributes['username'], news.username)
+
+        self.assertEqual('author' in relationships, hasattr(news, 'author'))
+        self.assertTrue('links' in relationships['author'])
+        self.assertTrue('self' in relationships['author']['links'])
+        self.assertTrue('related' in relationships['author']['links'])
+
+        self.assertEqual('news' in relationships, hasattr(news, 'news-comments'))
+        self.assertTrue('links' in relationships['news-comments'])
+        self.assertTrue('self' in relationships['news-comments']['links'])
+        self.assertTrue('related' in relationships['news-comments']['links'])
 
     def _check_news_list(self, data, length):
         self.assertTrue('data' in data)
@@ -59,8 +68,9 @@ class TestNews(GeokretyTestCase):
     def _post_news(self, payload, code=201, expected_count=1, user=None):
         """Check create request minimal informations"""
         with app.test_request_context():
-            self._send_post("/v1/news", payload=payload, code=code, user=user)
+            response = self._send_post("/v1/news", payload=payload, code=code, user=user)
             self.assertEqual(len(News.query.all()), expected_count)
+            return response
 
     def test_post_content_types(self):
         """Check accepted content types"""
@@ -168,6 +178,7 @@ class TestNews(GeokretyTestCase):
                     }
                 }
             }
+
             self._post_news(payload, code=401, expected_count=0)
             self._post_news(payload, code=201, expected_count=1, user=self.admin)
             self._post_news(payload, code=403, expected_count=1, user=self.user1)

@@ -13,6 +13,14 @@ from app.models import db
 #  /v1/user/1/news-comments
 
 
+def _relationship_builder(relation_type, relation_id):
+    return {
+        "data": {
+            "type": relation_type,
+            "id": relation_id
+        }
+    }
+
 def _payload(comment="My news comment", news_id=1, author_id=1):
     """Build a base payload"""
     attributes = {}
@@ -23,12 +31,23 @@ def _payload(comment="My news comment", news_id=1, author_id=1):
     if author_id is not None:
         attributes["author_id"] = author_id
 
-    return {
+    result = {
         "data": {
             "type": "news-comment",
-            "attributes": attributes
+            "attributes": {},
+            "relationships": {}
         }
     }
+
+    if comment is not None:
+        result["data"]["attributes"]["comment"] = comment
+    if news_id is not None:
+        result["data"]["relationships"]["news"] = _relationship_builder("news", news_id)
+    if author_id is not None:
+        result["data"]["relationships"]["author"] = _relationship_builder("user", author_id)
+
+    return result
+
 
 
 class TestNewsComment(GeokretyTestCase):
@@ -73,9 +92,9 @@ class TestNewsComment(GeokretyTestCase):
             self._blend()
             payload = _payload(author_id=None, news_id=None)
             self._send_post("/v1/news-comments", payload=payload, code=401)
-            self._send_post("/v1/news-comments", payload=payload, code=500, user=self.admin)
-            self._send_post("/v1/news-comments", payload=payload, code=500, user=self.user1)
-            self._send_post("/v1/news-comments", payload=payload, code=500, user=self.user2)
+            self._send_post("/v1/news-comments", payload=payload, code=422, user=self.admin)
+            self._send_post("/v1/news-comments", payload=payload, code=422, user=self.user1)
+            self._send_post("/v1/news-comments", payload=payload, code=422, user=self.user2)
 
     def test_create_news_comment(self):
         """Check create news_comment"""
@@ -84,17 +103,17 @@ class TestNewsComment(GeokretyTestCase):
             payload = _payload()
             self._send_post("/v1/news-comments", payload=payload, code=401)
 
-            payload['data']['attributes']['author_id'] = self.admin.id
+            payload = _payload(author_id=self.admin.id)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user2)
 
-            payload['data']['attributes']['author_id'] = self.user1.id
+            payload = _payload(author_id=self.user1.id)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user2)
 
-            payload['data']['attributes']['author_id'] = self.user2.id
+            payload = _payload(author_id=self.user2.id)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.admin)
             self._send_post("/v1/news-comments", payload=payload, code=403, user=self.user1)
             self._send_post("/v1/news-comments", payload=payload, code=201, user=self.user2)
@@ -103,8 +122,7 @@ class TestNewsComment(GeokretyTestCase):
         """Check create news_comment increment count on news"""
         with app.test_request_context():
             self._blend()
-            payload = _payload(news_id=2)
-            payload['data']['attributes']['author_id'] = self.admin.id
+            payload = _payload(news_id=2, author_id=self.admin.id)
 
             obj = safe_query(db, News, 'id', '2', 'news_id')
             self.assertEqual(obj.comments_count, 0)

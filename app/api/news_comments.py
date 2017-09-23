@@ -28,15 +28,12 @@ class NewsCommentList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
-        # Set author to current user by default
         user = current_identity
-        if 'author_id' not in data:
-            data['author_id'] = user.id
 
         # Check author_id
-        if not user.is_admin and not user.is_super_admin and data['author_id'] != user.id:
-            raise ForbiddenException({'parameter': 'author_id'}, 'Author {} must be yourself ({})'.format(
-                data['author_id'], user.id))
+        if not user.is_admin and not user.is_super_admin and data['author'] != user.id:
+            raise ForbiddenException({'parameter': 'author'}, 'Author {} must be yourself ({})'.format(
+                data['author'], user.id))
 
     def after_create_object(self, obj, data, view_kwargs):
         # Increment comment count on news
