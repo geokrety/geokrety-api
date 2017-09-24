@@ -8,7 +8,7 @@ Resources related to GeoKrety in the API.
 | Privilege level     | List    | View    | Create  | Update  | Delete  |
 |:--------------------|---------|---------|---------|---------|---------|
 | Anonymous           | ✓ [1]   | ✓ [1]   | ✗       | ✗       | ✗       |
-| Authenticated       | ✓ [1,2] | ✓ [1,2] | ✓ [1]   | ✓ [1]   | ✓ [1]   |
+| Authenticated       | ✓ [1,2] | ✓ [1,2] | ✓ [1]   | ✓ [1]   | ✗       |
 | Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
 
  - 1. Only public informations
@@ -22,8 +22,8 @@ Resources related to GeoKrety in the API.
 | **`tracking-code`**      | Tracking code (private key)               | string  | -        | **yes**  | - [1]   |
 | `name`                   | Geokrety name                             | string  | **yes**  | -        | **yes** |
 | `type`                   | Geokrety Type (See bellow)                | integer | **yes**  | -        | **yes** |
-| `missing`                | True if GeoKret is marked as missing      | boolean | -        | -        | **yes** |
 | `description`            | Geokrety mission                          | string  | -        | -        | **yes** |
+| `missing`                | True if GeoKret is marked as missing      | boolean | -        | **yes**  | **yes** |
 | `distance`               | Total distance traveled                   | integer | -        | **yes**  | **yes** |
 | `cache-count`            | Total cache visited                       | string  | -        | **yes**  | **yes** |
 | `pictures-count`         | Total GeoKret pictures                    | integer | -        | **yes**  | **yes** |
@@ -47,12 +47,311 @@ Resources related to GeoKrety in the API.
 
 **GeoKrety Relations:**
 
-| Parameter       | Type         | Description                           |
-|:----------------|--------------|---------------------------------------|
-| `owner`         | users        | User which created the GeoKret        |
-| `last-position` | move         | Last visited cache log                |
-| `last-log`      | move         | Last log                              |
-| `holder`        | users        | User which currently hold the GeoKret |
-| `avatar`        | pictures     | GeoKret picture avatar                |
+| Parameter       | Type         | Description                           | Readonly |
+|:----------------|--------------|---------------------------------------|----------|
+| `owner`         | users        | User which created the GeoKret        | **yes**  |
+| `last-position` | move         | Last visited cache log                | **yes**  |
+| `last-log`      | move         | Last log                              | **yes**  |
+| `holder`        | users        | User which currently hold the GeoKret | **yes**  |
+| `avatar`        | pictures     | GeoKret picture avatar                | -        |
 
 ---
+
+## GeoKrety Details [/v1/geokrety/{geokret_id}]
+
++ Parameters
+    + geokret_id: 1 (string) - ID of the GeoKret.
+
+### Get GeoKret [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+### Update GeoKret [PATCH]
+Update a single GeoKret by `id`.
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
+
+
+    + Attributes (object)
+        + `data` (geokrety-data-type, required)
+          + `attributes` (geokrety-attributes-write)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+### Delete GeoKret [DELETE]
+
+::: warning
+#### <i class="fa fa-warning"></i> Caution
+This will delete **all** GeoKret activity, including logs, comments and pictures.
+:::
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Deleted, required)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+## GeoKrety Collection [/v1/geokrety{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
+
+### Create a GeoKret [POST]
+
++ Request
+
+    + Attributes (object)
+        + `attributes` (geokrety-attributes-write)
+        - `relationships` (object)
+            - `owner` (object)
+                - `data` (object, required)
+                    - `type`: user (string, required, fixed)
+                    - `id`: 1 (string, required)
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
+            Accept: application/vnd.api+json
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
+
+### List all GeoKrety [GET]
+Retrieve paginated list of GeoKrety.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
+
+
+## List GeoKrety owned by User [/v1/users/{user_id}/geokrety/owned{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
++ Parameters
+    + user_id: 1 (string) - ID of the user id in the form of an integer
+
+### List GeoKrety owned by User [GET]
+Retrieve paginated list of GeoKrety.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
+
+
+## List GeoKrety in User's inventory [/v1/users/{user_id}/geokrety/inventory{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
++ Parameters
+    + user_id: 1 (string) - ID of the user id in the form of an integer
+
+### List GeoKrety in User's inventory [GET]
+Retrieve paginated list of GeoKrety.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
+
+
+## List GeoKrety in User's watch list [/v1/users/{user_id}/geokrety/watched{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
++ Parameters
+    + user_id: 1 (string) - ID of the user id in the form of an integer
+
+### List GeoKrety in User's watch list [GET]
+Retrieve paginated list of GeoKrety.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (geokrety-links, required)
+
+
+
+# Data Structures
+
+## `geokrety-data-type` (object)
+- `type`: `geokrety` (string, required)
+- `id`: `1` (string, required)
+
+## `geokrety-links` (object)
+- `self`: `/geokrety/1` (string, required)
+
+## `geokrety-attributes-write` (object)
+- `name`: `GeoKret name` (string, required)
+- `type`: `0` (enum, required)
+  - `0`
+  - `1`
+  - `2`
+  - `3`
+  - `4`
+- `description`: `Geokrety mission` (string)
+
+## `geokrety-attributes` (geokrety-attributes-write)
+- `tracking-code`: `XFS125` (string)
+- `missing`: `false` (boolean)
+- `distance`: `12` (number)
+- `cache-count`: `8` (number)
+- `pictures-count`: `82` (number)
+- `created-on-date-time`: `2007-10-25T12:10:22` (string)
+- `updated-on-date-time`: `2007-10-26T18:31:20` (string)
+
+## `geokrety-owner` (object)
+  - `links` (geokrety-links)
+    - `related`: `/geokrety/1/relationship/owner` (string, required)
+
+## `geokrety-last-position` (object)
+  - `links` (geokrety-links)
+    - `related`: `/geokrety/1/relationship/last-position` (string)
+
+## `geokrety-last-log` (object)
+  - `links` (geokrety-links)
+    - `related`: `/geokrety/1/relationship/last-log` (string)
+
+## `geokrety-holder` (object)
+  - `links` (geokrety-links)
+    - `related`: `/geokrety/1/relationship/holder` (string)
+
+## `geokrety-avatar` (object)
+  - `links` (geokrety-links)
+    - `related`: `/geokrety/1/relationship/avatar` (string)
+
+## `geokrety-relationships` (object)
+- `owner` (geokrety-owner)
+- `last-position` (geokrety-last-position)
+- `last-log` (geokrety-last-log)
+- `holder` (geokrety-holder)
+- `avatar` (geokrety-avatar)
+
+## `geokrety-data` (geokrety-data-type)
+- `attributes` (geokrety-attributes, required)
+- `relationships` (geokrety-relationships, optional)
+- `links` (geokrety-links, required)
