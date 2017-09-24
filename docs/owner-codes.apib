@@ -1,0 +1,35 @@
+# Group Owner Codes
+Resources related to Owner Codes in the API.
+
+TODO: need to define endpoint for adoption
+
+---
+
+**Owner Codes endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✗       | ✗       | ✗       | ✗       | ✗       |
+| Authenticated       | ✗       | ✗       | ✗       | ✗       | ✗       |
+| Administrators      | ✓       | ✓       | ✓       | ✗       | ✓       |
+
+---
+
+**Owner Codes attributes:**
+
+| Parameter               | Description                                  | Type    | Required | Readonly | Public  |
+|:------------------------|----------------------------------------------|---------|----------|----------|---------|
+| `code`                  | GeoKret adoption secret code                 | string  | **yes**  | -        | -       |
+| `generated-on-date-time`| Generated on date time                       | date    | -        | **yes**  | -       |
+| `claimed-on-date-time`  | Claimed on date time                         | date    | -        | **yes**  | -       |
+
+---
+
+**Owner Codes Relations:**
+
+| Parameter       | Type         | Description                           | Required |
+|:----------------|--------------|---------------------------------------|----------|
+| `user`          | users        | User who adopted the Geokret          | -        |
+| `geokret`       | geokret      | GeoKret which is to adoption          | **yes**  |
+
+---

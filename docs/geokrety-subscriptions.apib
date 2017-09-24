@@ -1,0 +1,32 @@
+# Group GeoKrety Subscriptions
+Resources related to GeoKrety Subscriptions in the API.
+
+---
+
+**GeoKrety Subscriptions endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✓       | ✓       | ✗       | ✗       | ✗       |
+| Authenticated       | ✓       | ✓       | ✓       | ✗       | ✓ [1]   |
+| Administrators      | ✓       | ✓       | ✓       | ✗       | ✓       |
+
+ - 1. Only self-owned informations
+
+---
+
+**GeoKrety Subscriptions attributes:**
+
+| Parameter             | Description                                  | Type    | Required | Readonly | Public  |
+|:----------------------|----------------------------------------------|---------|----------|----------|---------|
+
+---
+
+**GeoKrety Subscriptions Relations:**
+
+| Parameter       | Type         | Description                           | Required |
+|:----------------|--------------|---------------------------------------|----------|
+| `user`          | users        | User which is subscribed              | -        |
+| `geokret`       | geokret      | GeoKret which was subscribed          | **yes**  |
+
+---

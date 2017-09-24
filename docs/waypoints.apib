@@ -1,0 +1,36 @@
+# Group Waypoints
+Resources related to Waypoints in the API.
+
+Filled when synchronizing with other networks.
+
+---
+
+**Waypoints endpoints permissions:**
+
+TODO: Users will need to lookup by waypoint, when filling `ruchy.php`
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✗       | ✗       | ✗       | ✗       | ✗       |
+| Authenticated       | ✗       | ✗       | ✗       | ✗       | ✗       |
+| Administrators      | ✓       | ✓       | ✓       | ✗       | ✓       |
+
+---
+
+**Waypoints attributes:**
+
+| Parameter               | Description                                  | Type    | Required | Readonly | Public  |
+|:------------------------|----------------------------------------------|---------|----------|----------|---------|
+| `latitude`              | Waypoint position                            | double  | **yes**  | -        | -       |
+| `longitude`             | Waypoint position                            | double  | **yes**  | -        | -       |
+| `altitude`              | Altitude of the position (m)                 | integer | -        | **yes**  | -       |
+| `country`               | Country of the position                      | string  | -        | **yes**  | -       |
+| `name`                  | Cache name                                   | string  | **yes**  | -        | -       |
+| `owner`                 | Cache owner                                  | string  | **yes**  | -        | -       |
+| `type`                  | Cache type                                   | string  | **yes**  | -        | -       |
+| `country-name`          | Country full name                            | string  | **yes**  | -        | -       |
+| `link`                  | Link to the cache                            | string  | **yes**  | -        | -       |
+| `status`                | Cache current status                         | integer | **yes**  | -        | -       |
+| `updated-on-date-time`  | Updated on date time                         | date    | -        | **yes**  | -       |
+
+---

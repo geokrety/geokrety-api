@@ -1,0 +1,46 @@
+# Group Moves Comments
+Resources related to Moves Comments in the API.
+
+---
+
+**Moves Comments endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✓       | ✓       | ✗       | ✗       | ✗       |
+| Authenticated       | ✓       | ✓       | ✓       | ✓ [1]   | ✓ [1]   |
+| Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
+
+ - 1. Only self-owned informations
+ 
+---
+
+**Moves Comments attributes:**
+
+| Parameter             | Description                                  | Type    | Required | Readonly | Public  |
+|:----------------------|----------------------------------------------|---------|----------|----------|---------|
+| `comment`             | User comment on the move                     | string  | **yes**  | -        | **yes** |
+| `type`                | Type of comment (See bellow)                 | integer | **yes**  | -        | **yes** |
+| `created-on-date-time`| Creation on date time                        | date    | -        | **yes**  | **yes** |
+| `updated-on-date-time`| Updated on date time                         | date    | -        | **yes**  | **yes** |
+
+---
+
+**Moves Comments Types:**
+
+| Type       | Description   |
+|:-----------|---------------|
+| `0`        | Same entry    |
+| `1`        | Missing       |
+
+---
+
+**Moves Comments Relations:**
+
+| Parameter       | Type         | Description                           | Required |
+|:----------------|--------------|---------------------------------------|----------|
+| `move`          | move         | Commented move                        | **yes**  |
+| `author`        | users        | User which created the move           | -        |
+| `geokret`       | geokret      | GeoKret which was moved               | **yes**  |
+
+---

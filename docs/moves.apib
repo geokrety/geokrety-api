@@ -1,0 +1,65 @@
+# Group Moves
+Resources related to moves in the API.
+
+---
+
+**Moves endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✓       | ✓       | ✓       | ✗       | ✗       |
+| Authenticated       | ✓       | ✓       | ✓       | ✓ [1,2] | ✓ [1,2] |
+| Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
+
+ - 1. Only self-owned informations
+ - 2. Only on Owned GeoKrety
+---
+
+**Moves attributes:**
+
+| Parameter             | Description                                  | Type    | Required       | Readonly | Public  |
+|:----------------------|----------------------------------------------|---------|----------------|----------|---------|
+| **`tracking-code`**   | GeoKret tracking code used to authenticate the move| integer | **yes** [1,3]| -    | -       |
+| `move-type`           | Type of movement (See bellow)                | integer | **yes**        | -        | **yes** |
+| `waypoint`            | Code of the position waypoint                | string  | **yes** [1]    | -        | **yes** |
+| `latitude`            | Postion when GeoKret was dropped/visited     | double  | **yes** [1]    | -        | **yes** |
+| `longitude`           | Postion when GeoKret was dropped/visited     | double  | **yes** [1]    | -        | **yes** |
+| `comment`             | User comment when moving GeoKret             | string  | **recommended**| -        | **yes** |
+| `username`            | Override displayed username. (Anonymous only)| string  | **yes** [2]    | -        | **yes** |
+| `application`         | Application name used to post this move      | string  | **recommended**| -        | **yes** |
+| `application-version` | Application version used to post this move   | string  | **recommended**| -        | **yes** |
+| `altitude`            | Altitude of the position (m)                 | integer | -              | **yes**  | **yes** |
+| `country`             | Country of the position                      | string  | -              | **yes**  | **yes** |
+| `distance`            | Distance with last position (km)             | integer | -              | **yes**  | **yes** |
+| `comments-count`      | Comments count on this move                  | integer | -              | **yes**  | **yes** |
+| `pictures-count`      | Total Move pictures                          | integer | -              | **yes**  | **yes** |
+| `created-on-date-time`| Creation on date time                        | date    | -              | **yes**  | **yes** |
+| `updated-on-date-time`| Updated on date time                         | date    | -              | **yes**  | **yes** |
+
+ - 1. Only for certain move types (See bellow)
+ - 2. Only when unauthenticated
+ - 3. Write only!
+
+---
+
+**Moves Types:**
+
+| Type       | Description   | Require waypoint | Require Tracking-Code |
+|:-----------|---------------|------------------|-----------------------|
+| `0`        | Dropped to    | **yes**          | **yes**               |
+| `1`        | Grabbed from  | -                | **yes**               |
+| `2`        | A comment     | -                | -                     |
+| `3`        | Seen in       | **yes**          | **yes**               |
+| `4`        | Archived      | -                | **yes**               |
+| `5`        | Visiting      | **yes**          | **yes**               |
+
+---
+
+**Moves Relations:**
+
+| Parameter       | Type         | Description                           | Link mode                     |
+|:----------------|--------------|---------------------------------------|-------------------------------|
+| `author`        | users        | User which created the move           | Automatic from connected user |
+| `geokret`       | geokret      | GeoKret which was moved               | Automatic from tracking-code  |
+
+---

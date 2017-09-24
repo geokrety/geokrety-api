@@ -1,0 +1,58 @@
+# Group GeoKrety
+Resources related to GeoKrety in the API.
+
+---
+
+**GeoKrety endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✓ [1]   | ✓ [1]   | ✗       | ✗       | ✗       |
+| Authenticated       | ✓ [1,2] | ✓ [1,2] | ✓ [1]   | ✓ [1]   | ✓ [1]   |
+| Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
+
+ - 1. Only public informations
+ - 2. Only self-owned informations
+---
+
+**GeoKrety attributes:**
+
+| Parameter                | Description                               | Type    | Required | Readonly | Public  |
+|:-------------------------|-------------------------------------------|---------|----------|----------|---------|
+| **`tracking-code`**      | Tracking code (private key)               | string  | -        | **yes**  | - [1]   |
+| `name`                   | Geokrety name                             | string  | **yes**  | -        | **yes** |
+| `type`                   | Geokrety Type (See bellow)                | integer | **yes**  | -        | **yes** |
+| `missing`                | True if GeoKret is marked as missing      | boolean | -        | -        | **yes** |
+| `description`            | Geokrety mission                          | string  | -        | -        | **yes** |
+| `distance`               | Total distance traveled                   | integer | -        | **yes**  | **yes** |
+| `cache-count`            | Total cache visited                       | string  | -        | **yes**  | **yes** |
+| `pictures-count`         | Total GeoKret pictures                    | integer | -        | **yes**  | **yes** |
+| `created-on-date-time`   | Creation on date time                     | date    | -        | **yes**  | **yes** |
+| `updated-on-date-time`   | Updated on date time                      | date    | -        | **yes**  | **yes** |
+
+ - 1. Only self-owned GeoKret, or already grabbed/seen moves
+---
+
+**GeoKrety Types:**
+
+| Type       | Description   |
+|:-----------|---------------|
+| `0`        | Traditional   |
+| `1`        | A book/CD/DVD |
+| `2`        | A Human       |
+| `3`        | A coin        |
+| `4`        | KretyPost     |
+
+---
+
+**GeoKrety Relations:**
+
+| Parameter       | Type         | Description                           |
+|:----------------|--------------|---------------------------------------|
+| `owner`         | users        | User which created the GeoKret        |
+| `last-position` | move         | Last visited cache log                |
+| `last-log`      | move         | Last log                              |
+| `holder`        | users        | User which currently hold the GeoKret |
+| `avatar`        | pictures     | GeoKret picture avatar                |
+
+---

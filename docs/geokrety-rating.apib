@@ -1,0 +1,32 @@
+# Group GeoKrety Rating
+Resources related to GeoKrety Rating in the API.
+
+---
+
+**GeoKrety Rating endpoints permissions:**
+
+| Privilege level     | List    | View    | Create  | Update  | Delete  |
+|:--------------------|---------|---------|---------|---------|---------|
+| Anonymous           | ✓       | ✓       | ✗       | ✗       | ✗       |
+| Authenticated       | ✓       | ✓       | ✓       | ✓ [1]   | ✓ [1]   |
+| Administrators      | ✓       | ✓       | ✓       | ✓       | ✓       |
+
+ - 1. Only self-owned informations
+---
+
+**GeoKrety Rating attributes:**
+
+| Parameter             | Description                                  | Type    | Required | Readonly | Public  |
+|:----------------------|----------------------------------------------|---------|----------|----------|---------|
+| `rate`                | GeoKret rate                                 | integer | **yes**  | -        | **yes** |
+
+---
+
+**GeoKrety Rating Relations:**
+
+| Parameter       | Type         | Description                           | Required |
+|:----------------|--------------|---------------------------------------|----------|
+| `author`        | users        | User which created the move           | -        |
+| `geokret`       | geokret      | GeoKret which was moved               | **yes**  |
+
+---
