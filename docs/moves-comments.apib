@@ -65,7 +65,8 @@ Resources related to Moves Comments in the API.
     + Attributes (object)
         + `data` (moves-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/moves-comments`
 
 + Response 404 (application/json)
 
@@ -93,7 +94,8 @@ User himself or Administrators
     + Attributes (object)
         + `data` (moves-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/moves-comments`
 
 + Response 401 (application/json)
 
@@ -179,7 +181,8 @@ If no user specified, currently connected user will be used.
     + Attributes (object)
         + `data` (moves-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/moves-comments`
 
 + Response 401 (application/json)
 
@@ -216,7 +219,8 @@ Retrieve paginated list of Moves Comments.
         + `meta` (meta, required)
         + `data` (array[moves-comments-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/moves-comments`
 
 + Response 401 (application/json)
 

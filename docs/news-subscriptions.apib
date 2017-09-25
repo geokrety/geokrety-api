@@ -60,7 +60,8 @@ Get a single microlocation.
     + Attributes (object)
         + `data` (news-subscriptions-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
 
 + Response 404 (application/json)
 
@@ -127,7 +128,8 @@ If not user specified, currently connected user will be used.
     + Attributes (object)
         + `data` (news-subscriptions-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
 
 + Response 401 (application/json)
 
@@ -166,7 +168,8 @@ This is reserved to Administrators.
         + `meta` (meta, required)
         + `data` (array[news-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
 
 + Response 401 (application/json)
 
@@ -204,7 +207,8 @@ Retrieve subscription list.
         + `meta` (meta, required)
         + `data` (array[news-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
 
 + Response 401 (application/json)
 
@@ -246,7 +250,8 @@ Retrieve subscription list.
         + `meta` (meta, required)
         + `data` (array[news-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
 
 + Response 401 (application/json)
 

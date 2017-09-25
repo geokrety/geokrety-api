@@ -50,7 +50,8 @@ Resources related to GeoKrety Subscriptions in the API.
     + Attributes (object)
         + `data` (geokrety-subscriptions-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
 
 + Response 404 (application/json)
 
@@ -121,7 +122,8 @@ If no user specified, currently connected user will be used.
     + Attributes (object)
         + `data` (geokrety-subscriptions-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
 
 + Response 401 (application/json)
 
@@ -163,7 +165,8 @@ This is reserved to Administrators.
         + `meta` (meta, required)
         + `data` (array[geokrety-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
 
 + Response 401 (application/json)
 
@@ -201,7 +204,8 @@ Retrieve subscription list.
         + `meta` (meta, required)
         + `data` (array[geokrety-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
 
 + Response 401 (application/json)
 
@@ -243,7 +247,8 @@ Retrieve subscription list.
         + `meta` (meta, required)
         + `data` (array[geokrety-subscriptions-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-subscriptions-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
 
 + Response 401 (application/json)
 

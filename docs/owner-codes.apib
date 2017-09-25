@@ -56,7 +56,8 @@ TODO: need to define endpoint for adoption
     + Attributes (object)
         + `data` (owner-codes-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (owner-codes-links, required)
+        + `links` (object, required)
+            + `self`: `/owner-codes`
 
 + Response 404 (application/json)
 
@@ -118,7 +119,8 @@ Delete a single Owner Code.
     + Attributes (object)
         + `data` (owner-codes-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (owner-codes-links, required)
+        + `links` (object, required)
+            + `self`: `/owner-codes`
 
 + Response 401 (application/json)
 
@@ -155,7 +157,8 @@ Retrieve paginated list of Owner Codes.
         + `meta` (meta, required)
         + `data` (array[owner-codes-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (owner-codes-links, required)
+        + `links` (object, required)
+            + `self`: `/owner-codes`
 
 + Response 401 (application/json)
 
@@ -187,7 +190,8 @@ Retrieve paginated list of Owner Codes.
     + Attributes (object)
         + `data` (owner-codes-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (owner-codes-links, required)
+        + `links` (object, required)
+            + `self`: `/owner-codes`
 
 + Response 404 (application/json)
 

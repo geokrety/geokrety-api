@@ -69,7 +69,8 @@ Resources related to users in the API.
     + Attributes (object)
         + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 404 (application/json)
 
@@ -88,7 +89,7 @@ Resources related to users in the API.
     + Attributes (object)
         + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (users-links, required)
 
 + Response 404 (application/json)
 
@@ -117,7 +118,8 @@ User himself or Administrators
     + Attributes (object)
         + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 401 (application/json)
 
@@ -193,7 +195,8 @@ Create a user account.
     + Attributes (object)
         + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 401 (application/json)
 
@@ -226,7 +229,8 @@ Retrieve users list.
         + `meta` (meta, required)
         + `data` (array[users-data-public])
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 
 ## News Author [/v1/news/{news_id}/author]
@@ -250,7 +254,8 @@ Get the author for a news.
     + Attributes (object)
         + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 404 (application/json)
 
@@ -269,7 +274,8 @@ Get the author for a news.
     + Attributes (object)
         + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 404 (application/json)
 
@@ -299,7 +305,8 @@ Get the author for a news comment.
     + Attributes (object)
         + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 404 (application/json)
 
@@ -318,7 +325,8 @@ Get the author for a news comment.
     + Attributes (object)
         + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (user-links, required)
+        + `links` (object, required)
+          + `self`: `/users`
 
 + Response 404 (application/json)
 

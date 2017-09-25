@@ -55,7 +55,8 @@ Get a single microlocation.
     + Attributes (object)
         + `data` (news-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/news-comments`
 
 + Response 404 (application/json)
 
@@ -94,7 +95,8 @@ Update a single news by `id`.
     + Attributes (object)
         + `data` (news-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/news-comments`
 
 + Response 401 (application/json)
 
@@ -170,7 +172,8 @@ Delete a single News.
     + Attributes (object)
         + `data` (news-comments-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/news-comments`
 
 + Response 401 (application/json)
 
@@ -199,7 +202,8 @@ Retrieve paginated list of News Comments.
         + `meta` (meta, required)
         + `data` (array[news-comments-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (news-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/news-comments`
 
 
 
@@ -229,7 +233,8 @@ Retrieve news list.
         + `meta` (meta, required)
         + `data` (array[news-comments-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (news-comments-links, required)
+        + `links` (object, required)
+            + `self`: `/news-comments`
 
 
 # Data Structures

@@ -54,7 +54,8 @@ Resources related to news.
     + Attributes (object)
         + `data` (news-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-links, required)
+        + `links` (object, required)
+            + `self`: `/news`
 
 + Response 404 (application/json)
 
@@ -87,7 +88,8 @@ Update a single news by `id`.
     + Attributes (object)
         + `data` (news-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-links, required)
+        + `links` (object, required)
+            + `self`: `/news`
 
 + Response 401 (application/json)
 
@@ -152,7 +154,8 @@ Delete a single News.
     + Attributes (object)
         + `data` (news-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (news-links, required)
+        + `links` (object, required)
+            + `self`: `/news`
 
 
 ### List all news [GET]
@@ -177,7 +180,8 @@ Retrieve paginated list of news.
         + `meta` (meta, required)
         + `data` (array[news-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (news-links, required)
+        + `links` (object, required)
+            + `self`: `/news`
 
 
 
@@ -208,7 +212,8 @@ Retrieve paginated list of news.
         + `meta` (meta, required)
         + `data` (array[news-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (news-links, required)
+        + `links` (object, required)
+            + `self`: `/news`
 
 
 

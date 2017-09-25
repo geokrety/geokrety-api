@@ -51,7 +51,8 @@ Resources related to GeoKrety Rating in the API.
     + Attributes (object)
         + `data` (geokrety-rating-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 + Response 404 (application/json)
 
@@ -79,7 +80,8 @@ Update a single GeoKret Rate by `id`.
     + Attributes (object)
         + `data` (geokrety-rating-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 + Response 401 (application/json)
 
@@ -149,7 +151,8 @@ Delete a single GeoKret Rate.
     + Attributes (object)
         + `data` (geokrety-rating-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 
 ### List all geokrety-rating [GET]
@@ -174,7 +177,8 @@ Retrieve paginated list of geokrety-rating.
         + `meta` (meta, required)
         + `data` (array[geokrety-rating-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 
 
@@ -205,7 +209,8 @@ Retrieve paginated list of GeoKrety Rates.
         + `meta` (meta, required)
         + `data` (array[geokrety-rating-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 
 
@@ -236,7 +241,8 @@ Retrieve paginated list of GeoKrety Rates.
         + `meta` (meta, required)
         + `data` (array[geokrety-rating-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-rating-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-rating`
 
 
 

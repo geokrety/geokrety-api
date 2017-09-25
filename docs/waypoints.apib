@@ -55,7 +55,8 @@ TODO: Users will need to lookup by waypoint, when filling `ruchy.php`
     + Attributes (object)
         + `data` (waypoints-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (waypoints-links, required)
+        + `links` (object, required)
+            + `self`: `/waypoints`
 
 + Response 404 (application/json)
 
@@ -112,7 +113,8 @@ Delete a single Waypoint.
     + Attributes (object)
         + `data` (waypoints-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (waypoints-links, required)
+        + `links` (object, required)
+            + `self`: `/waypoints`
 
 + Response 401 (application/json)
 
@@ -149,7 +151,8 @@ Retrieve paginated list of Waypoints.
         + `meta` (meta, required)
         + `data` (array[waypoints-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (waypoints-links, required)
+        + `links` (object, required)
+            + `self`: `/waypoints`
 
 + Response 401 (application/json)
 
@@ -164,7 +167,7 @@ Retrieve paginated list of Waypoints.
 # Data Structures
 
 ## `waypoints-data-type` (object)
-- `type`: `move-comment` (string, required)
+- `type`: `waypoint` (string, required)
 - `id`: `1` (string, required)
 
 ## `waypoints-links` (object)

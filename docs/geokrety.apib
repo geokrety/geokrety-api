@@ -65,7 +65,8 @@ Resources related to GeoKrety in the API.
     + Attributes (object)
         + `data` (geokrety-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 + Response 404 (application/json)
 
@@ -93,7 +94,8 @@ Update a single GeoKret by `id`.
     + Attributes (object)
         + `data` (geokrety-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 + Response 401 (application/json)
 
@@ -162,7 +164,8 @@ This will delete **all** GeoKret activity, including logs, comments and pictures
     + Attributes (object)
         + `data` (geokrety-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 
 ### List all GeoKrety [GET]
@@ -187,7 +190,8 @@ Retrieve paginated list of GeoKrety.
         + `meta` (meta, required)
         + `data` (array[geokrety-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 
 
@@ -218,7 +222,8 @@ Retrieve paginated list of GeoKrety.
         + `meta` (meta, required)
         + `data` (array[geokrety-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 
 
@@ -249,7 +254,8 @@ Retrieve paginated list of GeoKrety.
         + `meta` (meta, required)
         + `data` (array[geokrety-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 
 
@@ -280,7 +286,8 @@ Retrieve paginated list of GeoKrety.
         + `meta` (meta, required)
         + `data` (array[geokrety-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
 
 
 

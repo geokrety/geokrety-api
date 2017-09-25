@@ -63,7 +63,8 @@ Currently known types.
     + Attributes (object)
         + `data` (geokrety-types-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-types-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-types`
 
 + Response 404 (application/json)
 
@@ -91,7 +92,8 @@ Update a single GeoKrety Type by `id`.
     + Attributes (object)
         + `data` (geokrety-types-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-types-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-types`
 
 + Response 401 (application/json)
 
@@ -155,7 +157,8 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
     + Attributes (object)
         + `data` (geokrety-types-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-types-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-types`
 
 
 ### List all GeoKrety Type [GET]
@@ -180,7 +183,8 @@ Retrieve paginated list of GeoKrety Type.
         + `meta` (meta, required)
         + `data` (array[geokrety-types-data])
         + `jsonapi` (jsonapi, required)
-        + `links` (geokrety-types-links, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-types`
 
 
 

@@ -83,7 +83,8 @@ Resources related to moves in the API.
     + Attributes (object)
         + `data` (moves-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 404 (application/json)
 
@@ -111,7 +112,8 @@ User himself or Administrators
     + Attributes (object)
         + `data` (moves-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 401 (application/json)
 
@@ -197,7 +199,8 @@ If no user specified, currently connected user will be used.
     + Attributes (object)
         + `data` (moves-data, required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 401 (application/json)
 
@@ -234,7 +237,8 @@ Retrieve paginated list of GeoKrety Moves.
         + `meta` (meta, required)
         + `data` (array[moves-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 401 (application/json)
 
@@ -273,7 +277,8 @@ Retrieve paginated list of GeoKrety Moves.
         + `meta` (meta, required)
         + `data` (array[moves-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 401 (application/json)
 
@@ -311,7 +316,8 @@ Retrieve paginated list of GeoKrety Moves.
         + `meta` (meta, required)
         + `data` (array[moves-data], required)
         + `jsonapi` (jsonapi, required)
-        + `links` (moves-links, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 401 (application/json)
 
