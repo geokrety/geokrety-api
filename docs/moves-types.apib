@@ -1,9 +1,9 @@
-# Group GeoKrety Types
+# Group Moves Types
 Resources related to GeoKrety in the API.
 
 ---
 
-**GeoKrety Types endpoints permissions:**
+**Moves Types endpoints permissions:**
 
 | Privilege level     | List    | View    | Create  | Update  | Delete  |
 |:--------------------|---------|---------|---------|---------|---------|
@@ -13,42 +13,41 @@ Resources related to GeoKrety in the API.
 
 ---
 
-**GeoKrety Types attributes:**
+**Moves Types attributes:**
 
 | Parameter                | Description                               | Type    | Required | Readonly | Public  |
 |:-------------------------|-------------------------------------------|---------|----------|----------|---------|
-| `name`                   | Geokrety type name                        | string  | **yes**  | -        | **yes** |
+| `name`                   | Moves Type name                           | string  | **yes**  | -        | **yes** |
 
 ---
 
-**GeoKrety Types:**
+**Moves Types:**
 
-Currently known types.
-
-| Type       | Description   |
-|:-----------|---------------|
-| `0`        | Traditional   |
-| `1`        | A book/CD/DVD |
-| `2`        | A Human       |
-| `3`        | A coin        |
-| `4`        | KretyPost     |
+| Type       | Description   | Require waypoint | Require Tracking-Code |
+|:-----------|---------------|------------------|-----------------------|
+| `0`        | Dropped to    | **yes**          | **yes**               |
+| `1`        | Grabbed from  | -                | **yes**               |
+| `2`        | A comment     | -                | -                     |
+| `3`        | Seen in       | **yes**          | **yes**               |
+| `4`        | Archived      | -                | **yes**               |
+| `5`        | Visiting      | **yes**          | **yes**               |
 
 ---
 
-**GeoKrety Types Relations:**
+**Moves Types Relations:**
 
 | Parameter       | Type         | Description                           |
 |:----------------|--------------|---------------------------------------|
-| `geokrety`      | geokrety     | User which are of the type            |
+| `move`          | moves        | Moves which are of the type            |
 
 ---
 
-## GeoKrety Type Details [/v1/geokrety-types/{geokrety_types_id}]
+## Moves Type Details [/v1/moves-types/{moves_types_id}]
 
 + Parameters
-    + geokrety_types_id: 1 (string) - ID of the GeoKrety Types.
+    + moves_types_id: 1 (string) - ID of the Moves Types.
 
-### Get GeoKrety Type [GET]
+### Get Moves Type [GET]
 
 
 + Request
@@ -61,18 +60,18 @@ Currently known types.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (geokrety-types-data, required)
+        + `data` (moves-types-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
-            + `self`: `/geokrety-types`
+            + `self`: `/moves-types`
 
 + Response 404 (application/json)
 
     + Attributes (Error 404)
 
 
-### Update GeoKrety Type [PATCH]
-Update a single GeoKrety Type by `id`.
+### Update Moves Type [PATCH]
+Update a single Moves Type by `id`.
 
 
 + Request
@@ -84,16 +83,16 @@ Update a single GeoKrety Type by `id`.
 
 
     + Attributes (object)
-        + `data` (geokrety-types-data-type, required)
-          + `attributes` (geokrety-types-attributes)
+        + `data` (moves-types-data-type, required)
+          + `attributes` (moves-types-attributes)
 
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (geokrety-types-data, required)
+        + `data` (moves-types-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
-            + `self`: `/geokrety-types`
+            + `self`: `/moves-types`
 
 + Response 401 (application/json)
 
@@ -109,7 +108,7 @@ Update a single GeoKrety Type by `id`.
 
 
 
-### Delete GeoKrety Type [DELETE]
+### Delete Moves Type [DELETE]
 
 ::: warning
 #### <i class="fa fa-warning"></i> Caution
@@ -136,15 +135,15 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
     + Attributes (Error 404)
 
 
-## GeoKrety Collection [/v1/geokrety-types{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## GeoKrety Collection [/v1/moves-types{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 
-### Create a GeoKrety Type [POST]
+### Create a Moves Type [POST]
 
 + Request
 
     + Attributes (object)
-        + `attributes` (geokrety-types-attributes)
+        + `attributes` (moves-types-attributes)
 
     + Headers
 
@@ -155,14 +154,14 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
 + Response 201 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (geokrety-types-data, required)
+        + `data` (moves-types-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
-            + `self`: `/geokrety-types`
+            + `self`: `/moves-types`
 
 
-### List all GeoKrety Type [GET]
-Retrieve paginated list of GeoKrety Type.
+### List all Moves Type [GET]
+Retrieve paginated list of Moves Type.
 
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
@@ -181,36 +180,36 @@ Retrieve paginated list of GeoKrety Type.
 
     + Attributes (object)
         + `meta` (meta, required)
-        + `data` (array[geokrety-types-data])
+        + `data` (array[moves-types-data])
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
-            + `self`: `/geokrety-types`
+            + `self`: `/moves-types`
 
 
 
 # Data Structures
 
-## `geokrety-types-data-type` (object)
+## `moves-types-data-type` (object)
 - `type`: `geokrety-type` (string, required)
 - `id`: `1` (string, required)
 
-## `geokrety-types-links` (object)
-- `self`: `/geokrety-types/1` (string, required)
+## `moves-types-links` (object)
+- `self`: `/moves-types/1` (string, required)
 
-## `geokrety-types-related` (object)
-- `related`: `/geokrety-types/1` (string, required)
+## `moves-types-related` (object)
+- `related`: `/moves-types/1` (string, required)
 
-## `geokrety-types-attributes` (object)
+## `moves-types-attributes` (object)
 - `name`: `Traditional` (string, required)
 
-## `geokrety-types-geokrety` (object)
+## `moves-types-geokrety` (object)
 - `links` (geokrety-related)
-  - `self`: `/geokrety-types/1/relationships/geokrety` (string)
+  - `self`: `/moves-types/1/relationships/geokrety` (string)
 
-## `geokrety-types-relationships` (object)
-- `geokrety` (geokrety-types-geokrety)
+## `moves-types-relationships` (object)
+- `geokrety` (moves-types-geokrety)
 
-## `geokrety-types-data` (geokrety-types-data-type)
-- `attributes` (geokrety-types-attributes, required)
-- `relationships` (geokrety-types-relationships, optional)
-- `links` (geokrety-types-links, required)
+## `moves-types-data` (moves-types-data-type)
+- `attributes` (moves-types-attributes, required)
+- `relationships` (moves-types-relationships, optional)
+- `links` (moves-types-links, required)
