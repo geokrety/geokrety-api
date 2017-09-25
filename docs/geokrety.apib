@@ -21,7 +21,6 @@ Resources related to GeoKrety in the API.
 |:-------------------------|-------------------------------------------|---------|----------|----------|---------|
 | **`tracking-code`**      | Tracking code (private key)               | string  | -        | **yes**  | - [1]   |
 | `name`                   | Geokrety name                             | string  | **yes**  | -        | **yes** |
-| `type`                   | Geokrety Type (See bellow)                | integer | **yes**  | -        | **yes** |
 | `description`            | Geokrety mission                          | string  | -        | -        | **yes** |
 | `missing`                | True if GeoKret is marked as missing      | boolean | -        | **yes**  | **yes** |
 | `distance`               | Total distance traveled                   | integer | -        | **yes**  | **yes** |
@@ -33,27 +32,16 @@ Resources related to GeoKrety in the API.
  - 1. Only self-owned GeoKret, or already grabbed/seen moves
 ---
 
-**GeoKrety Types:**
-
-| Type       | Description   |
-|:-----------|---------------|
-| `0`        | Traditional   |
-| `1`        | A book/CD/DVD |
-| `2`        | A Human       |
-| `3`        | A coin        |
-| `4`        | KretyPost     |
-
----
-
 **GeoKrety Relations:**
 
-| Parameter       | Type         | Description                           | Readonly |
-|:----------------|--------------|---------------------------------------|----------|
-| `owner`         | users        | User which created the GeoKret        | **yes**  |
-| `last-position` | move         | Last visited cache log                | **yes**  |
-| `last-log`      | move         | Last log                              | **yes**  |
-| `holder`        | users        | User which currently hold the GeoKret | **yes**  |
-| `avatar`        | pictures     | GeoKret picture avatar                | -        |
+| Parameter       | Type           | Description                           | Readonly |
+|:----------------|----------------|---------------------------------------|----------|
+| `owner`         | users          | User which created the GeoKret        | **yes**  |
+| `last-position` | move           | Last visited cache log                | **yes**  |
+| `last-log`      | move           | Last log                              | **yes**  |
+| `holder`        | users          | User which currently hold the GeoKret | **yes**  |
+| `avatar`        | pictures       | GeoKret picture avatar                | -        |
+| `type`          | geokrety-types | GeoKret Type                          | -        |
 
 ---
 
@@ -307,12 +295,6 @@ Retrieve paginated list of GeoKrety.
 
 ## `geokrety-attributes-write` (object)
 - `name`: `GeoKret name` (string, required)
-- `type`: `0` (enum, required)
-  - `0`
-  - `1`
-  - `2`
-  - `3`
-  - `4`
 - `description`: `Geokrety mission` (string)
 
 ## `geokrety-attributes` (geokrety-attributes-write)
@@ -344,7 +326,12 @@ Retrieve paginated list of GeoKrety.
   - `links` (geokrety-links)
     - `related`: `/geokrety/1/relationship/avatar` (string)
 
+## `geokrety-type` (object)
+- `links` (geokrety-types-related)
+  - `self`: `/geokrety/1/relationships/geokrety-type` (string)
+
 ## `geokrety-relationships` (object)
+- `type` (geokrety-type)
 - `owner` (geokrety-owner)
 - `last-position` (geokrety-last-position)
 - `last-log` (geokrety-last-log)
