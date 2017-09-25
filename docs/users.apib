@@ -67,7 +67,7 @@ Resources related to users in the API.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-public, required)
+        + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -86,7 +86,7 @@ Resources related to users in the API.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-private, required)
+        + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -107,15 +107,15 @@ Resources related to users in the API.
             Content-Type: application/vnd.api+json
 
     + Attributes (object)
-        + `data` (user-data-type, required)
-            + `attributes` (user-attributes-write)
+        + `data` (users-data-type, required)
+            + `attributes` (users-attributes-write)
                 - `name`: `someone else` (string, required)
 
 + Response 200 (application/vnd.api+json)
 User himself or Administrators
 
     + Attributes (object)
-        + `data` (user-data-private, required)
+        + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -186,12 +186,12 @@ Create a user account.
     + Attributes (object)
         + `data` (object)
             + `type`: `user` (string, required)
-            + `attributes` (user-attributes-write)
+            + `attributes` (users-attributes-write)
 
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-private, required)
+        + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -224,7 +224,7 @@ Retrieve users list.
 
     + Attributes (object)
         + `meta` (meta, required)
-        + `data` (array[user-data-public])
+        + `data` (array[users-data-public])
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -248,7 +248,7 @@ Get the author for a news.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-public, required)
+        + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -267,7 +267,7 @@ Get the author for a news.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-private, required)
+        + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -297,7 +297,7 @@ Get the author for a news comment.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-public, required)
+        + `data` (users-data-public, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -316,7 +316,7 @@ Get the author for a news comment.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (object)
-        + `data` (user-data-private, required)
+        + `data` (users-data-private, required)
         + `jsonapi` (jsonapi, required)
         + `links` (user-links, required)
 
@@ -326,17 +326,20 @@ Get the author for a news comment.
 
 # Data Structures
 
-## `user-data-type` (object)
+## `users-data-type` (object)
 - `type`: `user` (string, required)
 - `id`: `1` (string, required)
 
-## `user-links` (object)
+## `users-links` (object)
 - `self`: `/users/1` (string, required)
 
-## `user-attributes` (object)
+## `users-related` (object)
+- `related`: `/users/1` (string, required)
+
+## `users-attributes` (object)
 - `name`: `someone` (string, required)
 
-## `user-attributes-write` (object)
+## `users-attributes-write` (object)
 - `name`: `someone` (string)
 - `email`: `user@ema.il` (string)
 - `password`: `strong password` (string)
@@ -347,7 +350,7 @@ Get the author for a news comment.
 - `secid`: `abc123` (string)
 - `statpic-id`: `4` (number)
 
-## `user-attributes-private` (user-attributes)
+## `users-attributes-private` (users-attributes)
 - `email`: `user@ema.il` (string, required)
 - `daily-mails`: `true` (boolean)
 - `language`: `fr` (string)
@@ -363,33 +366,32 @@ Get the author for a news comment.
 - `last-login-date-time`: `2017-03-14T22:04:05` (string, optional, nullable)
 - `secid`: `abc123` (string)
 
-## `user-attributes-public` (user-attributes)
+## `users-attributes-public` (users-attributes)
 - `language`: `fr` (string)
 - `country`: `fr` (string)
 - `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
 
+## `users-news` (object)
+- `links` (news-related)
+  - `self`: /users/1/relationships/news (string)
 
-## `news` (object)
-- `links` (user-links)
-  - `related`: /users/1/relationship/news (string)
+## `users-news-comment` (object)
+- `links` (news-comments-related)
+  - `self`: `/users/1/relationships/news-comments` (string)
 
-## `news-comment` (object)
-- `links` (user-links)
-  - `related`: `/users/1/relationship/news-comments` (string)
-
-## `user-relationships` (object)
-- `news` (news)
-- `news-comments` (news-comment)
+## `users-relationships` (object)
+- `news` (users-news)
+- `news-comments` (users-news-comment)
 
 ## `meta` (object)
 - `count`: `1` (number, required)
 
-## `user-data-private` (user-data-type)
-- `attributes` (user-attributes-private, required)
-- `relationships` (user-relationships)
-- `links` (user-links, required)
+## `users-data-private` (users-data-type)
+- `attributes` (users-attributes-private, required)
+- `relationships` (users-relationships)
+- `links` (users-links, required)
 
-## `user-data-public` (user-data-type)
-- `attributes` (user-attributes-public)
-- `relationships` (user-relationships)
-- `links` (user-links, required)
+## `users-data-public` (users-data-type)
+- `attributes` (users-attributes-public)
+- `relationships` (users-relationships)
+- `links` (users-links, required)

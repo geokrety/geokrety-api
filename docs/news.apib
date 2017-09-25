@@ -221,6 +221,9 @@ Retrieve paginated list of news.
 ## `news-links` (object)
 - `self`: `/news/1` (string, required)
 
+## `news-related` (object)
+- `related`: `/news/1` (string, required)
+
 ## `news-attributes-write` (object)
 - `title`: `First News` (string, required)
 - `content`: `3,2,1,0 START! :) Have Fun!` (string, required)
@@ -231,16 +234,16 @@ Retrieve paginated list of news.
 - `comments-count`: `0` (number, required)
 - `last-comment-date-time` (string, optional, nullable)
 
-## `news-comments` (object)
-  - `links` (news-links)
-    - `related`: `/news/1/relationship/news-comments` (string, required)
+## `news-news-comments` (object)
+- `links` (news-comments-related)
+  - `self`: `/news/1/relationships/news-comments` (string, required)
 
 ## `news-author` (object)
-  - `links` (news-links)
-    - `related`: `/news/1/relationship/author` (string, required)
+- `links` (users-related)
+  - `self`: `/news/1/relationships/author` (string, required)
 
 ## `news-relationships` (object)
-- `news-comments` (news-comments)
+- `news-comments` (news-news-comments)
 - `author` (news-author)
 
 ## `news-data` (news-data-type)

@@ -249,18 +249,21 @@ Retrieve paginated list of GeoKrety Rates.
 ## `geokrety-rating-links` (object)
 - `self`: `/geokrety-rating/1` (string, required)
 
+## `geokrety-rating-related` (object)
+- `related`: `/geokrety-rating/1` (string, required)
+
 ## `geokrety-rating-attributes-write` (object)
 - `rate`: `5` (number, required)
 
 ## `geokrety-rating-attributes` (geokrety-rating-attributes-write)
 
 ## `geokrety-rating-author` (object)
-  - `links` (geokrety-rating-links)
-    - `related`: `/geokrety-rating/1/relationship/author` (string, required)
+- `links` (users-related)
+  - `self`: `/geokrety-rating/1/relationships/author` (string, required)
 
 ## `geokrety-rating-geokret` (object)
-  - `links` (geokrety-rating-links)
-    - `related`: `/geokrety-rating/1/relationship/geokret` (string)
+- `links` (geokrety-related)
+  - `self`: `/geokrety-rating/1/relationships/geokret` (string)
 
 ## `geokrety-rating-relationships` (object)
 - `author` (geokrety-rating-author)

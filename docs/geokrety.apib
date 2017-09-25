@@ -293,6 +293,9 @@ Retrieve paginated list of GeoKrety.
 ## `geokrety-links` (object)
 - `self`: `/geokrety/1` (string, required)
 
+## `geokrety-related` (object)
+- `related`: `/geokrety/1` (string, required)
+
 ## `geokrety-attributes-write` (object)
 - `name`: `GeoKret name` (string, required)
 - `description`: `Geokrety mission` (string)
@@ -307,24 +310,24 @@ Retrieve paginated list of GeoKrety.
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `geokrety-owner` (object)
-  - `links` (geokrety-links)
-    - `related`: `/geokrety/1/relationship/owner` (string, required)
+- `links` (users-related)
+  - `self`: `/geokrety/1/relationships/owner` (string, required)
 
 ## `geokrety-last-position` (object)
-  - `links` (geokrety-links)
-    - `related`: `/geokrety/1/relationship/last-position` (string)
+- `links` (moves-related)
+  - `self`: `/geokrety/1/relationships/last-position` (string)
 
 ## `geokrety-last-log` (object)
-  - `links` (geokrety-links)
-    - `related`: `/geokrety/1/relationship/last-log` (string)
+- `links` (moves-related)
+  - `self`: `/geokrety/1/relationships/last-log` (string)
 
 ## `geokrety-holder` (object)
-  - `links` (geokrety-links)
-    - `related`: `/geokrety/1/relationship/holder` (string)
+- `links` (users-related)
+  - `self`: `/geokrety/1/relationships/holder` (string)
 
 ## `geokrety-avatar` (object)
-  - `links` (geokrety-links)
-    - `related`: `/geokrety/1/relationship/avatar` (string)
+- `links` (pictures-related)
+  - `self`: `/geokrety/1/relationships/avatar` (string)
 
 ## `geokrety-type` (object)
 - `links` (geokrety-types-related)

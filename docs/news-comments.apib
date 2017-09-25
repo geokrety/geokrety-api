@@ -241,6 +241,9 @@ Retrieve news list.
 ## `news-comments-links` (object)
 - `self`: `/news-comment/1` (string, required)
 
+## `news-comments-related` (object)
+- `related`: `/news-comment/1` (string, required)
+
 ## `news-comments-attributes-write` (object)
 - `comment`: `Hey hey hey great news!` (string, required)
 - `icon`: `0` (number, required)
@@ -249,12 +252,12 @@ Retrieve news list.
 - `created-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `news-comments-news` (object)
-- `links` (news-comments-links)
-  - `related`: `/news-comments/1/relationship/news` (string)
+- `links` (news-related)
+  - `self`: `/news-comments/1/relationships/news` (string)
 
 ## `news-comments-author` (object)
-- `links` (news-comments-links)
-  - `related`: `/news-comments/1/relationship/author` (string)
+- `links` (users-related)
+  - `self`: `/news-comments/1/relationships/author` (string)
 
 ## `news-comments-relationships` (object)
 - `news` (news-comments-news)

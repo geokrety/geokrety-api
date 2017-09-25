@@ -270,6 +270,9 @@ Retrieve subscription list.
 ## `news-subscriptions-links` (object)
 - `self`: `/news-subscriptions/1` (string, required)
 
+## `news-subscriptions-related` (object)
+- `related`: `/news-subscriptions/1` (string, required)
+
 ## `news-subscriptions-attributes-write` (object)
 - `subscribed`: `true` (boolean, required)
 
@@ -277,12 +280,12 @@ Retrieve subscription list.
 - `subscribed-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `news-subscriptions-news` (object)
-- `links` (news-subscriptions-links)
-  - `related`: `/news-subscriptions/1/relationship/news` (string)
+- `links` (news-related)
+  - `self`: `/news-subscriptions/1/relationships/news` (string)
 
 ## `news-subscriptions-user` (object)
-- `links` (news-subscriptions-links)
-  - `related`: `/news-subscriptions/1/relationship/user` (string)
+- `links` (users-related)
+  - `self`: `/news-subscriptions/1/relationships/user` (string)
 
 ## `news-subscriptions-relationships` (object)
 - `news` (news-subscriptions-news)

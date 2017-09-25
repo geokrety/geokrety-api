@@ -204,6 +204,9 @@ Retrieve paginated list of Owner Codes.
 ## `owner-codes-links` (object)
 - `self`: `/owner-codes/1` (string, required)
 
+## `owner-codes-related` (object)
+- `related`: `/owner-codes/1` (string, required)
+
 ## `owner-codes-attributes-write` (object)
 - `code`: `SECRETCODE` (string, required)
 
@@ -212,12 +215,12 @@ Retrieve paginated list of Owner Codes.
 - `claimed-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `owner-codes-user` (object)
-  - `links` (owner-codes-links)
-    - `related`: `/owner-codes/1/relationship/user` (string, required)
+- `links` (users-related)
+  - `self`: `/owner-codes/1/relationships/user` (string, required)
 
 ## `owner-codes-geokret` (object)
-  - `links` (owner-codes-links)
-    - `related`: `/owner-codes/1/relationship/geokret` (string, required)
+- `links` (geokrety-related)
+  - `self`: `/owner-codes/1/relationships/geokret` (string, required)
 
 ## `owner-codes-relationships` (object)
 - `user` (owner-codes-user)

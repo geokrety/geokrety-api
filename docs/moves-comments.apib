@@ -237,6 +237,9 @@ Retrieve paginated list of Moves Comments.
 ## `moves-comments-links` (object)
 - `self`: `/moves-comments/1` (string, required)
 
+## `moves-comments-related` (object)
+- `related`: `/moves-comments/1` (string, required)
+
 ## `moves-comments-attributes-write` (object)
 - `comment`: `Thanks for the travel` (string, required)
 - `type`: `0` (enum, required)
@@ -248,16 +251,16 @@ Retrieve paginated list of Moves Comments.
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `moves-comments-author` (object)
-  - `links` (moves-comments-links)
-    - `related`: `/moves-comments/1/relationship/author` (string, required)
+- `links` (users-related)
+  - `self`: `/moves-comments/1/relationships/author` (string, required)
 
 ## `moves-comments-move` (object)
-  - `links` (moves-comments-links)
-    - `related`: `/moves-comments/1/relationship/move` (string, required)
+- `links` (moves-related)
+  - `self`: `/moves-comments/1/relationships/move` (string, required)
 
 ## `moves-comments-geokret` (object)
-  - `links` (moves-comments-links)
-    - `related`: `/moves-comments/1/relationship/geokret` (string, required)
+- `links` (geokrety-related)
+  - `self`: `/moves-comments/1/relationships/geokret` (string, required)
 
 ## `moves-comments-relationships` (object)
 - `author` (moves-comments-author)
