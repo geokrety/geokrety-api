@@ -29,6 +29,8 @@ Resources related to users in the API.
 | `daily-mails`           | User want to receive daily mail digest | boolean | -        | -        |         |
 | `observation-radius`    | Observation area in kilometers         | integer | -        | -        |         |
 | `hour`                  | Send mail at this hour                 | integer | -        | **yes**  |         |
+| `statpic-url`           | User's StatPic image url               | string  | -        | **yes**  | **yes** |
+| `avatar-url`            | User's Avatar image url                | string  | -        | **yes**  | **yes** |
 | `secid`                 | User secret id for legacy API          | string  | -        | -        |         |
 | `joined-date-time`      | News creation date                     | date    | -        | **yes**  | **yes** |
 | `last-update-date-time` | Date of last account update            | date    | -        | **yes**  |         |
@@ -39,10 +41,12 @@ Resources related to users in the API.
 
 **User Relations:**
 
-| Parameter       | Type         | Description              |
-|:----------------|--------------|--------------------------|
-| `news`          | news         | Posted news list         |
-| `news-comments` | news-comment | Posted news comment list |
+| Parameter         | Type               | Description              |
+|:------------------|--------------------|--------------------------|
+| `news`            | news               | Posted news list         |
+| `news-comments`   | news-comment       | Posted news comment list |
+| `statpic-template`| statpics-templates | Prefered statpic template|
+| `avatar`          | pictures           | User avatar              |
 
 ---
 
@@ -356,7 +360,6 @@ Get the author for a news comment.
 - `longitude`: `2.34901` (number)
 - `observation-radius`: `7` (number)
 - `secid`: `abc123` (string)
-- `statpic-id`: `4` (number)
 
 ## `users-attributes-private` (users-attributes)
 - `email`: `user@ema.il` (string, required)
@@ -367,7 +370,8 @@ Get the author for a news comment.
 - `observation-radius`: `7` (number)
 - `country`: `fr` (string)
 - `hour`: `7` (number)
-- `statpic-id`: `4` (number)
+- `statpic-url`: `https://static.geokrety.org/statpics/1.png` (string)
+- `avatar-url`: `https://static.geokrety.org/avatars/1.png` (string)
 - `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
 - `last-update-date-time`: `2017-01-26T19:46:44+00:00` (string)
 - `last-mail-date-time`: `2017-03-29T07:52:02` (string, optional, nullable)
@@ -377,6 +381,8 @@ Get the author for a news comment.
 ## `users-attributes-public` (users-attributes)
 - `language`: `fr` (string)
 - `country`: `fr` (string)
+- `statpic-url`: `https://static.geokrety.org/statpics/1.png` (string)
+- `avatar-url`: `https://static.geokrety.org/avatars/1.png` (string)
 - `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
 
 ## `users-news` (object)
@@ -387,9 +393,14 @@ Get the author for a news comment.
 - `links` (news-comments-related)
   - `self`: `/users/1/relationships/news-comments` (string)
 
+## `users-statpic-template` (object)
+- `links` (statpics-templates-related)
+  - `self`: `/users/1/relationships/statpic-template` (string)
+
 ## `users-relationships` (object)
 - `news` (users-news)
 - `news-comments` (users-news-comment)
+- `statpic-template` (users-statpic-template)
 
 ## `meta` (object)
 - `count`: `1` (number, required)
