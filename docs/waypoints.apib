@@ -105,7 +105,7 @@ Delete a single Waypoint.
 
     + Attributes (object)
         + `data` (waypoints-data-type, required)
-          + `attributes` (waypoints-attributes-write)
+            + `attributes` (waypoints-attributes-write)
 
 + Response 200 (application/vnd.api+json)
 
@@ -178,7 +178,7 @@ Retrieve paginated list of Waypoints.
 - `type`: `Cache name` (string, required)
 - `country-name`: `Cache name` (string, required)
 - `link`: `Link to the cache` (string, required)
-- `status`: `Cache current status` (number, required)
+- `status`: `0` (number, required)
 
 ## `waypoints-attributes` (waypoints-attributes-write)
 - `altitude`: `123` (number)
@@ -186,12 +186,12 @@ Retrieve paginated list of Waypoints.
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `waypoints-user` (object)
-  - `links` (waypoints-links)
-    - `related`: `/waypoints/1/relationship/user` (string, required)
+- `links` (waypoints-links)
+  - `related`: `/waypoints/1/relationship/user` (string, required)
 
 ## `waypoints-geokret` (object)
-  - `links` (waypoints-links)
-    - `related`: `/waypoints/1/relationship/geokret` (string, required)
+- `links` (waypoints-links)
+  - `related`: `/waypoints/1/relationship/geokret` (string, required)
 
 ## `waypoints-relationships` (object)
 - `user` (waypoints-user)
