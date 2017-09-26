@@ -132,7 +132,7 @@ Delete a single GeoKret Rate.
 ## GeoKret Rating Collection [/v1/geokrety-ratings{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 
-### Create a GeoKret Rating [POST]
+### Rate a GeoKret [POST]
 
 + Request
 
@@ -202,12 +202,61 @@ Retrieve paginated list of geokrety-ratings.
 
 
 
-## List User Geokrety Rates [/v1/users/{user_id}/geokrety-rates{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## Rate a GeoKret [/v1/geokrety/{geokret_id}/rate]
+
++ Parameters
+    + geokret_id: 1 (string) - ID of the GeoKret.
+
+### Rate a GeoKret [POST]
+
++ Request
+
+    + Attributes (object)
+        + `attributes` (geokrety-ratings-attributes-write)
+        - `relationships` (object)
+            - `geokret` (object, required)
+                - `data` (object, required)
+                    - `type`: geokret (string, required, fixed)
+                    - `id`: 1 (string, required)
+            - `author` (object)
+                - `data` (object, required)
+                    - `type`: user (string, required, fixed)
+                    - `id`: 1 (string, required)
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Content-Type: application/vnd.api+json
+            Accept: application/vnd.api+json
+
++ Response 201 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-ratings-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-ratings`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
+
+
+
+## List User Rates [/v1/users/{user_id}/geokrety-rates{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
     + user_id: 1 (string) - ID of the user id in the form of an integer
 
-### List User Geokrety Rates [GET]
+### List User Rates [GET]
 Retrieve paginated list of GeoKrety Rates.
 
 + Parameters
@@ -238,13 +287,13 @@ Retrieve paginated list of GeoKrety Rates.
 
 
 
-## List Geokrety Rates [/v1/geokrety/{geokret_id}/rates{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List GeoKret Rates [/v1/geokrety/{geokret_id}/rates{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
-    + geokret_id: 1 (string) - ID of the user id in the form of an integer
+    + geokret_id: 1 (string) - ID of the GeoKret
 
-### List Geokrety Rates [GET]
-Retrieve paginated list of GeoKrety Rates.
+### List GeoKret Rates [GET]
+Retrieve paginated list of GeoKret Rates.
 
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.

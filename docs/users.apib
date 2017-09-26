@@ -397,10 +397,40 @@ Get the author for a news comment.
   - `self`: `/users/1/relationships/statpic-template` (string, required)
   - `related`: `/users/1/statpic-template` (string, required)
 
+## `users-geokrety-owned` (object)
+- `links` (object)
+  - `self`: `/users/1/relationships/geokrety-owned` (string, required)
+  - `related`: `/users/1/geokrety-owned` (string, required)
+
+## `users-geokrety-inventory` (object)
+- `links` (object)
+  - `self`: `/users/1/relationships/geokrety-inventory` (string, required)
+  - `related`: `/users/1/geokrety-inventory` (string, required)
+
+## `users-geokrety-watched` (object)
+- `links` (object)
+  - `self`: `/users/1/relationships/geokrety-watched` (string, required)
+  - `related`: `/users/1/geokrety-watched` (string, required)
+
+## `users-geokrety-rates` (object)
+- `links` (object)
+  - `self`: `/users/1/relationships/geokrety-rates` (string, required)
+  - `related`: `/users/1/geokrety-rates` (string, required)
+
+## `users-geokrety-moved` (object)
+- `links` (object)
+  - `self`: `/users/1/relationships/geokrety-moved` (string, required)
+  - `related`: `/users/1/geokrety-moved` (string, required)
+
 ## `users-relationships` (object)
 - `news` (users-news, required)
 - `news-comments` (users-news-comment, required)
 - `statpic-template` (users-statpic-template, required)
+- `geokrety-owned` (users-geokrety-owned, required)
+- `geokrety-inventory` (users-geokrety-inventory, required)
+- `geokrety-watched` (users-geokrety-watched, required)
+- `geokrety-rates` (users-geokrety-rates, required)
+- `geokrety-moved` (users-geokrety-moved, required)
 
 ## `meta` (object)
 - `count`: `1` (number, required)

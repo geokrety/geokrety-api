@@ -228,12 +228,12 @@ Retrieve paginated list of GeoKrety.
 
 
 
-## List GeoKrety owned by User [/v1/users/{user_id}/geokrety/owned{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List User owned GeoKrety [/v1/users/{user_id}/geokrety-owned{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
     + user_id: 1 (string) - ID of the user id in the form of an integer
 
-### List GeoKrety owned by User [GET]
+### List User owned GeoKrety [GET]
 Retrieve paginated list of GeoKrety.
 
 + Parameters
@@ -264,12 +264,12 @@ Retrieve paginated list of GeoKrety.
 
 
 
-## List GeoKrety in User's inventory [/v1/users/{user_id}/geokrety/inventory{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List User inventory [/v1/users/{user_id}/geokrety-inventory{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
     + user_id: 1 (string) - ID of the user id in the form of an integer
 
-### List GeoKrety in User's inventory [GET]
+### List User inventory [GET]
 Retrieve paginated list of GeoKrety.
 
 + Parameters
@@ -300,12 +300,12 @@ Retrieve paginated list of GeoKrety.
 
 
 
-## List GeoKrety in User's watch list [/v1/users/{user_id}/geokrety/watched{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List user watched GeoKrety [/v1/users/{user_id}/geokrety-watched{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
     + user_id: 1 (string) - ID of the user id in the form of an integer
 
-### List GeoKrety in User's watch list [GET]
+### List user watched GeoKrety [GET]
 Retrieve paginated list of GeoKrety.
 
 + Parameters
@@ -326,6 +326,158 @@ Retrieve paginated list of GeoKrety.
     + Attributes (object)
         + `meta` (meta, required)
         + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## List GeoKrety by type [/v1/geokrety-types/{type_id}/geokrety{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
++ Parameters
+    + type_id: 1 (string) - ID of the type
+
+### List GeoKrety by type [GET]
+Retrieve paginated list of GeoKrety.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request List
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[geokrety-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get moved GeoKret [/v1/moves/{move_id}/geokrety]
+
++ Parameters
+    + move_id: 1 (string) - ID of the move.
+
+### Get moved GeoKret [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get rated GeoKret [/v1/geokrety-ratings/{rate_id}/geokret]
+
++ Parameters
+    + rate_id: 1 (string) - ID of the rate.
+
+### Get rated GeoKret [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get subscribed GeoKret [/v1/geokrety-subscriptions/{subscription_id}/geokret]
+
++ Parameters
+    + subscription_id: 1 (string) - ID of the GeoKret Subscription.
+
+### Get subscribed GeoKret [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get GeoKret for an owner-code [/v1/owner-codes/{owner_code_id}/geokret]
+
++ Parameters
+    + owner_code_id: 1 (string) - ID of the Owner Code.
+
+### Get GeoKret for an owner-code [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-data, required)
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/geokrety`
@@ -389,6 +541,16 @@ Retrieve paginated list of GeoKrety.
   - `self`: `/geokrety/1/relationships/type` (string, required)
   - `related`: `/geokrety/1/type` (string, required)
 
+## `geokrety-rates` (object)
+- `links` (object)
+  - `self`: `/geokrety/1/relationships/rates` (string, required)
+  - `related`: `/geokrety/1/rates` (string, required)
+
+## `geokrety-moves` (object)
+- `links` (object)
+  - `self`: `/geokrety/1/relationships/moves` (string, required)
+  - `related`: `/geokrety/1/moves` (string, required)
+
 ## `geokrety-relationships` (object)
 - `type` (geokrety-type, required)
 - `owner` (geokrety-owner, required)
@@ -396,6 +558,7 @@ Retrieve paginated list of GeoKrety.
 - `last-log` (geokrety-last-log, required)
 - `holder` (geokrety-holder, required)
 - `avatar` (geokrety-avatar, required)
+- `moves` (geokrety-moves, required)
 
 ## `geokrety-data` (geokrety-data-type)
 - `attributes` (geokrety-attributes, required)

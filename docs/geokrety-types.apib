@@ -207,6 +207,34 @@ Retrieve paginated list of GeoKrety Type.
             + `self`: `/geokrety-types`
 
 
+## GeoKrety Type Details [/v1/geokrety/{geokrety_id}/type]
+
++ Parameters
+    + geokrety_id: 1 (string) - ID of the GeoKrety.
+
+### Get GeoKrety Type [GET]
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-types-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-types`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
 
 # Data Structures
 

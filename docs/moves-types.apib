@@ -24,6 +24,7 @@ Resources related to GeoKrety in the API.
 ---
 
 **Moves Types:**
+
 Currently known Moves Types:
 
 | Type       | Description   | Require waypoint | Require Tracking-Code |
@@ -227,8 +228,14 @@ Retrieve paginated list of Moves Type.
   - `self`: `/moves-types/1/relationships/geokrety` (string, required)
   - `related`: `/moves-types/1/geokrety` (string, required)
 
+## `moves-types-moves` (object)
+- `links` (object)
+  - `self`: `/moves-types/1/relationships/moves` (string, required)
+  - `related`: `/moves-types/1/moves` (string, required)
+
 ## `moves-types-relationships` (object)
 - `geokrety` (moves-types-geokrety, required)
+- `moves` (moves-types-moves, required)
 
 ## `moves-types-data` (moves-types-data-type)
 - `attributes` (moves-types-attributes, required)
