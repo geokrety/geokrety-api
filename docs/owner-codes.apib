@@ -134,6 +134,10 @@ Delete a single Owner Code.
 
     + Attributes (Error 404)
 
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
+
 
 ### List All Owner Codes [GET]
 Retrieve paginated list of Owner Codes.
@@ -192,6 +196,14 @@ Retrieve paginated list of Owner Codes.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/owner-codes`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
 
 + Response 404 (application/json)
 

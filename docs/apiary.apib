@@ -32,8 +32,8 @@ This is **not yet the production service**. See https://geokrety.org/api.php for
 ## `JSONAPI Error` (object) - JSONAPI Error
 + status: 422 (number, required)
 + source (object, required)
-  + pointer: `/data/attributes/name` (string, required)
-  + detail: `Username already taken` (string, required)
+  + pointer: `/data/attributes/some_attribute` (string, required)
+  + detail: `Detailled reason of failure` (string, required)
   + title: `Unprocessable Entity` (string, required)
 
 ## Error 401 (object) - HTTP Error 401

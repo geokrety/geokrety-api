@@ -106,6 +106,10 @@ Update a single Moves Type by `id`.
 
     + Attributes (Error 404)
 
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
+
 
 
 ### Delete Moves Type [DELETE]
@@ -125,6 +129,10 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
 + Response 200 (application/vnd.api+json)
 
     + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 + Response 403 (application/json)
 
@@ -158,6 +166,18 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/moves-types`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
 
 
 ### List all Moves Type [GET]

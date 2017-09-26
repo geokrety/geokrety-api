@@ -95,6 +95,10 @@ Update a single GeoKret Rate by `id`.
 
     + Attributes (Error 404)
 
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
+
 
 
 ### Delete GeoKret Rating [DELETE]
@@ -110,6 +114,10 @@ Delete a single GeoKret Rate.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 + Response 403 (application/json)
 
@@ -153,6 +161,18 @@ Delete a single GeoKret Rate.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/geokrety-ratings`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
 
 
 ### List all geokrety-ratings [GET]
@@ -212,6 +232,10 @@ Retrieve paginated list of GeoKrety Rates.
         + `links` (object, required)
             + `self`: `/geokrety-ratings`
 
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
 
 
 ## List Geokrety Rates [/v1/geokrety/{geokret_id}/rates{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
@@ -243,6 +267,10 @@ Retrieve paginated list of GeoKrety Rates.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/geokrety-ratings`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
 
 
 

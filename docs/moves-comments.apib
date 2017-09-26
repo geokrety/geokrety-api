@@ -110,9 +110,6 @@ User himself or Administrators
     + Attributes (Error 404)
 
 + Response 422 (application/vnd.api+json)
-Constraints may be:
-  * A move at the same date time already exists
-  * Move is in the future
 
     + Attributes (Error 422)
 
@@ -192,9 +189,9 @@ If no user specified, currently connected user will be used.
 
     + Attributes (Error 403)
 
-+ Response 404 (application/json)
++ Response 422 (application/vnd.api+json)
 
-    + Attributes (Error 404)
+    + Attributes (Error 422)
 
 
 ### List All Moves Comments [GET]
@@ -225,10 +222,6 @@ Retrieve paginated list of Moves Comments.
 + Response 401 (application/json)
 
     + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
 
 
 

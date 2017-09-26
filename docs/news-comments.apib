@@ -35,12 +35,12 @@ Resources related to news comments in the API.
 ---
 
 
-## NewsComments Details [/v1/news-comments/{newscomment_id}]
+## News Comments Details [/v1/news-comments/{newscomment_id}]
 + Parameters
     + newscomment_id: 1 (integer) - ID of the news in the form of an integer
 
 
-### NewsComments Details [GET]
+### News Comments Details [GET]
 Get a single microlocation.
 
 
@@ -63,7 +63,7 @@ Get a single microlocation.
     + Attributes (Error 404)
 
 
-### Update NewsComments [PATCH]
+### Update News Comments [PATCH]
 Update a single news by `id`.
 
 + `id` (string) - ID of the record to update **(required)**
@@ -110,9 +110,13 @@ Update a single news by `id`.
 
     + Attributes (Error 404)
 
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
 
 
-### Delete NewsComments [DELETE]
+
+### Delete News Comments [DELETE]
 Delete a single News.
 
 
@@ -140,7 +144,7 @@ Delete a single News.
     + Attributes (Error 404)
 
 
-## NewsComments Collection [/v1/news-comments{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+## News Comments Collection [/v1/news-comments{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
 
 
 ### Create a News Comment [POST]
@@ -179,8 +183,12 @@ Delete a single News.
 
     + Attributes (Error 401)
 
++ Response 422 (application/json)
 
-### List All NewsComments [GET]
+    + Attributes (Error 422)
+
+
+### List All News Comments [GET]
 Retrieve paginated list of News Comments.
 
 + Parameters
@@ -235,6 +243,10 @@ Retrieve news list.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/news-comments`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
 
 
 # Data Structures

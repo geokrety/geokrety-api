@@ -103,6 +103,10 @@ Update a single news by `id`.
 
     + Attributes (Error 404)
 
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
+
 
 
 ### Delete News [DELETE]
@@ -118,6 +122,10 @@ Delete a single News.
 + Response 200 (application/vnd.api+json)
 
     + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
 
 + Response 403 (application/json)
 
@@ -156,6 +164,22 @@ Delete a single News.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/news`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
 
 
 ### List all news [GET]
@@ -214,6 +238,10 @@ Retrieve paginated list of news.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/news`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
 
 
 

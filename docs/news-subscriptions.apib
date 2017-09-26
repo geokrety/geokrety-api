@@ -63,6 +63,14 @@ Get a single microlocation.
         + `links` (object, required)
             + `self`: `/news-subscriptions`
 
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
 + Response 404 (application/json)
 
     + Attributes (Error 404)
@@ -142,6 +150,10 @@ If not user specified, currently connected user will be used.
 + Response 404 (application/json)
 
     + Attributes (Error 404)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
 
 
 ### List All News Subscriptions [GET]

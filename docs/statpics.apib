@@ -112,6 +112,10 @@ Update a single StatPic by `id`.
 
     + Attributes (Error 404)
 
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
+
 
 
 ### Delete StatPic [DELETE]
@@ -164,6 +168,18 @@ This will reset users using this template to some other statpic. The last templa
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/statpics-templates`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
 
 
 ### List all StatPic [GET]
