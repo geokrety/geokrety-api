@@ -196,20 +196,18 @@ Retrieve paginated list of Moves Type.
 ## `moves-types-links` (object)
 - `self`: `/moves-types/1` (string, required)
 
-## `moves-types-related` (object)
-- `related`: `/moves-types/1` (string, required)
-
 ## `moves-types-attributes` (object)
 - `name`: `Traditional` (string, required)
 
 ## `moves-types-geokrety` (object)
-- `links` (geokrety-related)
-  - `self`: `/moves-types/1/relationships/geokrety` (string)
+- `links` (object)
+  - `self`: `/moves-types/1/relationships/geokrety` (string, required)
+  - `related`: `/moves-types/1/geokrety` (string, required)
 
 ## `moves-types-relationships` (object)
-- `geokrety` (moves-types-geokrety)
+- `geokrety` (moves-types-geokrety, required)
 
 ## `moves-types-data` (moves-types-data-type)
 - `attributes` (moves-types-attributes, required)
-- `relationships` (moves-types-relationships, optional)
+- `relationships` (moves-types-relationships, required)
 - `links` (moves-types-links, required)

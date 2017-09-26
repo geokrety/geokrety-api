@@ -173,9 +173,6 @@ Retrieve paginated list of Waypoints.
 ## `waypoints-links` (object)
 - `self`: `/waypoints/1` (string, required)
 
-## `waypoints-related` (object)
-- `related`: `/waypoints/1` (string, required)
-
 ## `waypoints-attributes-write` (object)
 - `latitude`: `48.86471` (number, required)
 - `longitude`: `2.34901` (number, required)
@@ -192,18 +189,20 @@ Retrieve paginated list of Waypoints.
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `waypoints-user` (object)
-- `links` (users-related)
+- `links` (object)
   - `self`: `/waypoints/1/relationships/user` (string, required)
+  - `related`: `/waypoints/1/user` (string, required)
 
 ## `waypoints-geokret` (object)
-- `links` (geokrety-related)
+- `links` (object)
   - `self`: `/waypoints/1/relationships/geokret` (string, required)
+  - `related`: `/waypoints/1/geokret` (string, required)
 
 ## `waypoints-relationships` (object)
-- `user` (waypoints-user)
-- `geokret` (waypoints-geokret)
+- `user` (waypoints-user, required)
+- `geokret` (waypoints-geokret, required)
 
 ## `waypoints-data` (waypoints-data-type)
 - `attributes` (waypoints-attributes, required)
-- `relationships` (waypoints-relationships, optional)
+- `relationships` (waypoints-relationships, required)
 - `links` (waypoints-links, required)

@@ -197,20 +197,18 @@ Retrieve paginated list of GeoKrety Type.
 ## `geokrety-types-links` (object)
 - `self`: `/geokrety-types/1` (string, required)
 
-## `geokrety-types-related` (object)
-- `related`: `/geokrety-types/1` (string, required)
-
 ## `geokrety-types-attributes` (object)
 - `name`: `Traditional` (string, required)
 
 ## `geokrety-types-geokrety` (object)
-- `links` (geokrety-related)
-  - `self`: `/geokrety-types/1/relationships/geokrety` (string)
+- `links` (object)
+  - `self`: `/geokrety-types/1/relationships/geokrety` (string, required)
+  - `related`: `/geokrety-types/1/geokrety` (string, required)
 
 ## `geokrety-types-relationships` (object)
-- `geokrety` (geokrety-types-geokrety)
+- `geokrety` (geokrety-types-geokrety, required)
 
 ## `geokrety-types-data` (geokrety-types-data-type)
 - `attributes` (geokrety-types-attributes, required)
-- `relationships` (geokrety-types-relationships, optional)
+- `relationships` (geokrety-types-relationships, required)
 - `links` (geokrety-types-links, required)

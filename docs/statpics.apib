@@ -233,20 +233,18 @@ Retrieve paginated list of StatPic.
 ## `statpics-templates-links` (object)
 - `self`: `/statpics-templates/1` (string, required)
 
-## `statpics-templates-related` (object)
-- `related`: `/statpics-templates/1` (string, required)
-
 ## `statpics-templates-attributes` (object)
 - `name`: `Traditional` (string, required)
 
 ## `statpics-templates-users` (object)
-- `links` (geokrety-related)
-  - `self`: `/statpics-templates/1/relationships/users` (string)
+- `links` (object)
+  - `self`: `/statpics-templates/1/relationships/users` (string, required)
+  - `related`: `/statpics-templates/1/users` (string, required)
 
 ## `statpics-templates-relationships` (object)
-- `geokrety` (statpics-templates-users)
+- `geokrety` (statpics-templates-users, required)
 
 ## `statpics-templates-data` (statpics-templates-data-type)
 - `attributes` (statpics-templates-attributes, required)
-- `relationships` (statpics-templates-relationships, optional)
+- `relationships` (statpics-templates-relationships, required)
 - `links` (statpics-templates-links, required)

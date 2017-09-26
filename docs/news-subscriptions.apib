@@ -275,9 +275,6 @@ Retrieve subscription list.
 ## `news-subscriptions-links` (object)
 - `self`: `/news-subscriptions/1` (string, required)
 
-## `news-subscriptions-related` (object)
-- `related`: `/news-subscriptions/1` (string, required)
-
 ## `news-subscriptions-attributes-write` (object)
 - `subscribed`: `true` (boolean, required)
 
@@ -285,18 +282,20 @@ Retrieve subscription list.
 - `subscribed-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `news-subscriptions-news` (object)
-- `links` (news-related)
-  - `self`: `/news-subscriptions/1/relationships/news` (string)
+- `links` (object)
+  - `self`: `/news-subscriptions/1/relationships/news` (string, required)
+  - `related`: `/news-subscriptions/1/news` (string, required)
 
 ## `news-subscriptions-user` (object)
-- `links` (users-related)
-  - `self`: `/news-subscriptions/1/relationships/user` (string)
+- `links` (object)
+  - `self`: `/news-subscriptions/1/relationships/user` (string, required)
+  - `related`: `/news-subscriptions/1/user` (string, required)
 
 ## `news-subscriptions-relationships` (object)
-- `news` (news-subscriptions-news)
-- `user` (news-subscriptions-user)
+- `news` (news-subscriptions-news, required)
+- `user` (news-subscriptions-user, required)
 
 ## `news-subscriptions-data` (news-subscriptions-data-type)
-- `attributes` (news-subscriptions-attributes)
-- `relationships` (news-subscriptions-relationships)
+- `attributes` (news-subscriptions-attributes, required)
+- `relationships` (news-subscriptions-relationships, required)
 - `links` (news-subscriptions-links, required)

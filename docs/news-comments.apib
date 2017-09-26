@@ -246,9 +246,6 @@ Retrieve news list.
 ## `news-comments-links` (object)
 - `self`: `/news-comments/1` (string, required)
 
-## `news-comments-related` (object)
-- `related`: `/news-comments/1` (string, required)
-
 ## `news-comments-attributes-write` (object)
 - `comment`: `Hey hey hey great news!` (string, required)
 - `icon`: `0` (number, required)
@@ -257,18 +254,20 @@ Retrieve news list.
 - `created-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `news-comments-news` (object)
-- `links` (news-related)
-  - `self`: `/news-comments/1/relationships/news` (string)
+- `links` (object)
+  - `self`: `/news-comments/1/relationships/news` (string, required)
+  - `related`: `/news-comments/1/news` (string, required)
 
 ## `news-comments-author` (object)
-- `links` (users-related)
-  - `self`: `/news-comments/1/relationships/author` (string)
+- `links` (object)
+  - `self`: `/news-comments/1/relationships/author` (string, required)
+  - `related`: `/news-comments/1/author` (string, required)
 
 ## `news-comments-relationships` (object)
-- `news` (news-comments-news)
-- `author` (news-comments-author)
+- `news` (news-comments-news, required)
+- `author` (news-comments-author, required)
 
 ## `news-comments-data` (news-comments-data-type)
-- `attributes` (news-comments-attributes)
-- `relationships` (news-comments-relationships)
+- `attributes` (news-comments-attributes, required)
+- `relationships` (news-comments-relationships, required)
 - `links` (news-comments-links, required)

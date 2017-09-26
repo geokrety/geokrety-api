@@ -255,27 +255,26 @@ Retrieve paginated list of GeoKrety Rates.
 ## `geokrety-ratings-links` (object)
 - `self`: `/geokrety-ratings/1` (string, required)
 
-## `geokrety-ratings-related` (object)
-- `related`: `/geokrety-ratings/1` (string, required)
-
 ## `geokrety-ratings-attributes-write` (object)
 - `rate`: `5` (number, required)
 
 ## `geokrety-ratings-attributes` (geokrety-ratings-attributes-write)
 
 ## `geokrety-ratings-author` (object)
-- `links` (users-related)
+- `links` (object)
   - `self`: `/geokrety-ratings/1/relationships/author` (string, required)
+  - `related`: `/geokrety-ratings/1/author` (string)
 
 ## `geokrety-ratings-geokret` (object)
-- `links` (geokrety-related)
-  - `self`: `/geokrety-ratings/1/relationships/geokret` (string)
+- `links` (object)
+  - `self`: `/geokrety-ratings/1/relationships/geokret` (string, required)
+  - `related`: `/geokrety-ratings/1/geokret` (string, required)
 
 ## `geokrety-ratings-relationships` (object)
-- `author` (geokrety-ratings-author)
-- `geokret` (geokrety-ratings-geokret)
+- `author` (geokrety-ratings-author, required)
+- `geokret` (geokrety-ratings-geokret, required)
 
 ## `geokrety-ratings-data` (geokrety-ratings-data-type)
 - `attributes` (geokrety-ratings-attributes, required)
-- `relationships` (geokrety-ratings-relationships, optional)
+- `relationships` (geokrety-ratings-relationships, required)
 - `links` (geokrety-ratings-links, required)

@@ -325,9 +325,6 @@ Retrieve paginated list of GeoKrety Moves.
 ## `moves-links` (object)
 - `self`: `/moves/1` (string, required)
 
-## `moves-related` (object)
-- `related`: `/moves/1` (string, required)
-
 ## `moves-attributes-write` (object)
 - `tracking-code`: `XFS125` (string)
 - `move-type`: `0` (enum, required)
@@ -355,18 +352,20 @@ Retrieve paginated list of GeoKrety Moves.
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `moves-geokrety` (object)
-- `links` (geokrety-related)
+- `links` (object)
   - `self`: `/moves/1/relationships/geokrety` (string, required)
+  - `related`: `/moves/1/geokrety` (string, required)
 
 ## `moves-author` (object)
-- `links` (users-related)
-  - `self`: `/moves/1/relationships/author` (string)
+- `links` (object)
+  - `self`: `/moves/1/relationships/author` (string, required)
+  - `related`: `/moves/1/author` (string, required)
 
 ## `moves-relationships` (object)
-- `geokrety` (moves-geokrety)
-- `author` (moves-author)
+- `geokrety` (moves-geokrety, required)
+- `author` (moves-author, required)
 
 ## `moves-data` (moves-data-type)
 - `attributes` (moves-attributes, required)
-- `relationships` (moves-relationships, optional)
+- `relationships` (moves-relationships, required)
 - `links` (moves-links, required)

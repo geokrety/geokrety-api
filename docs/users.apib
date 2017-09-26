@@ -345,9 +345,6 @@ Get the author for a news comment.
 ## `users-links` (object)
 - `self`: `/users/1` (string, required)
 
-## `users-related` (object)
-- `related`: `/users/1` (string, required)
-
 ## `users-attributes` (object)
 - `name`: `someone` (string, required)
 
@@ -386,31 +383,34 @@ Get the author for a news comment.
 - `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
 
 ## `users-news` (object)
-- `links` (news-related)
-  - `self`: /users/1/relationships/news (string)
+- `links` (object)
+  - `self`: /users/1/relationships/news (string, required)
+  - `related`: `/users/1/news` (string, required)
 
 ## `users-news-comment` (object)
-- `links` (news-comments-related)
-  - `self`: `/users/1/relationships/news-comments` (string)
+- `links` (object)
+  - `self`: `/users/1/relationships/news-comments` (string, required)
+  - `related`: `/users/1/news-comments` (string, required)
 
 ## `users-statpic-template` (object)
-- `links` (statpics-templates-related)
-  - `self`: `/users/1/relationships/statpic-template` (string)
+- `links` (object)
+  - `self`: `/users/1/relationships/statpic-template` (string, required)
+  - `related`: `/users/1/statpic-template` (string, required)
 
 ## `users-relationships` (object)
-- `news` (users-news)
-- `news-comments` (users-news-comment)
-- `statpic-template` (users-statpic-template)
+- `news` (users-news, required)
+- `news-comments` (users-news-comment, required)
+- `statpic-template` (users-statpic-template, required)
 
 ## `meta` (object)
 - `count`: `1` (number, required)
 
 ## `users-data-private` (users-data-type)
 - `attributes` (users-attributes-private, required)
-- `relationships` (users-relationships)
+- `relationships` (users-relationships, required)
 - `links` (users-links, required)
 
 ## `users-data-public` (users-data-type)
-- `attributes` (users-attributes-public)
-- `relationships` (users-relationships)
+- `attributes` (users-attributes-public, required)
+- `relationships` (users-relationships, required)
 - `links` (users-links, required)

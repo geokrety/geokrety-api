@@ -241,35 +241,35 @@ Retrieve paginated list of Moves Comments.
 ## `moves-comments-links` (object)
 - `self`: `/moves-comments/1` (string, required)
 
-## `moves-comments-related` (object)
-- `related`: `/moves-comments/1` (string, required)
-
 ## `moves-comments-attributes-write` (object)
 - `comment`: `Thanks for the travel` (string, required)
 - `type`: `0` (enum, required)
-  - `0`: `Same entry` (string)
-  - `1`: `Missing` (string)
+  - `0`: `Same entry` (number)
+  - `1`: `Missing` (number)
 
 ## `moves-comments-attributes` (moves-comments-attributes-write)
 - `created-on-date-time`: `2007-10-25T12:10:22` (string)
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
 ## `moves-comments-author` (object)
-- `links` (users-related)
+- `links` (object)
   - `self`: `/moves-comments/1/relationships/author` (string, required)
+  - `related`: `/moves-comments/1/author` (string, required)
 
 ## `moves-comments-move` (object)
-- `links` (moves-related)
+- `links` (object)
   - `self`: `/moves-comments/1/relationships/move` (string, required)
+  - `related`: `/moves-comments/1/move` (string, required)
 
 ## `moves-comments-geokret` (object)
-- `links` (geokrety-related)
+- `links` (object)
   - `self`: `/moves-comments/1/relationships/geokret` (string, required)
+  - `related`: `/moves-comments/1/geokret` (string, required)
 
 ## `moves-comments-relationships` (object)
-- `author` (moves-comments-author)
-- `move` (moves-comments-move)
-- `geokret` (moves-comments-geokret)
+- `author` (moves-comments-author, required)
+- `move` (moves-comments-move, required)
+- `geokret` (moves-comments-geokret, required)
 
 ## `moves-comments-data` (moves-comments-data-type)
 - `attributes` (moves-comments-attributes, required)
