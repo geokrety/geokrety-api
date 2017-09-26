@@ -24,8 +24,9 @@ Resources related to GeoKrety in the API.
 | `description`            | Geokrety mission                          | string  | -        | -        | **yes** |
 | `missing`                | True if GeoKret is marked as missing      | boolean | -        | **yes**  | **yes** |
 | `distance`               | Total distance traveled                   | integer | -        | **yes**  | **yes** |
-| `cache-count`            | Total cache visited                       | string  | -        | **yes**  | **yes** |
+| `caches-count`           | Total visited caches                      | integer | -        | **yes**  | **yes** |
 | `pictures-count`         | Total GeoKret pictures                    | integer | -        | **yes**  | **yes** |
+| `average-rating`         | Average note for this Geokret             | float   | -        | **yes**  | **yes** |
 | `created-on-date-time`   | Creation on date time                     | date    | -        | **yes**  | **yes** |
 | `updated-on-date-time`   | Updated on date time                      | date    | -        | **yes**  | **yes** |
 
@@ -38,10 +39,11 @@ Resources related to GeoKrety in the API.
 |:----------------|----------------|---------------------------------------|----------|
 | `owner`         | users          | User which created the GeoKret        | **yes**  |
 | `last-position` | move           | Last visited cache log                | **yes**  |
-| `last-log`      | move           | Last log                              | **yes**  |
+| `last-log`      | move           | Last posted log                       | **yes**  |
 | `holder`        | users          | User which currently hold the GeoKret | **yes**  |
 | `avatar`        | pictures       | GeoKret picture avatar                | -        |
 | `type`          | geokrety-types | GeoKret Type                          | -        |
+| `rates`         | geokrety-rating| All rates for this GeoKret            | -        |
 
 ---
 
@@ -351,8 +353,9 @@ Retrieve paginated list of GeoKrety.
 - `tracking-code`: `XFS125` (string)
 - `missing`: `false` (boolean)
 - `distance`: `12` (number)
-- `cache-count`: `8` (number)
+- `caches-count`: `8` (number)
 - `pictures-count`: `82` (number)
+- `average-rating`: `4` (number)
 - `created-on-date-time`: `2007-10-25T12:10:22` (string)
 - `updated-on-date-time`: `2007-10-26T18:31:20` (string)
 
