@@ -95,7 +95,7 @@ def index():  # pragma: no cover
     Index route
     :return:
     """
-    r = requests.get('http://127.0.0.1:5000/static/api.html')
+    r = requests.get('https://geokrety.github.io/geokrety-api/')
     response = make_response(r.content)
     response.headers["Content-Type"] = "text/html"
     return response
