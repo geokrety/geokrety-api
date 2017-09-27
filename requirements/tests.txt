@@ -1,5 +1,1 @@
 -r dev.txt
-
-coverage
-dredd_hooks
-codacy-coverage
