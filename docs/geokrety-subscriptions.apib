@@ -92,7 +92,7 @@ Delete a single Geokrety Subscriptions.
 
 ## GeoKrety Subscriptions Collection [/v1/geokrety-subscriptions{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
 
-### GeoKrety Subscriptions Details [POST]
+### Watch a GeoKret [POST]
 
 ::: note
 #### <i class="fa fa-info"></i> Note
@@ -181,6 +181,60 @@ This is reserved to Administrators.
 + Response 403 (application/json)
 
     + Attributes (Error 403)
+
+
+
+## Watch a GeoKret [/v1/geokrety/1/{geokret_id}/watch]
+
++ Parameters
+    + geokret_id: 1 (string) - ID of the geokrety.
+
+### Watch a GeoKret [POST]
+
+::: note
+#### <i class="fa fa-info"></i> Note
+If no user specified, currently connected user will be used.
+:::
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
+
+    + Attributes (object)
+        + `data` (geokrety-subscriptions-data-type, required)
+          + `attributes` (geokrety-subscriptions-attributes-write)
+          - `relationships` (object)
+              - `user` (object)
+                  - `data` (object)
+                      - `type`: `user` (string, required, fixed)
+                      - `id`: 1 (string, required)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (geokrety-subscriptions-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/geokrety-subscriptions`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
 
 
 

@@ -110,8 +110,12 @@ Delete a single News Subscriptions.
 
 ## News Subscriptions Collection [/v1/news-subscriptions{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
 
-### News Subscriptions Details [POST]
-If not user specified, currently connected user will be used.
+### Subscribe to a News [POST]
+
+::: note
+#### <i class="fa fa-info"></i> Note
+If no user specified, currently connected user will be used.
+:::
 
 + Request
 
@@ -192,6 +196,102 @@ This is reserved to Administrators.
 + Response 403 (application/json)
 
     + Attributes (Error 403)
+
+
+
+## Subscribe to a News [/v1/news/{news_id}/subscribe]
+
++ Parameters
+    + news_id: 1 (string) - ID of the news.
+
+### Subscribe to a News [POST]
+
+::: note
+#### <i class="fa fa-info"></i> Note
+If no user specified, currently connected user will be used.
+:::
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
+
+    + Attributes (object)
+        + `data` (news-subscriptions-data-type, required)
+          + `attributes` (news-subscriptions-attributes-write)
+          - `relationships` (object)
+              - `user` (object)
+                  - `data` (object)
+                      - `type`: `user` (string, required, fixed)
+                      - `id`: 1 (string, required)
+              - `news` (object, required)
+                  - `data` (object, required)
+                      - `type`: `news` (string, required, fixed)
+                      - `id`: 1 (string, required)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (news-subscriptions-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/news-subscriptions`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
++ Response 422 (application/json)
+
+    + Attributes (Error 422)
+
+
+
+## UnSubscribe from a News [/v1/news/{news_id}/unsubscribe]
+
++ Parameters
+    + news_id: 1 (string) - ID of the news.
+
+### UnSubscribe from a News [DELETE]
+
+::: note
+#### <i class="fa fa-info"></i> Note
+If no user specified, currently connected user will be used.
+:::
+
+
++ Request
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (Deleted, required)
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
 
 
 # Data Structures

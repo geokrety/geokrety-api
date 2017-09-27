@@ -211,6 +211,52 @@ Retrieve paginated list of Owner Codes.
 
 
 
+## Adopt a GeoKret [/v1/geokrety/1/adopt]
+
+### Adopt a GeoKret [POST]
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+            Content-Type: application/vnd.api+json
+
+    + Attributes (object)
+        + `data` (owner-codes-data-type, required)
+          + `attributes` (owner-codes-attributes-write)
+          - `relationships` (object)
+              - `geokret` (object, required)
+                  - `data` (object, required)
+                      - `type`: geokret (string, required, fixed)
+                      - `id`: 1 (string, required)
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (owner-codes-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/owner-codes`
+
++ Response 401 (application/json)
+
+    + Attributes (Error 401)
+
++ Response 403 (application/json)
+
+    + Attributes (Error 403)
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
++ Response 422 (application/vnd.api+json)
+
+    + Attributes (Error 422)
+
+
+
 # Data Structures
 
 ## `owner-codes-data-type` (object)
