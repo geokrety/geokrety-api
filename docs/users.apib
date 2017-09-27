@@ -237,7 +237,260 @@ Retrieve users list.
           + `self`: `/users`
 
 
-## News Author [/v1/news/{news_id}/author]
+
+## List Users Subscribed to a News [/v1/news/{news_id}/subscribed-users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
+
+### List Users Subscribed to a News [GET]
+Retrieve users list.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+    Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[users-data-public])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## List Users watching a GeoKret [/v1/geokrety/{geokret_id}/watching-users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
++ Parameters
+    + user_id: 1 (integer) - ID of the GeoKret
+
+### List Users watching a GeoKret [GET]
+Retrieve paginated list of Users.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+    Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[users-data-public])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## List Users rating a GeoKret [/v1/geokrety/{geokret_id}/rating-users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
++ Parameters
+    + user_id: 1 (integer) - ID of the GeoKret
+
+### List Users rating a GeoKret [GET]
+Retrieve paginated list of Users.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+    Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[users-data-public])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## List Users who moved a GeoKret [/v1/geokrety/{geokret_id}/moved-by-users{?page%5Bsize%5D,page%5bnumber%5d,sort,filter}]
+
++ Parameters
+    + user_id: 1 (integer) - ID of the GeoKret
+
+### List Users who moved a GeoKret [GET]
+Retrieve paginated list of Users.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `name`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+    Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[users-data-public])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get GeoKrety Owner [/v1/geokrety/{geokret_id}/owner]
+
++ Parameters
+    + news_id: 1 (integer) - ID of the GeoKret
+
+
+### Get GeoKrety Owner [GET]
+Get the owner of a GeoKret.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get GeoKrety Holder [/v1/geokrety/{geokret_id}/owner]
+
++ Parameters
+    + news_id: 1 (integer) - ID of the GeoKret
+
+
+### Get GeoKrety Holder [GET]
+Get the user who currently hold the GeoKret.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get News Author [/v1/news/{news_id}/author]
 + Parameters
     + news_id: 1 (integer) - ID of the news in the form of an integer
 
@@ -287,13 +540,113 @@ Get the author for a news.
 
 
 
+## Get Move Author [/v1/move/{move_id}/author]
++ Parameters
+    + move_id: 1 (integer) - ID of the move
 
-## NewsComment Author [/v1/news-comments/{news_id}/author]
+
+### Get Move Author [GET]
+Get the author for a move.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get Move-Comment Author [/v1/move/{move_comment_id}/author]
++ Parameters
+    + move_comment_id: 1 (integer) - ID of the move comment
+
+
+### Get Move-Comment Author [GET]
+Get the author for a move comment.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+
+## Get News-Comment Author [/v1/news-comments/{news_id}/author]
 + Parameters
     + news_id: 1 (integer) - ID of the news in the form of an integer
 
 
-### Get NewsComment Author [GET]
+### Get News-Comment Author [GET]
 Get the author for a news comment.
 
 
@@ -335,6 +688,111 @@ Get the author for a news comment.
 + Response 404 (application/json)
 
     + Attributes (Error 404)
+
+
+
+
+## Get Picture Author [/v1/pictures/{picture_id}/author]
++ Parameters
+    + picture_id: 1 (integer) - ID of the picture
+
+
+### Get Picture Author [GET]
+Get the author for a picture.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+
+## Get Rate Author [/v1/geokrety-ratings/{rate_id}/author]
+
++ Parameters
+    + rate_id: 1 (integer) - ID of the Rate
+
+
+### Get Rate Author [GET]
+Get the author of a Rate.
+
+
++ Request Anonymous or Authenticated
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-public, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
++ Request Authenticated - Self or Administrators
+
+    + Headers
+
+            Authorization: JWT <Auth Key>
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (users-data-private, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+          + `self`: `/users`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
 
 # Data Structures
 

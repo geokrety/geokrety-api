@@ -209,12 +209,12 @@ Retrieve paginated list of news.
 
 
 
-## List News published by User [/v1/users/{user_id}/news{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List User published News [/v1/users/{user_id}/news{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 + Parameters
     + user_id: 1 (string) - ID of the user id in the form of an integer
 
-### List News published by User [GET]
+### List User published News [GET]
 Retrieve paginated list of news.
 
 + Parameters
@@ -222,6 +222,71 @@ Retrieve paginated list of news.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
     + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[news-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/news`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## List User subscribed News [/v1/users/{user_id}/subscribed-news{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
++ Parameters
+    + user_id: 1 (string) - ID of the user id in the form of an integer
+
+### List User subscribed News [GET]
+Retrieve paginated list of news.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[news-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/news`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get News-Comment News [/v1/news-comments/{news_comment_id}/news]
+
++ Parameters
+    + news_comment_id: 1 (string) - ID of the news comment
+
+### Get News-Comment News [GET]
 
 
 + Request

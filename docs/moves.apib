@@ -242,12 +242,12 @@ Retrieve paginated list of GeoKrety Moves.
 
 
 
-## List GeoKrety Moves by GeoKret [/v1/geokrety/{geokrety_id}/moves{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List GeoKret Moves [/v1/geokrety/{geokrety_id}/moves{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 + Parameters
     + geokrety_id: 1 (integer) - ID of the GeoKret
 
 
-### List GeoKrety Moves by GeoKret [GET]
+### List GeoKret Moves [GET]
 Retrieve paginated list of GeoKrety Moves.
 
 + Parameters
@@ -282,11 +282,11 @@ Retrieve paginated list of GeoKrety Moves.
 
 
 
-## List GeoKrety Moves by Users [/v1/users/{user_id}/geokrety-moved{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List Users Moves [/v1/users/{user_id}/geokrety-moved{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 + Parameters
     + user_id: 1 (integer) - ID of the User
 
-### List GeoKrety Moves by Users [GET]
+### List Users Moves [GET]
 Retrieve paginated list of GeoKrety Moves.
 
 + Parameters
@@ -323,11 +323,11 @@ Retrieve paginated list of GeoKrety Moves.
 
 
 
-## List GeoKrety Moves by Move Type [/v1/moves-types/{moves_types_id}/moves{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+## List Moves by Move Type [/v1/moves-types/{move_type_id}/moves{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 + Parameters
-    + moves_types_id: 1 (integer) - ID of the Move Type
+    + move_type_id: 1 (integer) - ID of the Move Type
 
-### List GeoKrety Moves by Move Type [GET]
+### List Moves by Move Type [GET]
 Retrieve paginated list of GeoKrety Moves.
 
 + Parameters
@@ -352,9 +352,61 @@ Retrieve paginated list of GeoKrety Moves.
         + `links` (object, required)
             + `self`: `/moves`
 
-+ Response 401 (application/json)
++ Response 404 (application/json)
 
-    + Attributes (Error 401)
+    + Attributes (Error 404)
+
+
+
+## Get Move-Comment Move [/v1/moves-comments/{move_comment_id}]
+
++ Parameters
+    + move_comment_id: 1 (integer) - ID of the Move Comment
+
+### Get Move-Comment Move [GET]
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (moves-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/moves`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
+
+
+
+## Get Picture Move [/v1/pictures/{picture_id}]
+
++ Parameters
+    + picture_id: 1 (string) - ID of the picture.
+
+### Get Picture Move [GET]
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `data` (moves-data, required)
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/moves`
 
 + Response 404 (application/json)
 

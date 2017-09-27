@@ -2,6 +2,8 @@
 Resources related to news subscription in the API.
 This permit users to get notified on new new-comments.
 
+TODO: Maybe this should be splitted in others collections
+
 ---
 
 **News Subscriptions endpoints permissions:**
@@ -190,92 +192,6 @@ This is reserved to Administrators.
 + Response 403 (application/json)
 
     + Attributes (Error 403)
-
-
-
-## Published [/v1/users/{user_id}/news-subscriptions{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
-+ Parameters
-    + user_id: 1 (integer) - ID of the user id in the form of an integer
-
-### List News Subscriptions by User [GET]
-Retrieve subscription list.
-
-+ Parameters
-    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
-    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `subscribed-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
-    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
-
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json)
-
-    + Attributes (object)
-        + `meta` (meta, required)
-        + `data` (array[news-subscriptions-data], required)
-        + `jsonapi` (jsonapi, required)
-        + `links` (object, required)
-            + `self`: `/news-subscriptions`
-
-+ Response 401 (application/json)
-
-    + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
-
-+ Response 404 (application/json)
-
-    + Attributes (Error 404)
-
-
-
-## Published [/v1/news/{news_id}/news-subscriptions{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
-+ Parameters
-    + news_id: 1 (integer) - ID of the news
-
-### List News Subscriptions by News [GET]
-Retrieve subscription list.
-
-+ Parameters
-    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
-    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `subscribed-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
-    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
-
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json)
-
-    + Attributes (object)
-        + `meta` (meta, required)
-        + `data` (array[news-subscriptions-data], required)
-        + `jsonapi` (jsonapi, required)
-        + `links` (object, required)
-            + `self`: `/news-subscriptions`
-
-+ Response 401 (application/json)
-
-    + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
-
-+ Response 404 (application/json)
-
-    + Attributes (Error 404)
 
 
 # Data Structures

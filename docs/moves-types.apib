@@ -147,6 +147,7 @@ This will delete **all** GeoKrety of that type, including logs, comments and pic
     + Attributes (Error 404)
 
 
+
 ## GeoKrety Collection [/v1/moves-types{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
 
 
@@ -208,6 +209,40 @@ Retrieve paginated list of Moves Type.
         + `jsonapi` (jsonapi, required)
         + `links` (object, required)
             + `self`: `/moves-types`
+
+
+
+## List Moves of this type [/v1/moves-types/{move_type}/moves{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
+
+
+### List Moves of this type [GET]
+Retrieve paginated list of Moves Type.
+
++ Parameters
+    + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
+    + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
+    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.api+json
+
++ Response 200 (application/vnd.api+json)
+
+    + Attributes (object)
+        + `meta` (meta, required)
+        + `data` (array[moves-types-data])
+        + `jsonapi` (jsonapi, required)
+        + `links` (object, required)
+            + `self`: `/moves-types`
+
++ Response 404 (application/json)
+
+    + Attributes (Error 404)
 
 
 
