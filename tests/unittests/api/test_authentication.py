@@ -29,28 +29,28 @@ class TestAuthentication(GeokretyTestCase):
 
     def test_auth_nonexistent_user(self):
         """
-        Check can't login with non-existent user
+        Check Authentication: POST can't login with non-existent user
         """
         response = self._check_login("someone", "else")
         self.assertEqual(response.status_code, 401)
 
     def test_auth(self):
         """
-        Check can login with existent user
+        Check Authentication: POST can login with existent user
         """
         response = self._check_login(self.username, self.password)
         self.assertEqual(response.status_code, 200)
 
     def test_auth_bad_password(self):
         """
-        Check can't login with bad password
+        Check Authentication: POST can't login with bad password
         """
         response = self._check_login(self.username, self.password_bad)
         self.assertEqual(response.status_code, 401)
 
     def test_auth_bad_username(self):
         """
-        Check can't login with bad username
+        Check Authentication: POST can't login with bad username
         """
         response = self._check_login(self.username + "_bad", self.password)
         self.assertEqual(response.status_code, 401)

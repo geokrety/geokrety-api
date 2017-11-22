@@ -10,6 +10,7 @@ from tests.unittests.utils import GeokretyTestCase
 class TestDBHelperValidation(GeokretyTestCase):
 
     def test_save_to_db(self):
+        """Check DBHelper: save to db"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 mixer.init_app(app)
@@ -20,6 +21,7 @@ class TestDBHelperValidation(GeokretyTestCase):
             self.assertEqual(obj.name, user.name)
 
     def test_safe_query(self):
+        """Check DBHelper: safe query"""
         with app.test_request_context():
             mixer.init_app(app)
             user = mixer.blend(User)
@@ -27,10 +29,12 @@ class TestDBHelperValidation(GeokretyTestCase):
             self.assertEqual(obj.name, user.name)
 
     def test_safe_query_exception(self):
+        """Check DBHelper: safe query exception"""
         with app.test_request_context():
             self.assertRaises(ObjectNotFound, lambda: safe_query(db, User, 'id', 1, 'user_id'))
 
     def test_get_or_create(self):
+        """Check DBHelper: get or create"""
         with app.test_request_context():
             mixer.init_app(app)
             with mixer.ctx(commit=False):
@@ -45,6 +49,7 @@ class TestDBHelperValidation(GeokretyTestCase):
             self.assertTrue(is_created)
 
     def test_get_count(self):
+        """Check DBHelper: get count"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 user = mixer.blend(User)

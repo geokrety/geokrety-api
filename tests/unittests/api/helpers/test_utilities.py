@@ -7,6 +7,7 @@ from app.api.helpers.utilities import dasherize, require_relationship
 class TestUtilitiesHelperValidation(GeokretyTestCase):
 
     def test_dasherize(self):
+        """Check UtilitiesHelper: dasherize"""
         with app.test_request_context():
             field = "starts_at"
             dasherized_field = "starts-at"
@@ -14,6 +15,7 @@ class TestUtilitiesHelperValidation(GeokretyTestCase):
             self.assertEqual(result, dasherized_field)
 
     def test_require_relationship(self):
+        """Check UtilitiesHelper: require relationship"""
         with self.assertRaises(UnprocessableEntity):
             data = ['event']
             require_relationship(['sponsor', 'event'], data)

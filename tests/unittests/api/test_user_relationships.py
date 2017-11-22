@@ -25,7 +25,7 @@ class TestUserRelationships(GeokretyTestCase):
         self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
 
     def test_get_news(self):
-        """Check users - GET relationship news"""
+        """Check UserRelationships: GET news"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -35,7 +35,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_get('/v1/users/1/relationship/news', code=200, user=self.user2)
 
     def test_post_news(self):
-        """Check users - POST relationship news"""
+        """Check UserRelationships: POST news"""
         with app.test_request_context():
             self._blend_users()
             self._send_post('/v1/users/1/relationship/news', code=405)
@@ -44,7 +44,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_post('/v1/users/1/relationship/news', code=405, user=self.user2)
 
     def test_patch_news(self):
-        """Check users - PATCH relationship news"""
+        """Check UserRelationships: PATCH news"""
         with app.test_request_context():
             self._blend_users()
             self._send_patch('/v1/users/1/relationship/news', code=405)
@@ -53,7 +53,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_patch('/v1/users/1/relationship/news', code=405, user=self.user2)
 
     def test_delete_news(self):
-        """Check users - DELETE relationship news"""
+        """Check UserRelationships: DELETE news"""
         with app.test_request_context():
             self._blend_users()
             self._send_delete('/v1/users/1/relationship/news', code=405)
@@ -62,7 +62,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_delete('/v1/users/1/relationship/news', code=405, user=self.user2)
 
     def test_get_news_comments(self):
-        """Check users - GET relationship news comment"""
+        """Check UserRelationships: GET news_comment"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -72,7 +72,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_get('/v1/users/1/relationship/news-comments', code=200, user=self.user2)
 
     def test_post_news_comments(self):
-        """Check users - POST relationship news comment"""
+        """Check UserRelationships: POST news_comment"""
         with app.test_request_context():
             self._blend_users()
             self._send_post('/v1/users/1/relationship/news-comments', code=405)
@@ -81,7 +81,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_post('/v1/users/1/relationship/news-comments', code=405, user=self.user2)
 
     def test_patch_news_comments(self):
-        """Check users - PATCH relationship news comment"""
+        """Check UserRelationships: PATCH news_comment"""
         with app.test_request_context():
             self._blend_users()
             self._send_patch('/v1/users/1/relationship/news-comments', code=405)
@@ -90,7 +90,7 @@ class TestUserRelationships(GeokretyTestCase):
             self._send_patch('/v1/users/1/relationship/news-comments', code=405, user=self.user2)
 
     def test_delete_news_comments(self):
-        """Check users - DELETE relationship news comment"""
+        """Check UserRelationships: DELETE news_comment"""
         with app.test_request_context():
             self._blend_users()
             self._send_delete('/v1/users/1/relationship/news-comments', code=405)
