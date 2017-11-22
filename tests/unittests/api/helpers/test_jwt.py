@@ -9,6 +9,7 @@ from tests.unittests.utils import GeokretyTestCase
 class TestJWTHelperValidation(GeokretyTestCase):
 
     def test_jwt_authenticate(self):
+        """Check JWTHelper: authenticate"""
         with app.test_request_context():
             mixer.init_app(app)
             user = mixer.blend(User)
@@ -22,6 +23,7 @@ class TestJWTHelperValidation(GeokretyTestCase):
             self.assertIsNone(wrong_credential_user)
 
     def test_get_identity(self):
+        """Check JWTHelper: get user identity"""
         with app.test_request_context():
             mixer.init_app(app)
             user = mixer.blend(User)

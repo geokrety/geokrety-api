@@ -66,14 +66,14 @@ class TestNews(GeokretyTestCase):
             self.assertTrue('username' in attributes)
 
     def _post_news(self, payload, code=201, expected_count=1, user=None):
-        """Check create request minimal informations"""
+        """Check News: POST request minimal informations"""
         with app.test_request_context():
             response = self._send_post("/v1/news", payload=payload, code=code, user=user)
             self.assertEqual(len(News.query.all()), expected_count)
             return response
 
     def test_post_content_types(self):
-        """Check accepted content types"""
+        """Check News: POST accepted content types"""
         with app.test_request_context():
             self._blend_users()
             self._send_post("/v1/news", payload="not a json", code=415,
@@ -82,7 +82,7 @@ class TestNews(GeokretyTestCase):
             self._send_post("/v1/news", payload={"user": "kumy"}, code=422, user=self.admin)
 
     def test_create_incomplete_1(self):
-        """Check create request incomplete 1"""
+        """Check News: POST request incomplete 1"""
         payload = {
             "data": {
                 "type": "news"
@@ -93,7 +93,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=422, expected_count=0, user=self.admin)
 
     def test_create_incomplete_2(self):
-        """Check create request incomplete 2"""
+        """Check News: POST request incomplete 2"""
         payload = {
             "data": {
                 "type": "news",
@@ -107,7 +107,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=422, expected_count=0, user=self.admin)
 
     def test_create_incomplete_3(self):
-        """Check create request incomplete 3"""
+        """Check News: POST request incomplete 3"""
         payload = {
             "data": {
                 "type": "news",
@@ -121,7 +121,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=422, expected_count=0, user=self.admin)
 
     def test_create_minimal(self):
-        """Check create request minimal informations"""
+        """Check News: POST request minimal informations"""
         payload = {
             "data": {
                 "type": "news",
@@ -139,7 +139,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=403, expected_count=1, user=self.user2)
 
     def test_create_with_username(self):
-        """Check create request with username"""
+        """Check News: POST request with username"""
         payload = {
             "data": {
                 "type": "news",
@@ -158,7 +158,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=403, expected_count=1, user=self.user2)
 
     def test_create_with_author(self):
-        """Check create request with author"""
+        """Check News: POST request with author"""
         with app.test_request_context():
             self._blend_users()
             payload = {
@@ -185,7 +185,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=403, expected_count=1, user=self.user2)
 
     def test_create_full(self):
-        """Check create request full"""
+        """Check News: POST request full"""
         with app.test_request_context():
             self._blend_users()
             payload = {
@@ -212,7 +212,7 @@ class TestNews(GeokretyTestCase):
             self._post_news(payload, code=403, expected_count=1, user=self.user2)
 
     def test_get_list(self):
-        """Check GET news listing"""
+        """Check News: GET news listing"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -230,7 +230,7 @@ class TestNews(GeokretyTestCase):
             self._check_news_list(response, length=2)
 
     def test_get_list_from_user(self):
-        """Check GET news listing from user"""
+        """Check News: GET news listing from user"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -255,7 +255,7 @@ class TestNews(GeokretyTestCase):
             self._check_news_list(response, length=0)
 
     def test_get_details(self):
-        """Check GET news details"""
+        """Check News: GET news details"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -275,7 +275,7 @@ class TestNews(GeokretyTestCase):
             response = self._send_get('/v1/news/666', code=404, user=self.admin)
 
     def test_get_details_from_news_comment(self):
-        """Check GET news details from news comment"""
+        """Check News: GET news details from news comment"""
         with app.test_request_context():
             self._blend_users()
             self._blend()
@@ -296,7 +296,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_list(self):
         """
-        Check patch list cannot be patched
+        Check News: PATCH list cannot be patched
         """
         with app.test_request_context():
             self._blend_users()
@@ -308,7 +308,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_title(self):
         """
-        Check patch title
+        Check News: PATCH title
         """
         with app.test_request_context():
             self._blend_users()
@@ -336,7 +336,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_content(self):
         """
-        Check patch content
+        Check News: PATCH content
         """
         with app.test_request_context():
             self._blend_users()
@@ -364,7 +364,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_username(self):
         """
-        Check patch username
+        Check News: PATCH username
         """
         with app.test_request_context():
             self._blend_users()
@@ -392,7 +392,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_full(self):
         """
-        Check patch full
+        Check News: PATCH full
         """
         with app.test_request_context():
             self._blend_users()
@@ -422,7 +422,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_nothing(self):
         """
-        Check patch nothing
+        Check News: PATCH nothing
         """
         with app.test_request_context():
             self._blend_users()
@@ -443,7 +443,7 @@ class TestNews(GeokretyTestCase):
 
     def test_patch_same_data(self):
         """
-        Check patch same data
+        Check News: PATCH same data
         """
         with app.test_request_context():
             self._blend_users()
@@ -466,7 +466,7 @@ class TestNews(GeokretyTestCase):
 
     def test_delete_list(self):
         """
-        Check delete list
+        Check News: DELETE list
         """
         with app.test_request_context():
             self._blend_users()
@@ -478,7 +478,7 @@ class TestNews(GeokretyTestCase):
 
     def test_delete_anonymous(self):
         """
-        Check delete Anonymous
+        Check News: DELETE Anonymous
         """
         with app.test_request_context():
             self._blend_users()
@@ -488,7 +488,7 @@ class TestNews(GeokretyTestCase):
 
     def test_delete_admin(self):
         """
-        Check delete Admin
+        Check News: DELETE Admin
         """
         with app.test_request_context():
             self._blend_users()
@@ -498,7 +498,7 @@ class TestNews(GeokretyTestCase):
 
     def test_delete_user1(self):
         """
-        Check delete User1
+        Check News: DELETE User1
         """
         with app.test_request_context():
             self._blend_users()
@@ -508,7 +508,7 @@ class TestNews(GeokretyTestCase):
 
     def test_delete_user2(self):
         """
-        Check delete User2
+        Check News: DELETE User2
         """
         with app.test_request_context():
             self._blend_users()

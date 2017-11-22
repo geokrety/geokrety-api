@@ -5,6 +5,7 @@ from app.api.helpers.exceptions import UnprocessableEntity, ConflictException, F
 class TestExceptionsHelperValidation(GeokretyTestCase):
 
     def test_exceptions(self):
+        """Check ExceptionsHelper: exceptions types"""
         # Unprocessable Entity Exception
         with self.assertRaises(UnprocessableEntity):
             raise UnprocessableEntity({'pointer': '/data/attributes/min-quantity'},

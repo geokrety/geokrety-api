@@ -57,13 +57,13 @@ class TestNewsSubscription(GeokretyTestCase):
         #     self.assertTrue('username' in attributes)
 
     def _subscribe(self, payload, code=201, expected_count=1, user=None):
-        """Check create request minimal informations"""
+        """Check NewsSubscription: POST request minimal informations"""
         with app.test_request_context():
             self._send_post("/v1/news-subscriptions", payload=payload, code=code, user=user)
             self.assertEqual(len(NewsSubscription.query.all()), expected_count)
 
     def test_post_content_types(self):
-        """Check accepted content types"""
+        """Check NewsSubscription: POST accepted content types"""
         with app.test_request_context():
             self._blend()
             self._send_post("/v1/news-subscriptions", payload="not a json", code=415,
@@ -72,7 +72,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._send_post("/v1/news-subscriptions", payload={"subscribed": True}, code=422, user=self.admin)
 
     def test_subscribe_incomplete_1(self):
-        """Check create request incomplete 1"""
+        """Check NewsSubscription: POST request incomplete 1"""
         payload = {
             "data": {
                 "type": "news-subscription"
@@ -83,7 +83,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=422, expected_count=0, user=self.admin)
 
     def test_subscribe_incomplete_2(self):
-        """Check create request incomplete 2"""
+        """Check NewsSubscription: POST request incomplete 2"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -97,7 +97,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=422, expected_count=0, user=self.admin)
 
     def test_subscribe_incomplete_3(self):
-        """Check create request incomplete 3"""
+        """Check NewsSubscription: POST request incomplete 3"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -111,7 +111,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=422, expected_count=0, user=self.admin)
 
     def test_subscribe_implicit_user(self):
-        """Check create request minimal informations"""
+        """Check NewsSubscription: POST request minimal informations"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -136,7 +136,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=201, expected_count=3, user=self.user2)
 
     def test_subscribe_with_user(self):
-        """Check subscribe with user"""
+        """Check NewsSubscription: POST subscribe with user"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -173,7 +173,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=201, expected_count=3, user=self.user2)
 
     def test_subscribe_someone_else(self):
-        """Check subscribe someone else"""
+        """Check NewsSubscription: POST subscribe someone else"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -213,7 +213,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=201, expected_count=2, user=self.admin)
 
     def test_unsubscribe(self):
-        """Check create with subscribed=false autodelete rows"""
+        """Check NewsSubscription: POST with subscribed=false autodelete rows"""
         payload = {
             "data": {
                 "type": "news-subscription",
@@ -255,7 +255,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._subscribe(payload, code=201, expected_count=0, user=self.admin)
 
     def test_get_list(self):
-        """Check GET news-subscriptions listing"""
+        """Check NewsSubscription: GET news-subscriptions listing"""
         with app.test_request_context():
             self._blend()
             self._blend_subscription()
@@ -272,7 +272,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._check_news_subscription_list(response, length=0)
 
     def test_get_list_from_user(self):
-        """Check GET news-subscriptions listing from user"""
+        """Check NewsSubscription: GET news-subscriptions listing from user"""
         with app.test_request_context():
             self._blend()
             self._blend_subscription()
@@ -298,7 +298,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._check_news_subscription_list(response, length=0)
 
     def test_get_list_from_news(self):
-        """Check GET news-subscriptions listing from news"""
+        """Check NewsSubscription: GET news-subscriptions listing from news"""
         with app.test_request_context():
             self._blend()
             self._blend_subscription()
@@ -326,7 +326,7 @@ class TestNewsSubscription(GeokretyTestCase):
             self._check_news_subscription_list(response, length=0)
 
     def test_get_details(self):
-        """Check GET news-subscriptions details"""
+        """Check NewsSubscription: GET news-subscriptions details"""
         with app.test_request_context():
             self._blend()
             self._blend_subscription()
@@ -352,7 +352,7 @@ class TestNewsSubscription(GeokretyTestCase):
 
     def test_delete_list(self):
         """
-        Check delete list
+        Check NewsSubscription: DELETE list
         """
         with app.test_request_context():
             self._blend()
@@ -364,7 +364,7 @@ class TestNewsSubscription(GeokretyTestCase):
 
     def test_delete_anonymous(self):
         """
-        Check delete Anonymous
+        Check NewsSubscription: DELETE Anonymous
         """
         with app.test_request_context():
             self._blend()
@@ -375,7 +375,7 @@ class TestNewsSubscription(GeokretyTestCase):
 
     def test_delete_admin(self):
         """
-        Check delete Admin
+        Check NewsSubscription: DELETE Admin
         """
         with app.test_request_context():
             self._blend()
@@ -386,7 +386,7 @@ class TestNewsSubscription(GeokretyTestCase):
 
     def test_delete_user1(self):
         """
-        Check delete User1
+        Check NewsSubscription: DELETE User1
         """
         with app.test_request_context():
             self._blend()
@@ -397,7 +397,7 @@ class TestNewsSubscription(GeokretyTestCase):
 
     def test_delete_user2(self):
         """
-        Check delete User2
+        Check NewsSubscription: DELETE User2
         """
         with app.test_request_context():
             self._blend()

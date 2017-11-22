@@ -84,13 +84,13 @@ class TestUser(GeokretyTestCase):
             self.assertDateTimeEqual(attributes['join-date-time'], user.join_date_time)
 
     def test_post_content_types(self):
-        """Check accepted content types"""
+        """Check User: POST accepted content types"""
         self._send_post("/v1/users", payload="not a json", code=415, content_type='application/json')
         self._send_post("/v1/users", payload={}, code=422)
         self._send_post("/v1/users", payload={"user": "kumy"}, code=422)
 
     def test_create_incomplete(self):
-        """Check incomplete create request"""
+        """Check User: POST incomplete request"""
         payload = {
             "data": {
                 "type": "user"
@@ -99,7 +99,7 @@ class TestUser(GeokretyTestCase):
         self._send_post("/v1/users", payload=payload, code=422)
 
     def test_create_without_username(self):
-        """Check create request without username"""
+        """Check User: POST request without username"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -116,7 +116,7 @@ class TestUser(GeokretyTestCase):
             self._send_post("/v1/users", payload=payload, code=422)
 
     def test_create_without_password(self):
-        """Check create request without password"""
+        """Check User: POST without password"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -133,7 +133,7 @@ class TestUser(GeokretyTestCase):
             self._send_post("/v1/users", payload=payload, code=422)
 
     def test_create_without_email(self):
-        """Check create request without email"""
+        """Check User: POST without email"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -150,7 +150,7 @@ class TestUser(GeokretyTestCase):
             self._send_post("/v1/users", payload=payload, code=422)
 
     def test_create_minimal(self):
-        """Check create request minimal informations"""
+        """Check User: POST request minimal informations"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -175,7 +175,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user)
 
     def test_create_complete(self):
-        """Check create request full informations"""
+        """Check User: POST request full informations"""
         with app.test_request_context():
             with mixer.ctx(commit=False):
                 someone = mixer.blend(User)
@@ -206,7 +206,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_with_private(response, user)
 
     def test_create_user(self):
-        """Check create and Read back an user"""
+        """Check User: POST and Read back an user"""
         with app.test_request_context():
             mixer.init_app(app)
             admin = mixer.blend(User)
@@ -242,7 +242,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_without_private(response, user1, skip_check=['times'])
 
     def test_create_user_name_uniqueness(self):
-        """Check create user, name uniqueness"""
+        """Check User: POST name uniqueness"""
         with app.test_request_context():
             self._blend()
             with mixer.ctx(commit=False):
@@ -262,7 +262,7 @@ class TestUser(GeokretyTestCase):
             self._send_post('/v1/users', payload=payload, code=422)
 
     def test_create_user_email_uniqueness(self):
-        """Check create user, email uniqueness"""
+        """Check User: POST email uniqueness"""
         with app.test_request_context():
             self._blend()
             with mixer.ctx(commit=False):
@@ -282,7 +282,7 @@ class TestUser(GeokretyTestCase):
             self._send_post('/v1/users', payload=payload, code=422)
 
     def test_get_user_list(self):
-        """Check GET user listing must be authenticated"""
+        """Check User: GET user listing must be authenticated"""
         with app.test_request_context():
             self._blend()
             self._send_get('/v1/users', code=401)
@@ -291,7 +291,7 @@ class TestUser(GeokretyTestCase):
             self._send_get('/v1/users', code=200, user=self.user2)
 
     def test_get_user_details(self):
-        """Check GET user details"""
+        """Check User: GET user details"""
         with app.test_request_context():
             self._blend()
             url = '/v1/users/%d' % self.user1.id
@@ -309,7 +309,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_without_private(response, self.user1)
 
     def test_get_news_author(self):
-        """Check GET author details from a news"""
+        """Check User: GET author details from a news"""
         with app.test_request_context():
             self._blend()
             url = '/v1/news/%d/author' % self.news1.id
@@ -324,7 +324,7 @@ class TestUser(GeokretyTestCase):
             self._check_user_without_private(response, self.user1)
 
     def test_get_unexistent_news_author(self):
-        """Check GET author details from an unexistent news"""
+        """Check User: GET author details from an unexistent news"""
         with app.test_request_context():
             self._blend()
 
@@ -333,7 +333,7 @@ class TestUser(GeokretyTestCase):
             self._send_get('/v1/news/666/author', code=404, user=self.user2)
 
     def test_get_news_orphan(self):
-        """Check GET author details from an orphan news"""
+        """Check User: GET author details from an orphan news"""
         with app.test_request_context():
             self._blend()
             orphan_url = '/v1/news/%d/author' % self.orphan_news.id
@@ -343,7 +343,7 @@ class TestUser(GeokretyTestCase):
             self._send_get(orphan_url, code=404, user=self.user2)
 
     def test_get_news_comment_author(self):
-        """Check GET author from a news_comment"""
+        """Check User: GET author from a news_comment"""
         with app.test_request_context():
             self._blend()
             response = self._send_get('/v1/news-comments/1/author', code=200, user=self.admin)
@@ -359,7 +359,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_list(self):
         """
-        Check patch list cannot be patched
+        Check User: PATCH list cannot be patched
         """
         with app.test_request_context():
             self._blend()
@@ -370,7 +370,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_anonymous(self):
         """
-        Check patch anonymously is forbidden
+        Check User: PATCH anonymously is forbidden
         """
         with app.test_request_context():
             self._blend()
@@ -382,7 +382,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_full_admin_someone(self):
         """
-        Check patch admin can update everyone - Admin
+        Check User: PATCH admin can update everyone - Admin
         """
         with app.test_request_context():
             self._blend()
@@ -432,7 +432,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_full_user1_someone(self):
         """
-        Check patch user can only update himself - User1
+        Check User: PATCH user can only update himself - User1
         """
         with app.test_request_context():
             self._blend()
@@ -480,7 +480,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_same_username_admin(self):
         """
-        Check patch username uniqueness - Admin
+        Check User: PATCH username uniqueness - Admin
         """
         with app.test_request_context():
             self._blend()
@@ -503,7 +503,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_same_username_user1(self):
         """
-        Check patch username uniqueness - User1
+        Check User: PATCH username uniqueness - User1
         """
         with app.test_request_context():
             self._blend()
@@ -520,7 +520,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_same_email_admin(self):
         """
-        Check patch email uniqueness - Admin
+        Check User: PATCH email uniqueness - Admin
         """
         with app.test_request_context():
             self._blend()
@@ -543,7 +543,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_same_email_user1(self):
         """
-        Check patch email uniqueness - User1
+        Check User: PATCH email uniqueness - User1
         """
         with app.test_request_context():
             self._blend()
@@ -560,7 +560,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_id_must_match(self):
         """
-        Check patch id must match
+        Check User: PATCH id must match
         """
         with app.test_request_context():
             self._blend()
@@ -580,7 +580,7 @@ class TestUser(GeokretyTestCase):
 
     def test_patch_hour_is_read_only(self):
         """
-        Check patch hour is read only
+        Check User: PATCH hour is read only
         """
         with app.test_request_context():
             self._blend()
@@ -599,7 +599,7 @@ class TestUser(GeokretyTestCase):
 
     def test_delete_list(self):
         """
-        Check delete list
+        Check User: DELETE list
         """
         with app.test_request_context():
             self._blend()
@@ -610,7 +610,7 @@ class TestUser(GeokretyTestCase):
 
     def test_delete_anonymous(self):
         """
-        Check delete Anonymous
+        Check User: DELETE Anonymous
         """
         with app.test_request_context():
             self._blend()
@@ -621,7 +621,7 @@ class TestUser(GeokretyTestCase):
 
     def test_delete_admin(self):
         """
-        Check delete Admin
+        Check User: DELETE Admin
         """
         with app.test_request_context():
             self._blend()
@@ -632,7 +632,7 @@ class TestUser(GeokretyTestCase):
 
     def test_delete_user1(self):
         """
-        Check delete User1
+        Check User: DELETE User1
         """
         with app.test_request_context():
             self._blend()
@@ -643,7 +643,7 @@ class TestUser(GeokretyTestCase):
 
     def test_delete_user2(self):
         """
-        Check delete User2
+        Check User: DELETE User2
         """
         with app.test_request_context():
             self._blend()

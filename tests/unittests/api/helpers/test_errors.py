@@ -5,6 +5,7 @@ from app.api.helpers.errors import ErrorResponse, ForbiddenError, NotFoundError,
 class TestErrorsHelperValidation(GeokretyTestCase):
 
     def test_errors(self):
+        """Check ErrorsHelper: errors codes"""
         with app.test_request_context():
             # Base error
             base_error = ErrorResponse({'source': ''}, 'Internal Server Error.', title='Internal Server Error.', status=500)
@@ -23,6 +24,7 @@ class TestErrorsHelperValidation(GeokretyTestCase):
             self.assertEqual(internal_server_error.status, 500)
 
     def test_errors_response(self):
+        """Check ErrorsHelper: errors response headers"""
         with app.test_request_context():
             not_found_error = NotFoundError({'source': ''}, 'Object not found.')
             response = not_found_error.respond()
