@@ -42,7 +42,7 @@ def safe_query(self, model, column_name, value, parameter_name):
     :return:
     """
     try:
-        record = self.session.query(model).filter(
+        record = db.session.query(model).filter(
             getattr(model, column_name) == value).one()
     except NoResultFound:
         raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},

@@ -3,6 +3,7 @@ from app.api.helpers.permissions import jwt_required
 from flask import request
 from flask_jwt import current_identity
 from sqlalchemy.orm.exc import NoResultFound
+from app.models.geokret import Geokret
 
 
 @jwt_required
@@ -31,10 +32,31 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
     return view(*view_args, **view_kwargs)
 
 
+@jwt_required
+def is_owner(view, view_args, view_kwargs, *args, **kwargs):
+    """
+    Allows GeoKret owner access to private resources of owned GeoKrety.
+    Otherwise the user can only access public resource.
+    """
+    user = current_identity
+    if user.is_admin:
+        return view(*view_args, **view_kwargs)
+
+    try:
+        geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
+    except NoResultFound:
+        return NotFoundError({'parameter': 'geokret_id'}, 'Geokret not found.').respond()
+
+    if geokret.owner_id == user.id:
+        return view(*view_args, **view_kwargs)
+
+    return ForbiddenError({'source': ''}, 'Access denied.').respond()
+
 permissions = {
     'is_admin': is_admin,
     'is_user_itself': is_user_itself,
     'auth_required': auth_required,
+    'is_owner': is_owner,
 }
 
 

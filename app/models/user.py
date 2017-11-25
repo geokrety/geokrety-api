@@ -127,6 +127,11 @@ class User(db.Model):
         backref="user",
         cascade="all,delete"
     )
+    geokrety_owned = db.relationship(
+        'Geokret',
+        backref="owner",
+        cascade="all,delete"
+    )
 
     @hybrid_property
     def password(self):
