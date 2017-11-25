@@ -14,15 +14,26 @@ Before submitting your pull request, it is recommended to launch the Unit Tests 
 
 ## Unit Tests
 
-Launch all tests:
+### Launch all tests:
 
 ```
 nosetests tests/unittests/ --verbose
 ```
 
-Launch tests on a specific file:
+### Launch tests on a specific file:
 ```
 nosetests tests/unittests/api/test_news_subscription.py --verbose
+```
+
+### Launch tests on a specific file and specific function:
+```
+nosetests tests/unittests/api/test_geokret.py:TestGeokret.test_patch_full_admin_someone --verbose
+```
+
+### Launch tests automatically on file change:
+You need to install `inotify-tools` (On Ubuntu: `sudo apt install inotify-tools`)
+```
+inotifywait -r -m -e close_write --exclude '\.pyc$' . | while read path _ file; do nosetests tests/unittests/api/test_geokret.py --verbose; done
 ```
 
 ## Validating documentation
