@@ -1,6 +1,7 @@
 import json
 
 from app import current_app as app
+from app.models import db
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
@@ -15,7 +16,10 @@ class TestAuthentication(GeokretyTestCase):
         super(TestAuthentication, self).setUp()
         with app.test_request_context():
             mixer.init_app(app)
-            mixer.blend(User, name=self.username, _password=self.password)
+            with mixer.ctx(commit=False):
+                user = mixer.blend(User, name=self.username, _password=self.password)
+                db.session.add(user)
+                db.session.commit()
 
     def _check_login(self, name, password):
         return self.app.post('/auth/session',

@@ -1,4 +1,5 @@
 from app import current_app as app
+from app.models import db
 from app.models.news import News
 from app.models.news_subscription import NewsSubscription
 from app.models.user import User
@@ -18,14 +19,20 @@ class TestNewsSubscription(GeokretyTestCase):
     def _blend(self):
         """Create mocked User/News/NewsComments"""
         mixer.init_app(app)
-        self.admin = mixer.blend(User)
-        self.user1 = mixer.blend(User)
-        self.user2 = mixer.blend(User)
-        self.news1 = mixer.blend(News, author=self.user1)
-        self.news2 = mixer.blend(News)
-        self.orphan_news = mixer.blend(News, author=None)
-        # self.newscomment1 = mixer.blend(NewsComment, author=self.user1, news=self.news1)
-        # self.newscomment2 = mixer.blend(NewsComment, author=self.user2, news=self.news1)
+        with mixer.ctx(commit=False):
+            self.admin = mixer.blend(User)
+            self.user1 = mixer.blend(User)
+            self.user2 = mixer.blend(User)
+            self.news1 = mixer.blend(News, author=self.user1)
+            self.news2 = mixer.blend(News)
+            self.orphan_news = mixer.blend(News, author=None)
+            db.session.add(self.admin)
+            db.session.add(self.user1)
+            db.session.add(self.user2)
+            db.session.add(self.news1)
+            db.session.add(self.news2)
+            db.session.add(self.orphan_news)
+            db.session.commit()
 
     def _check_news_subscription_details(self, data, news):
         pass
