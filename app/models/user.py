@@ -130,6 +130,13 @@ class User(db.Model):
     geokrety_owned = db.relationship(
         'Geokret',
         backref="owner",
+        foreign_keys="Geokret.owner_id",
+        cascade="all,delete"
+    )
+    geokrety_inventory = db.relationship(
+        'Geokret',
+        backref="hands_of",
+        foreign_keys="Geokret.hands_of_id",
         cascade="all,delete"
     )
 

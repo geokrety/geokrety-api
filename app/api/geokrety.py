@@ -4,6 +4,7 @@ from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
+from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
@@ -11,10 +12,25 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 
 class GeokretList(ResourceList):
 
+    def query(self, view_kwargs):
+        """Filter geokrety"""
+        query_ = self.session.query(Geokret)
+
+        # /users/<int:owner_id>/geokrety-owned
+        if view_kwargs.get('owner_id') is not None:
+            safe_query(self, User, 'id', view_kwargs['owner_id'], 'owner_id')
+            query_ = query_.filter_by(owner_id=view_kwargs['owner_id'])
+
+        return query_
+
     def before_marshmallow(self, args, kwargs):
         if current_identity:
             # Is admin?
             if has_access('is_admin', user_id=current_identity.id):
+                self.schema = GeokretSchema
+
+            # List owned geokret
+            if kwargs.get('owner_id') is not None and kwargs.get('owner_id') == current_identity.id:
                 self.schema = GeokretSchema
 
     def post(self, *args, **kwargs):
@@ -28,7 +44,10 @@ class GeokretList(ResourceList):
     )
     data_layer = {
         'session': db.session,
-        'model': Geokret
+        'model': Geokret,
+        'methods': {
+            'query': query,
+        }
     }
 
 
@@ -46,9 +65,6 @@ class GeokretDetail(ResourceDetail):
                 if geokret.owner_id == current_identity.id:
                     self.schema = GeokretSchema
 
-    # def before_patch(self, args, kwargs, data):
-    #     self.schema = GeokretSchema
-
     current_identity = current_identity
     decorators = (
         api.has_permission('is_owner', methods="PATCH,DELETE",
@@ -57,16 +73,8 @@ class GeokretDetail(ResourceDetail):
     )
     methods = ('GET', 'PATCH', 'DELETE')
     schema = GeokretSchemaPublic
-    data_layer = {'session': db.session,
-                  'model': Geokret,
-                  # 'methods': {
-                  #     'before_get_object': before_get_object,
-                  # },
-                  }
-#
-#
-# class UserRelationship(ResourceRelationship):
-#     methods = ['GET']
-#     schema = UserSchema
-#     data_layer = {'session': db.session,
-#                   'model': User}
+    data_layer = {
+        'session': db.session,
+        'model': Geokret,
+    }
+

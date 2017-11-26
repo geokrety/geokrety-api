@@ -324,54 +324,55 @@ class TestGeokret(GeokretyTestCase):
             response = self._send_get(url, code=200, user=self.user2)
             self._check_geokret_without_private(response['data'], self.geokret1)
 
-    # def test_get_news_author(self):
-    #     """ Check Geokret: GET author details from a news"""
-    #     with app.test_request_context():
-    #         self._blend()
-    #         url = '/v1/news/%d/author' % self.news1.id
-    #
-    #         response = self._send_get(url, code=200)
-    #         self._check_user_without_private(response, self.user1)
-    #         response = self._send_get(url, code=200, user=self.admin)
-    #         self._check_user_with_private(response, self.user1)
-    #         response = self._send_get(url, code=200, user=self.user1)
-    #         self._check_user_with_private(response, self.user1)
-    #         response = self._send_get(url, code=200, user=self.user2)
-    #         self._check_user_without_private(response, self.user1)
-    #
-    # def test_get_unexistent_news_author(self):
-    #     """ Check Geokret: GET author details from an unexistent news"""
-    #     with app.test_request_context():
-    #         self._blend()
-    #
-    #         self._send_get('/v1/news/666/author', code=404, user=self.admin)
-    #         self._send_get('/v1/news/666/author', code=404, user=self.user1)
-    #         self._send_get('/v1/news/666/author', code=404, user=self.user2)
-    #
-    # def test_get_news_orphan(self):
-    #     """ Check Geokret: GET author details from an orphan news"""
-    #     with app.test_request_context():
-    #         self._blend()
-    #         orphan_url = '/v1/news/%d/author' % self.orphan_news.id
-    #
-    #         self._send_get(orphan_url, code=404, user=self.admin)
-    #         self._send_get(orphan_url, code=404, user=self.user1)
-    #         self._send_get(orphan_url, code=404, user=self.user2)
-    #
-    # def test_get_news_comment_author(self):
-    #     """ Check Geokret: GET author from a news_comment"""
-    #     with app.test_request_context():
-    #         self._blend()
-    #         response = self._send_get('/v1/news-comments/1/author', code=200, user=self.admin)
-    #         self._check_user_with_private(response, self.user1)
-    #         response = self._send_get('/v1/news-comments/1/author', code=200, user=self.user1)
-    #         self._check_user_with_private(response, self.user1)
-    #         response = self._send_get('/v1/news-comments/1/author', code=200, user=self.user2)
-    #         self._check_user_without_private(response, self.user1)
-    #
-    #         self._send_get('/v1/news-comments/666/author', code=404, user=self.admin)
-    #         self._send_get('/v1/news-comments/666/author', code=404, user=self.user1)
-    #         self._send_get('/v1/news-comments/666/author', code=404, user=self.user2)
+    def test_get_geokrety_owned(self):
+        """ Check Geokret: GET geokrety owned"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/users/%d/geokrety-owned' % self.user1.id
+
+            response = self._send_get(url, code=200)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret_without_private(response[0], self.geokret1)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret_with_private(response[0], self.geokret1)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret_with_private(response[0], self.geokret1)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret_without_private(response[0], self.geokret1)
+
+    def test_get_geokrety_owned_empty(self):
+        """ Check Geokret: GET geokrety owned - Empty list"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/users/%d/geokrety-owned' % self.admin.id
+
+            response = self._send_get(url, code=200)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 0)
+
+    def test_get_geokrety_owned_unexistent_user(self):
+        """ Check Geokret: GET geokrety owned from an unexistent user"""
+        with app.test_request_context():
+            self._blend()
+
+            self._send_get('/v1/users/666/geokrety-owned', code=404)
+            self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.admin)
+            self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.user1)
+            self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.user2)
 
     def test_patch_list(self):
         """

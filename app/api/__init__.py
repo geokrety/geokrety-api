@@ -26,5 +26,5 @@ api.route(NewsSubscriptionDetail, 'news_subscription_details', '/news-subscripti
 api.route(NewsSubscriptionRelationship, 'news_subscription_user', '/news-subscriptions/<int:id>/relationship/user')
 api.route(NewsSubscriptionRelationship, 'news_subscription_news', '/news-subscriptions/<int:id>/relationship/news')
 
-api.route(GeokretList, 'geokrety_list', '/geokrety')
+api.route(GeokretList, 'geokrety_list', '/geokrety', '/users/<int:owner_id>/geokrety-owned')
 api.route(GeokretDetail, 'geokret_details', '/geokrety/<int:id>')

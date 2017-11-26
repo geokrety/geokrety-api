@@ -34,6 +34,11 @@ class Geokret(db.Model):
         nullable=False,
         default=''
     )
+    type = db.Column(
+        'type',
+        db.Enum('0', '1', '2', '3', '4'),
+        key='type'
+    )
     missing = db.Column(
         'missing',
         db.Boolean,
@@ -81,6 +86,30 @@ class Geokret(db.Model):
         db.ForeignKey('gk-users.id'),
         key='owner_id'
     )
+    hands_of_id = db.Column(
+        'hands_of',
+        db.Integer,
+        db.ForeignKey('gk-users.id'),
+        key='hands_of_id'
+    )
+    # last_position_id = db.Column(
+    #     'ost_pozycja_id',
+    #     db.Integer,
+    #     db.ForeignKey('gk-ruchy.id'),
+    #     key='last_position_id'
+    # )
+    # last_log_id = db.Column(
+    #     'ost_log_id',
+    #     db.Integer,
+    #     db.ForeignKey('gk-ruchy.id'),
+    #     key='last_log_id'
+    # )
+    # avatar_id = db.Column(
+    #     'avatarid',
+    #     db.Integer,
+    #     db.ForeignKey('gk-obrazki.id'),
+    #     key='avatar_id'
+    # )
 
     # news = db.relationship(
     #     'News',
