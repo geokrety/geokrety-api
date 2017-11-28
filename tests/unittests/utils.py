@@ -67,16 +67,12 @@ class GeokretyTestCase(unittest.TestCase):
               method,
               endpoint,
               code=200,
-              parameters=None,
               payload=None,
               user=None,
               content_type='application/vnd.api+json'):
         """
         Send a POST request to the api, and check expected response code.
         """
-        if not parameters:
-            parameters = {}
-
         if not payload:
             payload = {}
 
@@ -104,7 +100,6 @@ class GeokretyTestCase(unittest.TestCase):
     def _send_post(self,
                    endpoint,
                    code=200,
-                   parameters=None,
                    payload=None,
                    user=None,
                    content_type='application/vnd.api+json'):
@@ -112,14 +107,12 @@ class GeokretyTestCase(unittest.TestCase):
                           endpoint,
                           code=code,
                           payload=payload,
-                          parameters=parameters,
                           user=user,
                           content_type=content_type)
 
     def _send_get(self,
                   endpoint,
                   code=200,
-                  parameters=None,
                   payload=None,
                   user=None,
                   content_type='application/vnd.api+json'):
@@ -127,14 +120,12 @@ class GeokretyTestCase(unittest.TestCase):
                           endpoint,
                           code=code,
                           payload=payload,
-                          parameters=parameters,
                           user=user,
                           content_type=content_type)
 
     def _send_patch(self,
                     endpoint,
                     code=200,
-                    parameters=None,
                     payload=None,
                     user=None,
                     content_type='application/vnd.api+json'):
@@ -142,14 +133,12 @@ class GeokretyTestCase(unittest.TestCase):
                           endpoint,
                           code=code,
                           payload=payload,
-                          parameters=parameters,
                           user=user,
                           content_type=content_type)
 
     def _send_delete(self,
                      endpoint,
                      code=200,
-                     parameters=None,
                      payload=None,
                      user=None,
                      content_type='application/vnd.api+json'):
@@ -157,7 +146,6 @@ class GeokretyTestCase(unittest.TestCase):
                           endpoint,
                           code=code,
                           payload=payload,
-                          parameters=parameters,
                           user=user,
                           content_type=content_type)
 
@@ -184,3 +172,43 @@ class GeokretyTestCase(unittest.TestCase):
     #         self.assertFalse(raised, 'Date is not parsable')
     #     else:
     #         self.assertEqual(date_str, date_obj.strftime("%Y-%m-%d"))
+
+    def _check_geokret(self, data, geokret, skip_check=None, with_private=False):
+        skip_check = skip_check or []
+        # self.assertTrue('attributes' in data['data'])
+        # attributes = data['data']['attributes']
+        self.assertTrue('attributes' in data)
+        attributes = data['attributes']
+
+        self.assertTrue('name' in attributes)
+        self.assertTrue('description' in attributes)
+        self.assertTrue('missing' in attributes)
+        self.assertTrue('distance' in attributes)
+        self.assertTrue('caches-count' in attributes)
+        self.assertTrue('pictures-count' in attributes)
+        self.assertTrue('average-rating' in attributes)
+        self.assertTrue('created-on-date-time' in attributes)
+        self.assertTrue('updated-on-date-time' in attributes)
+
+        self.assertEqual(attributes['name'], geokret.name)
+        self.assertEqual(attributes['description'], geokret.description)
+        self.assertEqual(attributes['missing'], geokret.missing)
+        self.assertEqual(attributes['distance'], geokret.distance)
+        self.assertEqual(attributes['caches-count'], geokret.caches_count)
+        self.assertEqual(attributes['pictures-count'], geokret.pictures_count)
+        self.assertEqual(attributes['average-rating'], geokret.average_rating)
+
+        if 'times' not in skip_check:
+            self.assertDateTimeEqual(attributes['created-on-date-time'], geokret.created_on_date_time)
+            self.assertDateTimeEqual(attributes['updated-on-date-time'], geokret.updated_on_date_time)
+
+        if with_private is not None:
+            self.assertTrue('attributes' in data)
+            attributes = data['attributes']
+
+            if with_private:
+                self.assertTrue('tracking-code' in attributes)
+                if 'tracking-code' not in skip_check:
+                    self.assertEqual(attributes['tracking-code'], geokret.tracking_code)
+            else:
+                self.assertFalse('tracking-code' in attributes)

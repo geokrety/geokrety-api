@@ -16,6 +16,7 @@ from flask_cors import CORS
 from flask_jwt import JWT
 from flask_rest_jsonapi.errors import jsonapi_errors
 from flask_script import Manager
+from flask_rest_jsonapi.exceptions import JsonApiException
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

@@ -17,8 +17,8 @@ class TestGeokret(GeokretyTestCase):
             self.admin = mixer.blend(User)
             self.user1 = mixer.blend(User)
             self.user2 = mixer.blend(User)
-            self.geokret1 = mixer.blend(Geokret, owner=self.user1)
-            self.geokret2 = mixer.blend(Geokret, owner=self.user2)
+            self.geokret1 = mixer.blend(Geokret, owner=self.user1, holder=self.user2)
+            self.geokret2 = mixer.blend(Geokret, owner=self.user2, holder=self.user1)
             self.geokret3 = mixer.blend(Geokret)
             db.session.add(self.admin)
             db.session.add(self.user1)
@@ -27,49 +27,6 @@ class TestGeokret(GeokretyTestCase):
             db.session.add(self.geokret2)
             db.session.add(self.geokret3)
             db.session.commit()
-
-    def _check_geokret_with_private(self, data, geokret, skip_check=None):
-        skip_check = skip_check or []
-        # self.assertTrue('attributes' in data['data'])
-        # attributes = data['data']['attributes']
-        self.assertTrue('attributes' in data)
-        attributes = data['attributes']
-
-        self.assertTrue('tracking-code' in attributes)
-
-        if 'tracking-code' not in skip_check:
-            self.assertEqual(attributes['tracking-code'], geokret.tracking_code)
-
-        self._check_geokret_without_private(data, geokret, skip_check)
-
-    def _check_geokret_without_private(self, data, geokret, skip_check=None):
-        skip_check = skip_check or []
-        # self.assertTrue('attributes' in data['data'])
-        # attributes = data['data']['attributes']
-        self.assertTrue('attributes' in data)
-        attributes = data['attributes']
-
-        self.assertTrue('name' in attributes)
-        self.assertTrue('description' in attributes)
-        self.assertTrue('missing' in attributes)
-        self.assertTrue('distance' in attributes)
-        self.assertTrue('caches-count' in attributes)
-        self.assertTrue('pictures-count' in attributes)
-        self.assertTrue('average-rating' in attributes)
-        self.assertTrue('created-on-date-time' in attributes)
-        self.assertTrue('updated-on-date-time' in attributes)
-
-        self.assertEqual(attributes['name'], geokret.name)
-        self.assertEqual(attributes['description'], geokret.description)
-        self.assertEqual(attributes['missing'], geokret.missing)
-        self.assertEqual(attributes['distance'], geokret.distance)
-        self.assertEqual(attributes['caches-count'], geokret.caches_count)
-        self.assertEqual(attributes['pictures-count'], geokret.pictures_count)
-        self.assertEqual(attributes['average-rating'], geokret.average_rating)
-
-        if 'times' not in skip_check:
-            self.assertDateTimeEqual(attributes['created-on-date-time'], geokret.created_on_date_time)
-            self.assertDateTimeEqual(attributes['updated-on-date-time'], geokret.updated_on_date_time)
 
     def test_create_authenticated_only(self):
         """Check Geokret: POST is reserved to authenticated users"""
@@ -154,13 +111,13 @@ class TestGeokret(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/geokrety", payload=payload, code=201, user=admin)
-            self._check_geokret_with_private(response['data'], akret, skip_check=['times', 'tracking-code'])
+            self._check_geokret(response['data'], akret, skip_check=['times', 'tracking-code'], with_private=True)
 
             geokrety = Geokret.query.all()
             self.assertEqual(len(geokrety), 1)
             geokret = geokrety[0]
             self.assertEqual(akret.name, geokret.name)
-            self._check_geokret_with_private(response['data'], geokret)
+            self._check_geokret(response['data'], geokret, with_private=True)
 
     def test_create_complete(self):
         """Check Geokret: POST request full informations"""
@@ -179,13 +136,13 @@ class TestGeokret(GeokretyTestCase):
                 }
             }
             response = self._send_post("/v1/geokrety", payload=payload, code=201, user=admin)
-            self._check_geokret_with_private(response['data'], akret, skip_check=['times', 'tracking-code'])
+            self._check_geokret(response['data'], akret, skip_check=['times', 'tracking-code'], with_private=True)
 
             geokrety = Geokret.query.all()
             self.assertEqual(len(geokrety), 1)
             geokret = geokrety[0]
             self.assertEqual(akret.name, geokret.name)
-            self._check_geokret_with_private(response['data'], geokret)
+            self._check_geokret(response['data'], geokret, with_private=True)
 
     def test_create_geokret(self):
         """ Check Geokret: POST and Read back a geokret"""
@@ -207,18 +164,18 @@ class TestGeokret(GeokretyTestCase):
                 }
             }
             response = self._send_post('/v1/geokrety', payload=payload, code=201, user=admin)
-            self._check_geokret_with_private(response['data'], akret, skip_check=['times', 'tracking-code'])
+            self._check_geokret(response['data'], akret, skip_check=['times', 'tracking-code'], with_private=True)
             akret.id = response['data']['id']
             akret.tracking_code = response['data']['attributes']['tracking-code']
 
             response = self._send_get('/v1/geokrety/%s' % akret.id, code=200)
-            self._check_geokret_without_private(response['data'], akret, skip_check=['times'])
+            self._check_geokret(response['data'], akret, skip_check=['times'])
 
             response = self._send_get('/v1/geokrety/%s' % akret.id, code=200, user=someone)
-            self._check_geokret_without_private(response['data'], akret, skip_check=['times'])
+            self._check_geokret(response['data'], akret, skip_check=['times'])
 
             response = self._send_get('/v1/geokrety/%s' % akret.id, code=200, user=admin)
-            self._check_geokret_with_private(response['data'], akret, skip_check=['times'])
+            self._check_geokret(response['data'], akret, skip_check=['times'], with_private=True)
 
     def test_create_geokret_ignore_non_writable_fields(self):
         """ Check Geokret: POST ignore non writable fields"""
@@ -284,27 +241,27 @@ class TestGeokret(GeokretyTestCase):
 
             response = self._send_get('/v1/geokrety', code=200)['data']
             self.assertEqual(len(response), 3)
-            self._check_geokret_without_private(response[0], self.geokret1)
-            self._check_geokret_without_private(response[1], self.geokret2)
-            self._check_geokret_without_private(response[2], self.geokret3)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+            self._check_geokret(response[2], self.geokret3)
 
             response = self._send_get('/v1/geokrety', code=200, user=self.admin)['data']
             self.assertEqual(len(response), 3)
-            self._check_geokret_with_private(response[0], self.geokret1)
-            self._check_geokret_with_private(response[1], self.geokret2)
-            self._check_geokret_with_private(response[2], self.geokret3)
+            self._check_geokret(response[0], self.geokret1, with_private=True)
+            self._check_geokret(response[1], self.geokret2, with_private=True)
+            self._check_geokret(response[2], self.geokret3, with_private=True)
 
             response = self._send_get('/v1/geokrety', code=200, user=self.user1)['data']
             self.assertEqual(len(response), 3)
-            self._check_geokret_without_private(response[0], self.geokret1)
-            self._check_geokret_without_private(response[1], self.geokret2)
-            self._check_geokret_without_private(response[2], self.geokret3)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+            self._check_geokret(response[2], self.geokret3)
 
             response = self._send_get('/v1/geokrety', code=200, user=self.user2)['data']
             self.assertEqual(len(response), 3)
-            self._check_geokret_without_private(response[0], self.geokret1)
-            self._check_geokret_without_private(response[1], self.geokret2)
-            self._check_geokret_without_private(response[2], self.geokret3)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+            self._check_geokret(response[2], self.geokret3)
 
     def test_get_geokrety_details(self):
         """ Check Geokret: GET geokrety details"""
@@ -313,16 +270,16 @@ class TestGeokret(GeokretyTestCase):
             url = '/v1/geokrety/%d' % self.geokret1.id
 
             response = self._send_get(url, code=200)
-            self._check_geokret_without_private(response['data'], self.geokret1)
+            self._check_geokret(response['data'], self.geokret1)
 
             response = self._send_get(url, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret1)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
 
             response = self._send_get(url, code=200, user=self.user1)
-            self._check_geokret_with_private(response['data'], self.geokret1)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
 
             response = self._send_get(url, code=200, user=self.user2)
-            self._check_geokret_without_private(response['data'], self.geokret1)
+            self._check_geokret(response['data'], self.geokret1)
 
     def test_get_geokrety_owned(self):
         """ Check Geokret: GET geokrety owned"""
@@ -332,19 +289,19 @@ class TestGeokret(GeokretyTestCase):
 
             response = self._send_get(url, code=200)['data']
             self.assertEqual(len(response), 1)
-            self._check_geokret_without_private(response[0], self.geokret1)
+            self._check_geokret(response[0], self.geokret1)
 
             response = self._send_get(url, code=200, user=self.admin)['data']
             self.assertEqual(len(response), 1)
-            self._check_geokret_with_private(response[0], self.geokret1)
+            self._check_geokret(response[0], self.geokret1, with_private=True)
 
             response = self._send_get(url, code=200, user=self.user1)['data']
             self.assertEqual(len(response), 1)
-            self._check_geokret_with_private(response[0], self.geokret1)
+            self._check_geokret(response[0], self.geokret1, with_private=True)
 
             response = self._send_get(url, code=200, user=self.user2)['data']
             self.assertEqual(len(response), 1)
-            self._check_geokret_without_private(response[0], self.geokret1)
+            self._check_geokret(response[0], self.geokret1)
 
     def test_get_geokrety_owned_empty(self):
         """ Check Geokret: GET geokrety owned - Empty list"""
@@ -373,6 +330,58 @@ class TestGeokret(GeokretyTestCase):
             self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.admin)
             self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.user1)
             self._send_get('/v1/users/666/geokrety-owned', code=404, user=self.user2)
+
+    def test_get_geokrety_held(self):
+        """ Check Geokret: GET geokrety held"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/users/%d/geokrety-held' % self.user1.id
+
+            response = self._send_get(url, code=200)['data']
+            import pprint
+            pprint.pprint(response)
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret2)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret2, with_private=True)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret2, with_private=True)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret2)
+
+    def test_get_geokrety_held_empty(self):
+        """ Check Geokret: GET geokrety held - Empty list"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/users/%d/geokrety-held' % self.admin.id
+
+            response = self._send_get(url, code=200)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 0)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 0)
+
+    def test_get_geokrety_held_unexistent_user(self):
+        """ Check Geokret: GET geokrety held from an unexistent user"""
+        with app.test_request_context():
+            self._blend()
+
+            self._send_get('/v1/users/666/geokrety-held', code=404)
+            self._send_get('/v1/users/666/geokrety-held', code=404, user=self.admin)
+            self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user1)
+            self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user2)
 
     def test_patch_list(self):
         """
@@ -427,19 +436,19 @@ class TestGeokret(GeokretyTestCase):
             payload["data"]["attributes"]["name"] = self.geokret1.name = "geokret_1"
             payload["data"]["attributes"]["description"] = self.geokret1.description = "description_1"
             response = self._send_patch("/v1/geokrety/1", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret1, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret1, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["name"] = self.geokret2.name = "geokret_2"
             payload["data"]["attributes"]["description"] = self.geokret2.description = "description_2"
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = self.geokret3.name = "geokret_3"
             payload["data"]["attributes"]["description"] = self.geokret3.description = "description_3"
             response = self._send_patch("/v1/geokrety/3", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret3, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret3, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "4"
             payload["data"]["attributes"]["name"] = "geokret_4"
@@ -476,7 +485,7 @@ class TestGeokret(GeokretyTestCase):
             payload["data"]["attributes"]["name"] = self.geokret1.name = "geokret_1"
             payload["data"]["attributes"]["description"] = self.geokret1.description = "description_1"
             response = self._send_patch("/v1/geokrety/1", payload=payload, code=200, user=self.user1)
-            self._check_geokret_with_private(response['data'], self.geokret1, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret1, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["name"] = self.geokret2.name = "geokret_2"
@@ -528,7 +537,7 @@ class TestGeokret(GeokretyTestCase):
             payload["data"]["attributes"]["name"] = self.geokret2.name = "geokret_2"
             payload["data"]["attributes"]["description"] = self.geokret2.description = "description_2"
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.user2)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = self.geokret3.name = "geokret_3"
@@ -556,17 +565,17 @@ class TestGeokret(GeokretyTestCase):
             }
             payload["data"]["attributes"]["name"] = self.geokret1.name = "geokret1.name"
             response = self._send_patch("/v1/geokrety/1", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret1, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret1, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["name"] = self.geokret2.name = "geokret2.name"
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = self.geokret3.name = "geokret3.name"
             response = self._send_patch("/v1/geokrety/3", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret3, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret3, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "4"
             payload["data"]["attributes"]["name"] = "geokret4.name"
@@ -591,17 +600,17 @@ class TestGeokret(GeokretyTestCase):
             print(self.geokret1.distance)
             payload["data"]["attributes"]["description"] = self.geokret1.description = "geokret1.description"
             response = self._send_patch("/v1/geokrety/1", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret1, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret1, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["description"] = self.geokret2.description = "geokret2.description"
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["description"] = self.geokret3.description = "geokret3.description"
             response = self._send_patch("/v1/geokrety/3", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret3, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret3, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "4"
             payload["data"]["attributes"]["description"] = "geokret4.description"
@@ -631,15 +640,15 @@ class TestGeokret(GeokretyTestCase):
                 }
             }
             response = self._send_patch("/v1/geokrety/1", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret1, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret1, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "2"
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             response = self._send_patch("/v1/geokrety/3", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret3, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret3, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "4"
             self._send_patch("/v1/geokrety/4", payload=payload, code=404, user=self.admin)
@@ -662,12 +671,12 @@ class TestGeokret(GeokretyTestCase):
             payload["data"]["id"] = "2"
             payload["data"]["attributes"]["name"] = self.geokret2.name = self.geokret1.name
             response = self._send_patch("/v1/geokrety/2", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret2, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret2, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "3"
             payload["data"]["attributes"]["name"] = self.geokret3.name = self.geokret1.name
             response = self._send_patch("/v1/geokrety/3", payload=payload, code=200, user=self.admin)
-            self._check_geokret_with_private(response['data'], self.geokret3, skip_check=['times'])
+            self._check_geokret(response['data'], self.geokret3, skip_check=['times'], with_private=True)
 
             payload["data"]["id"] = "4"
             self._send_patch("/v1/geokrety/4", payload=payload, code=404, user=self.admin)

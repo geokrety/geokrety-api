@@ -21,6 +21,11 @@ class GeokretList(ResourceList):
             safe_query(self, User, 'id', view_kwargs['owner_id'], 'owner_id')
             query_ = query_.filter_by(owner_id=view_kwargs['owner_id'])
 
+        # /users/<int:holder_id>/geokrety-held
+        if view_kwargs.get('holder_id') is not None:
+            safe_query(self, User, 'id', view_kwargs['holder_id'], 'holder_id')
+            query_ = query_.filter_by(holder_id=view_kwargs['holder_id'])
+
         return query_
 
     def before_marshmallow(self, args, kwargs):
@@ -31,6 +36,10 @@ class GeokretList(ResourceList):
 
             # List owned geokret
             if kwargs.get('owner_id') is not None and kwargs.get('owner_id') == current_identity.id:
+                self.schema = GeokretSchema
+
+            # List held geokret
+            if kwargs.get('holder_id') is not None and kwargs.get('holder_id') == current_identity.id:
                 self.schema = GeokretSchema
 
     def post(self, *args, **kwargs):
@@ -61,7 +70,7 @@ class GeokretDetail(ResourceDetail):
 
             # Is GeoKret owner?
             if kwargs.get('id') is not None:
-                geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'geokret_id')
+                geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'geokret_owned_id')
                 if geokret.owner_id == current_identity.id:
                     self.schema = GeokretSchema
 
@@ -78,3 +87,11 @@ class GeokretDetail(ResourceDetail):
         'model': Geokret,
     }
 
+
+class GeokretRelationship(ResourceRelationship):
+    methods = ['GET']
+    schema = GeokretSchemaPublic
+    data_layer = {
+        'session': db.session,
+        'model': Geokret,
+    }

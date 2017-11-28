@@ -35,7 +35,7 @@ class Geokret(db.Model):
         default=''
     )
     type = db.Column(
-        'type',
+        'typ',
         db.Enum('0', '1', '2', '3', '4'),
         key='type'
     )
@@ -86,11 +86,11 @@ class Geokret(db.Model):
         db.ForeignKey('gk-users.id'),
         key='owner_id'
     )
-    hands_of_id = db.Column(
+    holder_id = db.Column(
         'hands_of',
         db.Integer,
         db.ForeignKey('gk-users.id'),
-        key='hands_of_id'
+        key='holder_id'
     )
     # last_position_id = db.Column(
     #     'ost_pozycja_id',
@@ -110,25 +110,6 @@ class Geokret(db.Model):
     #     db.ForeignKey('gk-obrazki.id'),
     #     key='avatar_id'
     # )
-
-    # news = db.relationship(
-    #     'News',
-    #     backref="author",
-    #     cascade="all,delete"
-    # )
-    # news_comments = db.relationship(
-    #     'NewsComment',
-    #     backref="author",
-    #     cascade="all,delete"
-    # )
-    # news_subscriptions = db.relationship(
-    #     'NewsSubscription',
-    #     backref="user",
-    #     cascade="all,delete"
-    # )
-
-    def get_id(self):
-        return self.id
 
     @property
     def average_rating(self):

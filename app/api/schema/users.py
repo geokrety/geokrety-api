@@ -23,23 +23,46 @@ class UserSchemaPublic(Schema):
     join_date_time = fields.Date(dump_only=True)
 
     # statpic = Relationship()
-    news = Relationship(self_view='v1.user_news',
-                        self_view_kwargs={'id': '<id>'},
-                        related_view='v1.news_list',
-                        related_view_kwargs={'author_id': '<id>'},
-                        many=True,
-                        schema='NewsSchema',
-                        type_='news')
+    news = Relationship(
+        self_view='v1.user_news',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.news_list',
+        related_view_kwargs={'author_id': '<id>'},
+        many=True,
+        schema='NewsSchema',
+        type_='news'
+    )
 
-    news_comments = Relationship(self_view='v1.user_news_comments',
-                                 self_view_kwargs={'id': '<id>'},
-                                 related_view='v1.news_comments_list',
-                                 related_view_kwargs={'author_id': '<id>'},
-                                 many=True,
-                                 schema='NewsCommentSchema',
-                                 type_='news-comment',
-                                 # include_resource_linkage=True
-                                 )
+    news_comments = Relationship(
+        self_view='v1.user_news_comments',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.news_comments_list',
+        related_view_kwargs={'author_id': '<id>'},
+        many=True,
+        schema='NewsCommentSchema',
+        type_='news-comment',
+        # include_resource_linkage=True
+    )
+
+    geokrety_owned = Relationship(
+        self_view='v1.user_geokrety_owned',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.geokrety_list',
+        related_view_kwargs={'owner_id': '<id>'},
+        many=True,
+        schema='GeokretSchemaPublic',
+        type_='geokret',
+    )
+
+    geokrety_held = Relationship(
+        self_view='v1.user_geokrety_held',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.geokrety_list',
+        related_view_kwargs={'holder_id': '<id>'},
+        many=True,
+        schema='GeokretSchemaPublic',
+        type_='geokret',
+    )
 
 
 class UserSchema(UserSchemaPublic):
