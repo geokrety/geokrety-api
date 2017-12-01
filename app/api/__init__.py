@@ -1,5 +1,7 @@
 from app.api.bootstrap import api
 from app.api.geokrety import GeokretDetail, GeokretList, GeokretRelationship
+from app.api.geokrety_types import GeokretTypeDetail, GeokretTypeList
+from app.api.moves_types import MovesTypeDetail, MovesTypeList
 from app.api.news import NewsDetail, NewsList, NewsRelationship
 from app.api.news_comments import (NewsCommentDetail, NewsCommentList,
                                    NewsCommentRelationship)
@@ -38,6 +40,12 @@ api.route(NewsSubscriptionList, 'news_subscriptions_list', '/news-subscriptions'
 api.route(NewsSubscriptionDetail, 'news_subscription_details', '/news-subscriptions/<int:id>')
 api.route(NewsSubscriptionRelationship, 'news_subscription_user', '/news-subscriptions/<int:id>/relationship/user')
 api.route(NewsSubscriptionRelationship, 'news_subscription_news', '/news-subscriptions/<int:id>/relationship/news')
+
+api.route(MovesTypeList, 'moves_type_list', '/moves-types')
+api.route(MovesTypeDetail, 'moves_type_details', '/moves-types/<int:id>')
+
+api.route(GeokretTypeList, 'geokrety_type_list', '/geokrety-types')
+api.route(GeokretTypeDetail, 'geokrety_type_details', '/geokrety-types/<int:id>')
 
 api.route(GeokretList, 'geokrety_list', '/geokrety',
           '/users/<int:owner_id>/geokrety-owned', '/users/<int:holder_id>/geokrety-held')
