@@ -47,7 +47,7 @@ class GeoKretyTypeDataLayer(BaseDataLayer):
         elif 'geokret_id' in view_kwargs:
             geokret = safe_query(self, Geokret, 'id', view_kwargs['geokret_id'], 'id')
             type_id = int(geokret.type)
-        else:
+        else:  # pragma: no cover
             return None
         try:
             return GEOKRETY_TYPES[type_id]
