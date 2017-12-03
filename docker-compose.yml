@@ -11,7 +11,12 @@ services:
       - ./:/src/
       - ./.env.production:/src/.env
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.backend=geokrety-api-dev"
+      - "traefik.frontend.rule=Host:api.geokrety.house.kumy.net"
+      - "traefik.backend.loadbalancer.method=drr"
+      - "traefik.docker.network=kumy_default"
+      - "traefik.port=5000"
     networks:
       - back
     environment:

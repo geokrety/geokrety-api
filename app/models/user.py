@@ -139,6 +139,12 @@ class User(db.Model):
         foreign_keys="Geokret.holder_id",
         cascade="all,delete"
     )
+    geokrety_moves = db.relationship(
+        'Move',
+        backref="author",
+        foreign_keys="Move.author_id",
+        cascade="all,delete"
+    )
 
     @hybrid_property
     def password(self):

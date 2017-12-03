@@ -17,3 +17,4 @@ git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
 bcrypt==3.1.4
 requests[security]==2.19.1
 flask-script==2.0.6
+htmlentities

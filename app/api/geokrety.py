@@ -1,14 +1,15 @@
 from app.api.bootstrap import api
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
 from app.api.helpers.db import safe_query
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
-from app.api.helpers.data_layers import GEOKRETY_TYPES_COUNT
 from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
 class GeokretList(ResourceList):
@@ -29,9 +30,9 @@ class GeokretList(ResourceList):
 
         # /geokrety-types/<int:geokrety_type_id>/geokrety
         if view_kwargs.get('geokrety_type_id') is not None:
-            if view_kwargs['geokrety_type_id'] < 0 or view_kwargs['geokrety_type_id'] > GEOKRETY_TYPES_COUNT:
-                raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},
-                                     "{}: {} not found".format(model.__name__, value))
+            if str(view_kwargs['geokrety_type_id']) not in GEOKRETY_TYPES_LIST:
+                raise ObjectNotFound({'parameter': '{}'.format('geokrety_type_id')},
+                                     "{}: {} not found".format('geokrety_type', view_kwargs['geokrety_type_id']))
             query_ = query_.filter_by(type=str(view_kwargs['geokrety_type_id']))
 
         return query_

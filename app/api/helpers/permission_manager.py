@@ -1,9 +1,10 @@
 from app.api.helpers.errors import ForbiddenError, NotFoundError
 from app.api.helpers.permissions import jwt_required
+from app.models.geokret import Geokret
+from app.models.move import Move
 from flask import request
 from flask_jwt import current_identity
 from sqlalchemy.orm.exc import NoResultFound
-from app.models.geokret import Geokret
 
 
 @jwt_required
@@ -33,6 +34,26 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
 
 
 @jwt_required
+def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
+    """
+    Allows Move author to fully manage move.
+    """
+    user = current_identity
+    if user.is_admin:
+        return view(*view_args, **view_kwargs)
+
+    try:
+        move = Move.query.filter(Move.id == kwargs['move_id']).one()
+    except NoResultFound:
+        return NotFoundError({'parameter': 'id'}, 'Move not found.').respond()
+
+    if move.author_id == user.id:
+        return view(*view_args, **view_kwargs)
+
+    return ForbiddenError({'source': ''}, 'Access denied.').respond()
+
+
+@jwt_required
 def is_owner(view, view_args, view_kwargs, *args, **kwargs):
     """
     Allows GeoKret owner access to private resources of owned GeoKrety.
@@ -52,11 +73,13 @@ def is_owner(view, view_args, view_kwargs, *args, **kwargs):
 
     return ForbiddenError({'source': ''}, 'Access denied.').respond()
 
+
 permissions = {
     'is_admin': is_admin,
     'is_user_itself': is_user_itself,
     'auth_required': auth_required,
     'is_owner': is_owner,
+    'is_move_author': is_move_author,
 }
 
 

@@ -5,6 +5,8 @@ from datetime import date, datetime
 
 import phpass
 from app import current_app as app
+from app.api.helpers.data_layers import (MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
+                                         MOVE_TYPE_SEEN)
 from tests.unittests.setup_database import Setup
 
 
@@ -91,6 +93,7 @@ class GeokretyTestCase(unittest.TestCase):
             print("Endpoint: %s" % endpoint)
             pprint.pprint(json.dumps(payload, default=json_serial))
             pprint.pprint(data)
+            pprint.pprint(payload)
 
         self.assertEqual(response.status_code, code)
         if response.content_type in ['application/vnd.api+json', 'application/json'] and data:
@@ -175,8 +178,6 @@ class GeokretyTestCase(unittest.TestCase):
 
     def _check_geokret(self, data, geokret, skip_check=None, with_private=False):
         skip_check = skip_check or []
-        # self.assertTrue('attributes' in data['data'])
-        # attributes = data['data']['attributes']
         self.assertTrue('attributes' in data)
         attributes = data['attributes']
 
@@ -212,3 +213,48 @@ class GeokretyTestCase(unittest.TestCase):
                     self.assertEqual(attributes['tracking-code'], geokret.tracking_code)
             else:
                 self.assertFalse('tracking-code' in attributes)
+
+    def _check_move(self, data, move, skip_check=None):
+        skip_check = skip_check or []
+        self.assertTrue('attributes' in data)
+        attributes = data['attributes']
+
+        self.assertTrue('move-type-id' in attributes)
+        self.assertTrue('altitude' in attributes)
+        self.assertTrue('country' in attributes)
+        self.assertTrue('distance' in attributes)
+        self.assertTrue('comment' in attributes)
+        self.assertTrue('username' in attributes)
+        self.assertTrue('application-name' in attributes)
+        self.assertTrue('application-version' in attributes)
+        self.assertTrue('pictures-count' in attributes)
+        self.assertTrue('comments-count' in attributes)
+        self.assertTrue('moved-on-date-time' in attributes)
+        self.assertTrue('created-on-date-time' in attributes)
+        self.assertTrue('updated-on-date-time' in attributes)
+
+        self.assertEqual(attributes['move-type-id'], move.move_type_id)
+        self.assertEqual(attributes['altitude'], move.altitude)
+        self.assertEqual(attributes['country'], move.country)
+        self.assertEqual(attributes['distance'], move.distance)
+        self.assertEqual(attributes['comment'], move.comment)
+        self.assertEqual(attributes['username'], move.username)
+        self.assertEqual(attributes['application-name'], move.application_name)
+        self.assertEqual(attributes['application-version'], move.application_version)
+        self.assertEqual(attributes['pictures-count'], move.pictures_count)
+        self.assertEqual(attributes['comments-count'], move.comments_count)
+
+        if attributes['moved-on-date-time'] is not None:
+            self.assertDateTimeEqual(attributes['moved-on-date-time'], move.moved_on_date_time)
+
+        if attributes['move-type-id'] in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED):
+            self.assertTrue('latitude' in attributes)
+            self.assertTrue('longitude' in attributes)
+            self.assertTrue('waypoint' in attributes)
+            self.assertEqual(attributes['latitude'], float(move.latitude))
+            self.assertEqual(attributes['longitude'], float(move.longitude))
+            self.assertEqual(attributes['waypoint'], move.waypoint)
+
+        if 'times' not in skip_check:
+            self.assertDateTimeEqual(attributes['created-on-date-time'], move.created_on_date_time)
+            self.assertDateTimeEqual(attributes['updated-on-date-time'], move.updated_on_date_time)

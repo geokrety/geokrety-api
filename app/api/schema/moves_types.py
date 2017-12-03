@@ -7,7 +7,7 @@ from marshmallow_jsonapi.flask import Schema
 class MovesTypesSchema(Schema):
     class Meta:
         type_ = 'geokrety-type'
-        self_view = 'v1.moves_type_details'
+        self_view = 'v1.move_type_details'
         self_view_kwargs = {'id': '<id>'}
         self_view_many = 'v1.moves_type_list'
         inflect = dasherize

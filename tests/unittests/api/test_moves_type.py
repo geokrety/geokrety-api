@@ -1,5 +1,5 @@
 from app import current_app as app
-from app.api.helpers.data_layers import MOVE_TYPES, MOVE_TYPES_COUNT
+from app.api.helpers.data_layers import MOVE_TYPES, MOVE_TYPES_LIST
 from app.models import db
 from app.models.user import User
 from mixer.backend.flask import mixer
@@ -45,7 +45,7 @@ class TestMovesType(GeokretyTestCase):
             self._blend()
 
             def check(response):
-                self.assertEqual(len(response), MOVE_TYPES_COUNT)
+                self.assertEqual(len(response), len(MOVE_TYPES_LIST))
                 self.assertTrue('attributes' in response[0])
                 self.assertTrue('name' in response[0]['attributes'])
                 self.assertTrue('name' in response[1]['attributes'])
@@ -67,7 +67,7 @@ class TestMovesType(GeokretyTestCase):
         """ Check MovesType: GET moves-types details"""
         with app.test_request_context():
             self._blend()
-            url = '/v1/moves-types/%d'
+            url = '/v1/moves-types/%s'
 
             def check(response, name):
                 self.assertTrue('attributes' in response)
@@ -135,7 +135,7 @@ class TestMovesType(GeokretyTestCase):
 
     def test_delete_forbidden(self):
         """
-        Check Geokret: DELETE Anonymous
+        Check MovesType: DELETE Anonymous
         """
         with app.test_request_context():
             self._blend()

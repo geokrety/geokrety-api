@@ -1,6 +1,7 @@
 from app.api.bootstrap import api
 from app.api.geokrety import GeokretDetail, GeokretList, GeokretRelationship
 from app.api.geokrety_types import GeokretTypeDetail, GeokretTypeList
+from app.api.moves import MoveDetail, MovesList, MoveRelationship
 from app.api.moves_types import MovesTypeDetail, MovesTypeList
 from app.api.news import NewsDetail, NewsList, NewsRelationship
 from app.api.news_comments import (NewsCommentDetail, NewsCommentList,
@@ -16,7 +17,8 @@ api.route(UserDetail, 'user_details',
           '/news/<int:news_id>/author',
           '/news-comments/<int:newscomment_id>/author',
           '/geokrety/<int:geokret_owned_id>/owner',
-          '/geokrety/<int:geokret_held_id>/holder')
+          '/geokrety/<int:geokret_held_id>/holder',
+          '/move/<int:move_author_id>/author')
 api.route(UserRelationship, 'user_news', '/users/<int:id>/relationship/news')
 api.route(UserRelationship, 'user_news_comments', '/users/<int:id>/relationship/news-comments')
 api.route(UserRelationship, 'user_geokrety_owned', '/users/<int:id>/relationship/geokrety-owned')
@@ -44,7 +46,7 @@ api.route(NewsSubscriptionRelationship, 'news_subscription_user', '/news-subscri
 api.route(NewsSubscriptionRelationship, 'news_subscription_news', '/news-subscriptions/<int:id>/relationship/news')
 
 api.route(MovesTypeList, 'moves_type_list', '/moves-types')
-api.route(MovesTypeDetail, 'moves_type_details', '/moves-types/<int:id>')
+api.route(MovesTypeDetail, 'move_type_details', '/moves-types/<int:id>')
 
 api.route(GeokretTypeList, 'geokrety_type_list', '/geokrety-types')
 api.route(GeokretTypeDetail, 'geokrety_type_details',
@@ -58,3 +60,16 @@ api.route(GeokretList, 'geokrety_list', '/geokrety',
 api.route(GeokretDetail, 'geokret_details', '/geokrety/<int:id>')
 api.route(GeokretRelationship, 'geokret_owner', '/geokrety/<int:id>/relationship/owner')
 api.route(GeokretRelationship, 'geokret_holder', '/geokrety/<int:id>/relationship/holder')
+
+api.route(
+    MovesList,
+    'moves_list',
+    '/moves'
+)
+api.route(
+    MoveDetail,
+    'move_details',
+    '/moves/<int:id>'
+)
+api.route(MoveRelationship, 'move_author', '/moves/<int:id>/relationship/author')
+api.route(MoveRelationship, 'move_type', '/moves/<int:id>/relationship/type')
