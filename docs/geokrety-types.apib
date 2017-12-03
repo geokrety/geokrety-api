@@ -71,114 +71,7 @@ Currently known types.
     + Attributes (Error 404)
 
 
-### Update GeoKrety Type [PATCH]
-Update a single GeoKrety Type by `id`.
-
-
-+ Request
-
-    + Headers
-
-            Authorization: JWT <Auth Key>
-            Content-Type: application/vnd.api+json
-
-
-    + Attributes (object)
-        + `data` (geokrety-types-data-type, required)
-          + `attributes` (geokrety-types-attributes)
-
-+ Response 200 (application/vnd.api+json)
-
-    + Attributes (object)
-        + `data` (geokrety-types-data, required)
-        + `jsonapi` (jsonapi, required)
-        + `links` (object, required)
-            + `self`: `/geokrety-types`
-
-+ Response 401 (application/json)
-
-    + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
-
-+ Response 404 (application/json)
-
-    + Attributes (Error 404)
-
-+ Response 422 (application/json)
-
-    + Attributes (Error 422)
-
-
-
-### Delete GeoKrety Type [DELETE]
-
-::: warning
-#### <i class="fa fa-warning"></i> Caution
-This will delete **all** GeoKrety of that type, including logs, comments and pictures.
-:::
-
-+ Request
-
-    + Headers
-
-            Authorization: JWT <Auth Key>
-            Accept: application/vnd.api+json
-
-+ Response 200 (application/vnd.api+json)
-
-    + Attributes (Deleted, required)
-
-+ Response 401 (application/json)
-
-    + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
-
-+ Response 404 (application/json)
-
-    + Attributes (Error 404)
-
-
 ## GeoKrety Collection [/v1/geokrety-types{?page%5Bsize%5D,page%5Bnumber%5D,sort,filter}]
-
-
-### Create a GeoKrety Type [POST]
-
-+ Request
-
-    + Attributes (object)
-        + `attributes` (geokrety-types-attributes)
-
-    + Headers
-
-            Authorization: JWT <Auth Key>
-            Content-Type: application/vnd.api+json
-            Accept: application/vnd.api+json
-
-+ Response 201 (application/vnd.api+json)
-
-    + Attributes (object)
-        + `data` (geokrety-types-data, required)
-        + `jsonapi` (jsonapi, required)
-        + `links` (object, required)
-            + `self`: `/geokrety-types`
-
-+ Response 401 (application/json)
-
-    + Attributes (Error 401)
-
-+ Response 403 (application/json)
-
-    + Attributes (Error 403)
-
-+ Response 422 (application/json)
-
-    + Attributes (Error 422)
 
 
 ### List all GeoKrety Type [GET]
@@ -207,7 +100,7 @@ Retrieve paginated list of GeoKrety Type.
             + `self`: `/geokrety-types`
 
 
-## GeoKrety Type Details [/v1/geokrety/{geokrety_id}/type]
+## GeoKrety Type Details [/v1/geokrety/{geokrety_id}/geokrety-types]
 
 + Parameters
     + geokrety_id: 1 (string) - ID of the GeoKrety.

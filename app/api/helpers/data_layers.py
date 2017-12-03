@@ -1,5 +1,4 @@
 from app.api.helpers.db import safe_query
-from app.models import db
 from app.models.geokret import Geokret
 from flask_rest_jsonapi.data_layers.base import BaseDataLayer
 
@@ -44,14 +43,14 @@ class GeoKretyTypeDataLayer(BaseDataLayer):
         :return DeclarativeMeta: an object
         """
         if 'id' in view_kwargs:
-            id = view_kwargs['id']
+            type_id = view_kwargs['id']
         elif 'geokret_id' in view_kwargs:
             geokret = safe_query(self, Geokret, 'id', view_kwargs['geokret_id'], 'id')
-            id = int(geokret.type)
+            type_id = int(geokret.type)
         else:
             return None
         try:
-            return GEOKRETY_TYPES[id]
+            return GEOKRETY_TYPES[type_id]
         except IndexError:
             return None
 
