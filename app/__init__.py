@@ -92,7 +92,7 @@ def push_to_ctx():
 
 
 @app.errorhandler(500)
-def internal_server_error(error):
+def internal_server_error(error):  # pragma: no cover
     if current_app.config['PROPOGATE_ERROR'] is True:
         exc = JsonApiException({'pointer': ''}, str(error))
     else:
