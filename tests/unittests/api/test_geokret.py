@@ -2,6 +2,7 @@ from app import current_app as app
 # from app.api.helpers.db import safe_query
 from app.models import db
 from app.models.geokret import Geokret
+from app.api.helpers.data_layers import GEOKRET_TYPE_TRADITIONAL, GEOKRET_TYPE_COIN
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
@@ -17,12 +18,14 @@ class TestGeokret(GeokretyTestCase):
             self.admin = mixer.blend(User)
             self.user1 = mixer.blend(User)
             self.user2 = mixer.blend(User)
-            self.geokret1 = mixer.blend(Geokret, owner=self.user1, holder=self.user2)
-            self.geokret2 = mixer.blend(Geokret, owner=self.user2, holder=self.user1)
-            self.geokret3 = mixer.blend(Geokret)
+            self.user3 = mixer.blend(User)
+            self.geokret1 = mixer.blend(Geokret, type=GEOKRET_TYPE_TRADITIONAL, owner=self.user1, holder=self.user2)
+            self.geokret2 = mixer.blend(Geokret, type=GEOKRET_TYPE_TRADITIONAL, owner=self.user2, holder=self.user1)
+            self.geokret3 = mixer.blend(Geokret, type=GEOKRET_TYPE_COIN)
             db.session.add(self.admin)
             db.session.add(self.user1)
             db.session.add(self.user2)
+            db.session.add(self.user3)
             db.session.add(self.geokret1)
             db.session.add(self.geokret2)
             db.session.add(self.geokret3)
@@ -338,8 +341,6 @@ class TestGeokret(GeokretyTestCase):
             url = '/v1/users/%d/geokrety-held' % self.user1.id
 
             response = self._send_get(url, code=200)['data']
-            import pprint
-            pprint.pprint(response)
             self.assertEqual(len(response), 1)
             self._check_geokret(response[0], self.geokret2)
 
@@ -382,6 +383,63 @@ class TestGeokret(GeokretyTestCase):
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.admin)
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user1)
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user2)
+
+    def test_get_geokrety_by_types_traditional(self):
+        """ Check Geokret: GET geokrety by types traditional"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety-types/%s/geokrety' % GEOKRET_TYPE_TRADITIONAL
+
+            response = self._send_get(url, code=200)['data']
+            self.assertEqual(len(response), 2)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 2)
+            self._check_geokret(response[0], self.geokret1, with_private=True)
+            self._check_geokret(response[1], self.geokret2, with_private=True)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 2)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 2)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+
+            response = self._send_get(url, code=200, user=self.user3)['data']
+            self.assertEqual(len(response), 2)
+            self._check_geokret(response[0], self.geokret1)
+            self._check_geokret(response[1], self.geokret2)
+
+    def test_get_geokrety_by_types_coin(self):
+        """ Check Geokret: GET geokrety by types coin"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety-types/%s/geokrety' % GEOKRET_TYPE_COIN
+
+            response = self._send_get(url, code=200)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret3)
+
+            response = self._send_get(url, code=200, user=self.admin)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret3, with_private=True)
+
+            response = self._send_get(url, code=200, user=self.user1)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret3)
+
+            response = self._send_get(url, code=200, user=self.user2)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret3)
+
+            response = self._send_get(url, code=200, user=self.user3)['data']
+            self.assertEqual(len(response), 1)
+            self._check_geokret(response[0], self.geokret3)
 
     def test_patch_list(self):
         """

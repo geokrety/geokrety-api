@@ -1,21 +1,37 @@
+from app.api.helpers.db import safe_query
+from app.models import db
+from app.models.geokret import Geokret
 from flask_rest_jsonapi.data_layers.base import BaseDataLayer
 
+GEOKRET_TYPE_TRADITIONAL = "0"
+GEOKRET_TYPE_BOOK = "1"
+GEOKRET_TYPE_HUMAN = "2"
+GEOKRET_TYPE_COIN = "3"
+GEOKRET_TYPE_KRETYPOST = "4"
+
 GEOKRETY_TYPES = [
-    {'id': 0, 'name': 'Traditional'},
-    {'id': 1, 'name': 'A book/CD/DVD'},
-    {'id': 2, 'name': 'A Human'},
-    {'id': 3, 'name': 'A coin'},
-    {'id': 4, 'name': 'KretyPost'},
+    {'id': GEOKRET_TYPE_TRADITIONAL, 'name': 'Traditional'},
+    {'id': GEOKRET_TYPE_BOOK, 'name': 'A book/CD/DVD'},
+    {'id': GEOKRET_TYPE_HUMAN, 'name': 'A Human'},
+    {'id': GEOKRET_TYPE_COIN, 'name': 'A coin'},
+    {'id': GEOKRET_TYPE_KRETYPOST, 'name': 'KretyPost'},
 ]
 GEOKRETY_TYPES_COUNT = 5
 
+MOVE_TYPE_DROPPED = 0
+MOVE_TYPE_GRABBED = 1
+MOVE_TYPE_COMMENT = 2
+MOVE_TYPE_SEEN = 3
+MOVE_TYPE_ARCHIVED = 4
+MOVE_TYPE_VISITED = 5
+
 MOVE_TYPES = [
-    {'id': 0, 'name': 'Dropped to'},
-    {'id': 1, 'name': 'Grabbed from'},
-    {'id': 2, 'name': 'A comment'},
-    {'id': 3, 'name': 'Seen in'},
-    {'id': 4, 'name': 'Archived'},
-    {'id': 5, 'name': 'Visiting'},
+    {'id': MOVE_TYPE_DROPPED, 'name': 'Dropped to'},
+    {'id': MOVE_TYPE_GRABBED, 'name': 'Grabbed from'},
+    {'id': MOVE_TYPE_COMMENT, 'name': 'A comment'},
+    {'id': MOVE_TYPE_SEEN, 'name': 'Seen in'},
+    {'id': MOVE_TYPE_ARCHIVED, 'name': 'Archived'},
+    {'id': MOVE_TYPE_VISITED, 'name': 'Visiting'},
 ]
 MOVE_TYPES_COUNT = 6
 
@@ -27,8 +43,15 @@ class GeoKretyTypeDataLayer(BaseDataLayer):
         :params dict view_kwargs: kwargs from the resource view
         :return DeclarativeMeta: an object
         """
+        if 'id' in view_kwargs:
+            id = view_kwargs['id']
+        elif 'geokret_id' in view_kwargs:
+            geokret = safe_query(self, Geokret, 'id', view_kwargs['geokret_id'], 'id')
+            id = int(geokret.type)
+        else:
+            return None
         try:
-            return GEOKRETY_TYPES[view_kwargs['id']]
+            return GEOKRETY_TYPES[id]
         except IndexError:
             return None
 

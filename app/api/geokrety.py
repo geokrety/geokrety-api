@@ -4,6 +4,7 @@ from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
+from app.api.helpers.data_layers import GEOKRETY_TYPES_COUNT
 from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
@@ -25,6 +26,13 @@ class GeokretList(ResourceList):
         if view_kwargs.get('holder_id') is not None:
             safe_query(self, User, 'id', view_kwargs['holder_id'], 'holder_id')
             query_ = query_.filter_by(holder_id=view_kwargs['holder_id'])
+
+        # /geokrety-types/<int:geokrety_type_id>/geokrety
+        if view_kwargs.get('geokrety_type_id') is not None:
+            if view_kwargs['geokrety_type_id'] < 0 or view_kwargs['geokrety_type_id'] > GEOKRETY_TYPES_COUNT:
+                raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},
+                                     "{}: {} not found".format(model.__name__, value))
+            query_ = query_.filter_by(type=str(view_kwargs['geokrety_type_id']))
 
         return query_
 

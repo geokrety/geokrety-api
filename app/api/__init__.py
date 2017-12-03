@@ -35,8 +35,10 @@ api.route(NewsCommentDetail, 'news_comment_details', '/news-comments/<int:id>')
 api.route(NewsCommentRelationship, 'news_comments_author', '/news-comments/<int:id>/relationship/author')
 api.route(NewsCommentRelationship, 'news_comments_news', '/news-comments/<int:id>/relationship/news')
 
-api.route(NewsSubscriptionList, 'news_subscriptions_list', '/news-subscriptions',
-          '/users/<int:user_id>/news-subscriptions', '/news/<int:news_id>/news-subscriptions')
+api.route(NewsSubscriptionList, 'news_subscriptions_list',
+          '/news-subscriptions',
+          '/users/<int:user_id>/news-subscriptions',
+          '/news/<int:news_id>/news-subscriptions')
 api.route(NewsSubscriptionDetail, 'news_subscription_details', '/news-subscriptions/<int:id>')
 api.route(NewsSubscriptionRelationship, 'news_subscription_user', '/news-subscriptions/<int:id>/relationship/user')
 api.route(NewsSubscriptionRelationship, 'news_subscription_news', '/news-subscriptions/<int:id>/relationship/news')
@@ -45,10 +47,14 @@ api.route(MovesTypeList, 'moves_type_list', '/moves-types')
 api.route(MovesTypeDetail, 'moves_type_details', '/moves-types/<int:id>')
 
 api.route(GeokretTypeList, 'geokrety_type_list', '/geokrety-types')
-api.route(GeokretTypeDetail, 'geokrety_type_details', '/geokrety-types/<int:id>')
+api.route(GeokretTypeDetail, 'geokrety_type_details',
+          '/geokrety-types/<int:id>',
+          '/geokrety/<int:geokret_id>/geokrety-types')
 
 api.route(GeokretList, 'geokrety_list', '/geokrety',
-          '/users/<int:owner_id>/geokrety-owned', '/users/<int:holder_id>/geokrety-held')
+          '/users/<int:owner_id>/geokrety-owned',
+          '/users/<int:holder_id>/geokrety-held',
+          '/geokrety-types/<int:geokrety_type_id>/geokrety')
 api.route(GeokretDetail, 'geokret_details', '/geokrety/<int:id>')
 api.route(GeokretRelationship, 'geokret_owner', '/geokrety/<int:id>/relationship/owner')
 api.route(GeokretRelationship, 'geokret_holder', '/geokrety/<int:id>/relationship/holder')
