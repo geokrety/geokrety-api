@@ -12,7 +12,7 @@ raven[flask]
 flask-jwt
 pytz
 mysqlclient
-factory_boy
+factory_boy==2.11.1
 git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
 bcrypt
 requests[security]
