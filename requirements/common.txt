@@ -6,7 +6,7 @@ flask-cors==3.0.4
 Flask-OAuthlib
 flask-login==0.4.1
 wtforms
-flask-admin
+flask-admin==1.5.1
 envparse
 raven[flask]
 flask-jwt
