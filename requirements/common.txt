@@ -6,7 +6,7 @@ Flask-OAuthlib==0.9.5
 flask-login==0.4.1
 wtforms==2.2.1
 flask-admin==1.5.1
-envparse
+envparse==0.2.0
 raven[flask]
 flask-jwt
 pytz
