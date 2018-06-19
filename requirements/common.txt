@@ -9,7 +9,7 @@ flask-admin==1.5.1
 envparse==0.2.0
 raven[flask]==6.9.0
 flask-jwt==0.3.2
-pytz
+pytz==2018.4
 mysqlclient
 factory_boy
 git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
