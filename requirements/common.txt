@@ -8,7 +8,7 @@ flask-login==0.4.1
 wtforms
 flask-admin==1.5.1
 envparse
-raven[flask]
+raven[flask]==6.9.0
 flask-jwt
 pytz
 mysqlclient
