@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import logging
+import logging
 
 from app import current_app as app
 from app.models import db
