@@ -3,7 +3,7 @@ git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety#egg=flask-rest-j
 gunicorn
 Flask-SQLAlchemy
 flask-cors
-Flask-OAuthlib
+Flask-OAuthlib==0.9.5
 flask-login
 wtforms
 flask-admin
