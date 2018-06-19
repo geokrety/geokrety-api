@@ -1,6 +1,6 @@
 marshmallow-jsonapi==0.16.0
 git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety#egg=flask-rest-jsonapi
-gunicorn
+gunicorn==19.8.1
 Flask-SQLAlchemy
 flask-cors
 Flask-OAuthlib
