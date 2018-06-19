@@ -4,7 +4,7 @@ gunicorn==19.8.1
 Flask-SQLAlchemy
 flask-cors==3.0.4
 Flask-OAuthlib
-flask-login
+flask-login==0.4.1
 wtforms
 flask-admin
 envparse
