@@ -4,7 +4,7 @@ gunicorn
 Flask-SQLAlchemy
 flask-cors
 Flask-OAuthlib
-flask-login
+flask-login==0.4.1
 wtforms
 flask-admin
 envparse
