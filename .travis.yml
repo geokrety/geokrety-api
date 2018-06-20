@@ -9,8 +9,7 @@ addons:
 cache:
   pip: true
   directories:
-    - $HOME/.nvm/versions/node/v8.4.0/lib
-    - $HOME/.nvm/versions/node/v8.4.0/bin/
+    - $HOME/.nvm/versions/node/
 python:
   #- pypy
   - 2.7
