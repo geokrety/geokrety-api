@@ -9,7 +9,7 @@ wtforms
 flask-admin==1.5.1
 envparse
 raven[flask]
-flask-jwt
+flask-jwt==0.3.2
 pytz
 mysqlclient
 factory_boy
