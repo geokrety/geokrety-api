@@ -5,5 +5,5 @@ pep8>=1.7.0,<2
 mixer==6.0.1
 
 coverage
-dredd_hooks
+dredd_hooks==0.2.0
 codacy-coverage
