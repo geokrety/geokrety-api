@@ -11,7 +11,7 @@ envparse
 raven[flask]
 flask-jwt
 pytz
-mysqlclient
+mysqlclient==1.3.12
 factory_boy
 git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
 bcrypt
