@@ -1,4 +1,4 @@
-marshmallow-jsonapi==0.16.0
+git+https://github.com/kumy/marshmallow-jsonapi.git@missing-relationship#egg=marshmallow-jsonapi&version=0.20.0
 git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety#egg=flask-rest-jsonapi
 gunicorn
 Flask-SQLAlchemy
