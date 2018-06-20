@@ -15,5 +15,5 @@ mysqlclient
 factory_boy==2.11.1
 git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
 bcrypt
-requests[security]
+requests[security]==2.19.1
 flask-script
