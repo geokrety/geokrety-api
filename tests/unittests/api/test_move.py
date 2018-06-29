@@ -1,6 +1,5 @@
 # coding=utf-8
 import datetime
-import random
 
 from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_COIN, GEOKRET_TYPE_HUMAN,
@@ -13,87 +12,7 @@ from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.user import User
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
-
-
-class Payload(dict):
-    def __init__(self, move_type, no_application_info=False):
-        self.update({
-            "data": {
-                "type": "move",
-                "attributes": {
-                    "move_type_id": move_type,
-                },
-                "relationships": {}
-            }
-        })
-        self.moved_date_time()
-        self.application_name()
-        self.application_version()
-
-    def coordinates(self, latitude=43.78, longitude=7.06):
-        self['data']['attributes']['latitude'] = latitude
-        self['data']['attributes']['longitude'] = longitude
-        return self
-
-    def tracking_code(self, tracking_code="ABC123"):
-        # if tracking_code is None:
-        #     tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))
-        self['data']['attributes']['tracking_code'] = tracking_code
-        return self
-
-    def application_name(self, application_name="GeoKrety API"):
-        self['data']['attributes']['application_name'] = application_name
-        return self
-
-    def application_version(self, application_version="Unit Tests 1.0"):
-        self['data']['attributes']['application_version'] = application_version
-        return self
-
-    def comment(self, comment="Born here ;)"):
-        self['data']['attributes']['comment'] = comment
-        return self
-
-    def moved_date_time(self, date_time=None):
-        def random_date(start):
-            """Generate a random datetime between `start` and `end`"""
-            start = datetime.datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
-            end = datetime.datetime.utcnow()
-            return (start + datetime.timedelta(
-                # Get a random amount of seconds between `start` and `end`
-                seconds=random.randint(0, int((end - start).total_seconds())),
-            )).strftime("%Y-%m-%dT%H:%M:%S")
-
-        if date_time:
-            self['data']['attributes']['moved_on_date_time'] = date_time
-        else:
-            self['data']['attributes']['moved_on_date_time'] = random_date("2017-12-01T14:18:22")
-        return self
-
-    def username(self, username="Anyone"):
-        self['data']['attributes']['username'] = username
-        return self
-
-    def author_id(self, author_id="0"):
-        self['data']['attributes']['author_id'] = str(author_id)
-        return self
-
-    def author_relationship(self, user_id="0"):
-        relationship_author = {
-            "data": {
-                "type": "user",
-                "id": str(user_id)
-            }
-        }
-        self['data']['relationships']['author'] = relationship_author
-        return self
-
-    def blend(self):
-        with mixer.ctx(commit=False):
-            move = mixer.blend(Move)
-            for key in self['data']['attributes'].keys():
-                setattr(move, key, self['data']['attributes'][key])
-            return move
+from tests.unittests.utils import GeokretyTestCase, MovePayload
 
 
 class TestMove(GeokretyTestCase):
@@ -128,9 +47,11 @@ class TestMove(GeokretyTestCase):
             self.move2 = mixer.blend(Move, id=2, move_type_id=MOVE_TYPE_GRABBED,
                                      geokret=self.geokret1, author=self.user2)
             self.move3 = mixer.blend(Move, id=3, move_type_id=MOVE_TYPE_COMMENT, geokret=self.geokret2, author=None)
-            self.move4 = mixer.blend(Move, id=4, move_type_id=MOVE_TYPE_SEEN, geokret=self.geokret2, author=None)
+            self.move4 = mixer.blend(Move, id=4, move_type_id=MOVE_TYPE_SEEN, latitude=43.78,
+                                     longitude=7.06, geokret=self.geokret2, author=None)
             self.move5 = mixer.blend(Move, id=5, move_type_id=MOVE_TYPE_ARCHIVED, geokret=self.geokret2, author=None)
-            self.move6 = mixer.blend(Move, id=6, move_type_id=MOVE_TYPE_DIPPED, geokret=self.geokret2, author=None)
+            self.move6 = mixer.blend(Move, id=6, move_type_id=MOVE_TYPE_DIPPED, latitude=43.78,
+                                     longitude=7.06, geokret=self.geokret2, author=None)
 
             db.session.add(self.admin)
             db.session.add(self.user1)
@@ -144,6 +65,9 @@ class TestMove(GeokretyTestCase):
             db.session.add(self.move1)
             db.session.add(self.move2)
             db.session.add(self.move3)
+            db.session.add(self.move4)
+            db.session.add(self.move5)
+            db.session.add(self.move6)
             db.session.commit()
 
     def test_get_moves_list(self):
@@ -154,10 +78,13 @@ class TestMove(GeokretyTestCase):
             url = '/v1/moves'
 
             def check(response):
-                self.assertEqual(len(response), 3)
+                self.assertEqual(len(response), 6)
                 self._check_move(response[self.move1.id - 1], self.move1)
                 self._check_move(response[self.move2.id - 1], self.move2)
                 self._check_move(response[self.move3.id - 1], self.move3)
+                self._check_move(response[self.move4.id - 1], self.move4)
+                self._check_move(response[self.move5.id - 1], self.move5)
+                self._check_move(response[self.move6.id - 1], self.move6)
 
             response = self._send_get(url, code=200)['data']
             check(response)
@@ -249,14 +176,14 @@ class TestMove(GeokretyTestCase):
         with app.test_request_context():
             self._blend()
 
-            self._send_post("/v1/moves", payload=Payload(move_type=-1), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(666), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type="-1"), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type="666"), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type="A"), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type=""), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type=" "), code=422, user=self.admin)
-            self._send_post("/v1/moves", payload=Payload(move_type=u"Póki"), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type=-1), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(666), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type="-1"), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type="666"), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type="A"), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type=""), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type=" "), code=422, user=self.admin)
+            self._send_post("/v1/moves", payload=MovePayload(move_type=u"Póki"), code=422, user=self.admin)
 
     def test_geokret_id_in_response(self):
         """Check Move: POST GeoKret ID have to be present
@@ -264,7 +191,7 @@ class TestMove(GeokretyTestCase):
         with app.test_request_context():
             self._blend()
 
-            payload = Payload(move_type=MOVE_TYPE_DROPPED) \
+            payload = MovePayload(move_type=MOVE_TYPE_DROPPED) \
                 .tracking_code(self.geokret1.tracking_code) \
                 .coordinates()
             response = self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
@@ -277,7 +204,7 @@ class TestMove(GeokretyTestCase):
         """Check Move: POST validate coordinates"""
         with app.test_request_context():
             self._blend()
-            payload = Payload(move_type=MOVE_TYPE_DROPPED).tracking_code()
+            payload = MovePayload(move_type=MOVE_TYPE_DROPPED).tracking_code()
 
             # Coordinates missing
             self._send_post("/v1/moves", payload=payload, code=422, user=self.admin)
@@ -322,58 +249,58 @@ class TestMove(GeokretyTestCase):
 
             # Anonymous Incomplete cases
             user = None
-            payload = Payload(move_type)
+            payload = MovePayload(move_type)
             self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-            payload = Payload(move_type).coordinates()
+            payload = MovePayload(move_type).coordinates()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code()
+            payload = MovePayload(move_type).tracking_code()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code("ABC123")
+            payload = MovePayload(move_type).tracking_code("ABC123")
             self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-            payload = Payload(move_type).tracking_code("666666")
+            payload = MovePayload(move_type).tracking_code("666666")
             self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-            payload = Payload(move_type).coordinates().tracking_code()
+            payload = MovePayload(move_type).coordinates().tracking_code()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).username()
+            payload = MovePayload(move_type).username()
             self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-            payload = Payload(move_type).coordinates().username()
+            payload = MovePayload(move_type).coordinates().username()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code().username()
+            payload = MovePayload(move_type).tracking_code().username()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code("666666").username()
+            payload = MovePayload(move_type).tracking_code("666666").username()
             self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
             # Authenticated Incomplete cases
             for user in (self.admin, self.user1, self.user2):
-                payload = Payload(move_type)
+                payload = MovePayload(move_type)
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-                payload = Payload(move_type).coordinates()
+                payload = MovePayload(move_type).coordinates()
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-                payload = Payload(move_type).tracking_code()
+                payload = MovePayload(move_type).tracking_code()
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-                payload = Payload(move_type).tracking_code("666666")
+                payload = MovePayload(move_type).tracking_code("666666")
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
             # Valid and Anonymous
-            payload = Payload(move_type).coordinates().tracking_code().username()
+            payload = MovePayload(move_type).coordinates().tracking_code().username()
             response = self._send_post("/v1/moves", payload=payload, code=201)
             self._check_move(response['data'], payload.blend(), skip_check=['times'])
 
             # Valid and Authenticated
             for user in (self.admin, self.user1, self.user2):
-                payload = Payload(move_type).coordinates().tracking_code()
+                payload = MovePayload(move_type).coordinates().tracking_code()
                 response = self._send_post("/v1/moves", payload=payload, code=201, user=user)
                 self._check_move(response['data'], payload.blend(), skip_check=['times'])
 
@@ -390,49 +317,49 @@ class TestMove(GeokretyTestCase):
             self._blend()
 
             # Anonymous Incomplete cases
-            payload = Payload(move_type)
+            payload = MovePayload(move_type)
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).coordinates()
+            payload = MovePayload(move_type).coordinates()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code()
+            payload = MovePayload(move_type).tracking_code()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code("666666")
+            payload = MovePayload(move_type).tracking_code("666666")
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).coordinates().tracking_code()
+            payload = MovePayload(move_type).coordinates().tracking_code()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).username()
+            payload = MovePayload(move_type).username()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).coordinates().username()
+            payload = MovePayload(move_type).coordinates().username()
             self._send_post("/v1/moves", payload=payload, code=422)
 
-            payload = Payload(move_type).tracking_code("666666").username()
+            payload = MovePayload(move_type).tracking_code("666666").username()
             self._send_post("/v1/moves", payload=payload, code=422)
 
             # Authenticated Incomplete cases
             for user in (self.admin, self.user1, self.user2):
-                payload = Payload(move_type)
+                payload = MovePayload(move_type)
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-                payload = Payload(move_type).coordinates()
+                payload = MovePayload(move_type).coordinates()
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-                payload = Payload(move_type).tracking_code("666666")
+                payload = MovePayload(move_type).tracking_code("666666")
                 self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
             # Valid and Anonymous
-            payload = Payload(move_type).tracking_code().username()
+            payload = MovePayload(move_type).tracking_code().username()
             response = self._send_post("/v1/moves", payload=payload, code=201)
             self._check_move(response['data'], payload.blend(), skip_check=['times'])
 
             # Valid and Authenticated
             for user in (self.admin, self.user1, self.user2):
-                payload = Payload(move_type).tracking_code()
+                payload = MovePayload(move_type).tracking_code()
                 response = self._send_post("/v1/moves", payload=payload, code=201, user=user)
                 self._check_move(response['data'], payload.blend(), skip_check=['times'])
 
@@ -495,7 +422,7 @@ class TestMove(GeokretyTestCase):
             self._blend()
             move_type = MOVE_TYPE_ARCHIVED
 
-            payload = Payload(move_type).tracking_code(self.geokret1.tracking_code)
+            payload = MovePayload(move_type).tracking_code(self.geokret1.tracking_code)
             self._send_post("/v1/moves", payload=payload, code=401, user=None)
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
@@ -506,7 +433,7 @@ class TestMove(GeokretyTestCase):
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=403, user=self.user3)
 
-            payload = Payload(move_type).tracking_code(self.geokret2.tracking_code)
+            payload = MovePayload(move_type).tracking_code(self.geokret2.tracking_code)
             self._send_post("/v1/moves", payload=payload, code=401, user=None)
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
@@ -517,7 +444,7 @@ class TestMove(GeokretyTestCase):
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=403, user=self.user3)
 
-            payload = Payload(move_type).tracking_code(self.geokret3.tracking_code)
+            payload = MovePayload(move_type).tracking_code(self.geokret3.tracking_code)
             self._send_post("/v1/moves", payload=payload, code=401, user=None)
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
@@ -528,7 +455,7 @@ class TestMove(GeokretyTestCase):
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=403, user=self.user3)
 
-            payload = Payload(move_type).tracking_code("666666")
+            payload = MovePayload(move_type).tracking_code("666666")
             self._send_post("/v1/moves", payload=payload, code=422, user=None)
             payload.moved_date_time()
             self._send_post("/v1/moves", payload=payload, code=422, user=self.admin)
@@ -555,11 +482,11 @@ class TestMove(GeokretyTestCase):
                 for user in (None, self.admin, self.user1, self.user2):
                     self._send_post("/v1/moves", payload=payload, code=422, user=user)
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_missing_move_date_defaults_to_now(self):
         """Check Move: POST missing move date is set to NOW()"""
@@ -578,18 +505,18 @@ class TestMove(GeokretyTestCase):
                     result = self._send_post("/v1/moves", payload=payload, code=201, user=user)
                     self.assertIsNotNone(result['data']['attributes']['moved-on-date-time'])
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_identical_move_date_is_forbidden(self):
         """Check Move: POST identical move date is forbidden"""
         with app.test_request_context():
             self._blend()
 
-            payload = Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret1.tracking_code)
+            payload = MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret1.tracking_code)
             response = self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
 
             # Check in database
@@ -607,7 +534,7 @@ class TestMove(GeokretyTestCase):
             _enc = "P&oacute;ki"
 
             # Post some data wich will be encoded for html entities
-            payload = Payload(MOVE_TYPE_DIPPED) \
+            payload = MovePayload(MOVE_TYPE_DIPPED) \
                 .coordinates() \
                 .tracking_code() \
                 .comment(_raw)
@@ -666,11 +593,11 @@ class TestMove(GeokretyTestCase):
                     self.assertTrue("username" in response["data"]["attributes"])
                     self.assertFalse(len(response["data"]["attributes"]["username"]))
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_author_id_force_connected_user_as_author(self):
         """Check Move: POST force current connected user as author"""
@@ -705,11 +632,11 @@ class TestMove(GeokretyTestCase):
                     self.assertNotEqual(response["data"]["relationships"]["author"]["data"], None)
                     self.assertEqual(response["data"]["relationships"]["author"]["data"]["id"], str(user.id))
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_author_relationship_override_only_by_admins(self):
         """Check Move: POST author relationship overridable only by admin"""
@@ -727,11 +654,11 @@ class TestMove(GeokretyTestCase):
                 payload.moved_date_time()
                 self._send_post("/v1/moves", payload=payload, code=403, user=self.user2)
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_author_id_override_only_by_admins(self):
         """Check Move: POST author_id overridable only by admin"""
@@ -749,11 +676,11 @@ class TestMove(GeokretyTestCase):
                 payload.moved_date_time()
                 self._send_post("/v1/moves", payload=payload, code=403, user=self.user2)
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code())
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code())
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code())
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code())
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code())
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code())
 
     def test_create_forbid_move_before_birth_date(self):
         """Check Move: POST forbidden for move before birth date"""
@@ -789,11 +716,11 @@ class TestMove(GeokretyTestCase):
                 payload.moved_date_time(datetime_obj)
                 self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code(self.geokret1.tracking_code))
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code(self.geokret2.tracking_code))
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code(self.geokret3.tracking_code))
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code(self.geokret1.tracking_code))
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code(self.geokret2.tracking_code))
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code(self.geokret3.tracking_code))
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
 
     def test_create_forbid_move_in_the_future(self):
         """Check Move: POST forbidden for move in the future"""
@@ -824,11 +751,11 @@ class TestMove(GeokretyTestCase):
                 payload.moved_date_time(datetime_obj)
                 self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
 
-            check(Payload(MOVE_TYPE_DROPPED).coordinates().tracking_code(self.geokret1.tracking_code))
-            check(Payload(MOVE_TYPE_GRABBED).tracking_code(self.geokret2.tracking_code))
-            check(Payload(MOVE_TYPE_COMMENT).tracking_code(self.geokret3.tracking_code))
-            check(Payload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
-            check(Payload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
+            check(MovePayload(MOVE_TYPE_DROPPED).coordinates().tracking_code(self.geokret1.tracking_code))
+            check(MovePayload(MOVE_TYPE_GRABBED).tracking_code(self.geokret2.tracking_code))
+            check(MovePayload(MOVE_TYPE_COMMENT).tracking_code(self.geokret3.tracking_code))
+            check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
+            check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
 
     def test_delete_list(self):
         """

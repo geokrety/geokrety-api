@@ -1,12 +1,15 @@
 import json
 import pprint
+import random
 import unittest
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import phpass
 from app import current_app as app
 from app.api.helpers.data_layers import (MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_SEEN)
+from app.models.move import Move
+from mixer.backend.flask import mixer
 from tests.unittests.setup_database import Setup
 
 
@@ -258,3 +261,83 @@ class GeokretyTestCase(unittest.TestCase):
         if 'times' not in skip_check:
             self.assertDateTimeEqual(attributes['created-on-date-time'], move.created_on_date_time)
             self.assertDateTimeEqual(attributes['updated-on-date-time'], move.updated_on_date_time)
+
+
+class MovePayload(dict):
+    def __init__(self, move_type, no_application_info=False):
+        self.update({
+            "data": {
+                "type": "move",
+                "attributes": {
+                    "move_type_id": move_type,
+                },
+                "relationships": {}
+            }
+        })
+        self.moved_date_time()
+        self.application_name()
+        self.application_version()
+
+    def coordinates(self, latitude=43.78, longitude=7.06):
+        self['data']['attributes']['latitude'] = latitude
+        self['data']['attributes']['longitude'] = longitude
+        return self
+
+    def tracking_code(self, tracking_code="ABC123"):
+        # if tracking_code is None:
+        #     tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))
+        self['data']['attributes']['tracking_code'] = tracking_code
+        return self
+
+    def application_name(self, application_name="GeoKrety API"):
+        self['data']['attributes']['application_name'] = application_name
+        return self
+
+    def application_version(self, application_version="Unit Tests 1.0"):
+        self['data']['attributes']['application_version'] = application_version
+        return self
+
+    def comment(self, comment="Born here ;)"):
+        self['data']['attributes']['comment'] = comment
+        return self
+
+    def moved_date_time(self, date_time=None):
+        def random_date(start):
+            """Generate a random datetime between `start` and `end`"""
+            start = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
+            end = datetime.utcnow()
+            return (start + timedelta(
+                # Get a random amount of seconds between `start` and `end`
+                seconds=random.randint(0, int((end - start).total_seconds())),
+            )).strftime("%Y-%m-%dT%H:%M:%S")
+
+        if date_time:
+            self['data']['attributes']['moved_on_date_time'] = date_time
+        else:
+            self['data']['attributes']['moved_on_date_time'] = random_date("2017-12-01T14:18:22")
+        return self
+
+    def username(self, username="Anyone"):
+        self['data']['attributes']['username'] = username
+        return self
+
+    def author_id(self, author_id="0"):
+        self['data']['attributes']['author_id'] = str(author_id)
+        return self
+
+    def author_relationship(self, user_id="0"):
+        relationship_author = {
+            "data": {
+                "type": "user",
+                "id": str(user_id)
+            }
+        }
+        self['data']['relationships']['author'] = relationship_author
+        return self
+
+    def blend(self):
+        with mixer.ctx(commit=False):
+            move = mixer.blend(Move)
+            for key in self['data']['attributes'].keys():
+                setattr(move, key, self['data']['attributes'][key])
+            return move

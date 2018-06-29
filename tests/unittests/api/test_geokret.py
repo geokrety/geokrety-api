@@ -1,11 +1,12 @@
 from app import current_app as app
-# from app.api.helpers.db import safe_query
 from app.models import db
 from app.models.geokret import Geokret
 from app.api.helpers.data_layers import GEOKRET_TYPE_TRADITIONAL, GEOKRET_TYPE_COIN
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
+
+# TODO on create holder is owner
 
 
 class TestGeokret(GeokretyTestCase):

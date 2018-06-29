@@ -5,6 +5,8 @@ from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
 import htmlentities
 
+# TODO add unicity constraint on geokret_id + moved_on_date_time
+
 
 class Move(db.Model):
     __tablename__ = 'gk-ruchy'
@@ -32,7 +34,7 @@ class Move(db.Model):
         db.Integer,
         db.ForeignKey('gk-geokrety.id'),
         key='geokret_id',
-        nullable=True,
+        nullable=False,
         default=None
     )
     latitude = db.Column(
@@ -122,23 +124,23 @@ class Move(db.Model):
     )
     moved_on_date_time = db.Column(
         'data',
-        db.TIMESTAMP(timezone=True),
+        db.DateTime,
         key='moved_on_date_time',
         nullable=False,
-        default=datetime.datetime.utcnow
     )
     created_on_date_time = db.Column(
         'data_dodania',
         db.DateTime,
         key='created_on_date_time',
         nullable=False,
-        default=datetime.datetime.utcnow
+        default=datetime.datetime.utcnow,
     )
     updated_on_date_time = db.Column(
         'timestamp',
-        db.TIMESTAMP(timezone=True),
+        db.DateTime,
         key='updated_on_date_time',
-        default=datetime.datetime.utcnow
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow
     )
     application_name = db.Column(
         'app',
@@ -152,3 +154,6 @@ class Move(db.Model):
         key='application_version',
         nullable=False
     )
+
+    # geokret = db.relationship('Geokret',
+    #     backref=db.backref('moves', lazy=True))
