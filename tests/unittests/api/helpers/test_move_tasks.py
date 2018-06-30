@@ -4,8 +4,8 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
                                          MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
                                          MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
                                          MOVE_TYPE_SEEN)
-from app.api.helpers.move_tasks import (compute_move_distances,
-                                        update_country_and_altitude)
+from app.api.helpers.move_tasks import (update_country_and_altitude,
+                                        update_move_distances)
 from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.user import User
@@ -53,14 +53,14 @@ class TestMoveTasksHelper(GeokretyTestCase):
                                      author=self.user1, moved_on_date_time="2017-12-01T14:18:22",
                                      latitude=43.693633, longitude=6.860933)
 
-    def test_compute_move_distances(self):
+    def test_update_move_distances(self):
         """Check Move Tasks: compute move distances"""
 
         with app.test_request_context():
             self._blend()
 
             # run the function
-            compute_move_distances(self.geokret1.id)
+            update_move_distances(self.geokret1.id)
 
             # Check in database
             moves = Move.query.filter(Move.geokret_id == self.geokret1.id) \
@@ -90,7 +90,8 @@ class TestMoveTasksHelper(GeokretyTestCase):
             update_country_and_altitude(self.move1.id)
             move = Move.query.get(self.move1.id)
             self.assertEqual(move.country, 'FR')
-            self.assertEqual(move.altitude, '720')
+            self.assertNotEqual(move.altitude, '720')
+            self.assertEqual(move.altitude, 720)
 
     @responses.activate
     def test_update_country_and_altitude_errors(self):
@@ -112,4 +113,5 @@ class TestMoveTasksHelper(GeokretyTestCase):
             update_country_and_altitude(another_move.id)
             move = Move.query.get(another_move.id)
             self.assertEqual(move.country, 'XYZ')
-            self.assertEqual(move.altitude, '-2000')
+            self.assertNotEqual(move.altitude, '-2000')
+            self.assertEqual(move.altitude, -2000)

@@ -1,16 +1,15 @@
-# from .celery import celery
 import requests
 
 import geopy.distance
+from app import make_celery, current_app
 from app.models import db
 from app.models.move import Move
 
-# @app.task
-# def add(x, y):
-#     return x + y
+celery = make_celery(current_app)
 
 
-def compute_move_distances(geokret_id):
+@celery.task(name='update.move.distance')
+def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret
     """
     moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_date_time.asc())
@@ -29,10 +28,10 @@ def compute_move_distances(geokret_id):
     db.session.commit()
 
 
+@celery.task(name='update.move.country.and.elevation')
 def update_country_and_altitude(move_id):
     """ Obtain and update country and altitude of a move
     """
-
     move = Move.query.get(move_id)
 
     response = requests.get('https://geo.kumy.org/api/getCountry?lat={}&lon={}'.format(move.latitude, move.longitude))
@@ -46,3 +45,5 @@ def update_country_and_altitude(move_id):
         move.altitude = response.text
     else:
         move.altitude = '-2000'
+
+    db.session.commit()

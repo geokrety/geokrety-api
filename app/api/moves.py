@@ -109,9 +109,9 @@ class MovesList(ResourceList):
         # Identical move date is forbidden
         try:
             db.session.query(Move).filter(
-                    Move.moved_on_date_time == str(data['moved_on_date_time']),
-                    Move.geokret_id == str(geokret.id)
-                ).one()
+                Move.moved_on_date_time == str(data['moved_on_date_time']),
+                Move.geokret_id == str(geokret.id)
+            ).one()
             raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
                                       "There is already a move at that time")
         except NoResultFound:
@@ -130,6 +130,14 @@ class MovesList(ResourceList):
         # Force current connected user as author
         if current_identity:
             data["author_id"] = current_identity.id
+
+    def after_post(self, result):
+        from app.api.helpers.move_tasks import (update_country_and_altitude,
+                                                update_move_distances)
+
+        # Enhance move content
+        update_country_and_altitude.delay(result['data']['id'])
+        update_move_distances.delay(result['data']['attributes']['geokret-id'])
 
     current_identity = current_identity
     schema = MoveWithCoordinatesSchema

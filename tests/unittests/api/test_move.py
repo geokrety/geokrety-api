@@ -1,6 +1,7 @@
 # coding=utf-8
 import datetime
 
+import responses
 from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_COIN, GEOKRET_TYPE_HUMAN,
                                          GEOKRET_TYPE_TRADITIONAL,
@@ -195,6 +196,10 @@ class TestMove(GeokretyTestCase):
                 .tracking_code(self.geokret1.tracking_code) \
                 .coordinates()
             response = self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
+
+            # Check in response
+            self.assertIn('geokret-id', response['data']['attributes'])
+            self.assertEqual(self.geokret1.id, response['data']['attributes']['geokret-id'])
 
             # Check in database
             move = Move.query.filter(Move.id == response["data"]["id"]).one()
@@ -756,6 +761,28 @@ class TestMove(GeokretyTestCase):
             check(MovePayload(MOVE_TYPE_COMMENT).tracking_code(self.geokret3.tracking_code))
             check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
             check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
+
+    @responses.activate
+    def test_update_country_elevation(self):
+        """Check Move: POST move will be ammended with country and elevation"""
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getCountry?lat=43.69448&lon=6.85575',
+                      status=200, body='FR')
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=43.69448&lon=6.85575',
+                      status=200, body='720')
+
+        with app.test_request_context():
+            self._blend()
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code()
+            response = self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
+
+            self.assertEqual(response['data']['attributes']['country'], '')
+            self.assertEqual(response['data']['attributes']['altitude'], -32768)
+
+            # Check in database
+            move = Move.query.filter(Move.id == response["data"]["id"]).one()
+            self.assertEqual(move.country, 'FR')
+            self.assertEqual(move.altitude, 720)
 
     def test_delete_list(self):
         """
