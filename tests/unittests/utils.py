@@ -5,6 +5,7 @@ import unittest
 from datetime import date, datetime, timedelta
 
 import phpass
+import responses
 from app import current_app as app
 from app.api.helpers.data_layers import (MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_SEEN)
@@ -34,8 +35,26 @@ def mock_check_password(obj, password_1, password_2):
     return password_1 == password_2
 
 
+class ResponsesMixin(object):
+    def setUp(self):
+        assert responses, 'responses package required to use ResponsesMixin'
+        responses.start()
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getCountry?lat=43.69448&lon=6.85575',
+                      status=200, body='FR')
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=43.69448&lon=6.85575',
+                      status=200, body='720')
+
+        super(ResponsesMixin, self).setUp()
+
+    def tearDown(self):
+        super(ResponsesMixin, self).tearDown()
+        responses.stop()
+        responses.reset()
+
+
 class GeokretyTestCase(unittest.TestCase):
     def setUp(self):
+        Setup.drop_db()
         self.app = Setup.create_app()
         phpass.PasswordHash.hash_password = mock_hash_password
         phpass.PasswordHash.check_password = mock_check_password

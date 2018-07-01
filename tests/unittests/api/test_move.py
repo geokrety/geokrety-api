@@ -13,10 +13,10 @@ from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.user import User
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase, MovePayload
+from tests.unittests.utils import GeokretyTestCase, MovePayload, ResponsesMixin
 
 
-class TestMove(GeokretyTestCase):
+class TestMove(ResponsesMixin, GeokretyTestCase):
     """Test Move CRUD operations"""
 
     def _blend(self):
@@ -762,14 +762,8 @@ class TestMove(GeokretyTestCase):
             check(MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code(self.geokret4.tracking_code))
             check(MovePayload(MOVE_TYPE_SEEN).coordinates().tracking_code(self.geokret5.tracking_code))
 
-    @responses.activate
     def test_update_country_elevation(self):
-        """Check Move: POST move will be ammended with country and elevation"""
-        responses.add(responses.GET, 'https://geo.kumy.org/api/getCountry?lat=43.69448&lon=6.85575',
-                      status=200, body='FR')
-        responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=43.69448&lon=6.85575',
-                      status=200, body='720')
-
+        """Check Move: POST move will be amended with country and elevation"""
         with app.test_request_context():
             self._blend()
 
@@ -783,6 +777,25 @@ class TestMove(GeokretyTestCase):
             move = Move.query.filter(Move.id == response["data"]["id"]).one()
             self.assertEqual(move.country, 'FR')
             self.assertEqual(move.altitude, 720)
+
+    def test_update_distances(self):
+        """Check Move: POST moves will be amended with updated distances"""
+        with app.test_request_context():
+            self._blend()
+
+            # insert first move
+            payload = MovePayload(MOVE_TYPE_DIPPED).coordinates().tracking_code()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
+
+            # insert second move
+            payload = payload.coordinates(48.8567, 2.3508).moved_date_time()
+            response = self._send_post("/v1/moves", payload=payload, code=201, user=self.admin)
+
+            self.assertEqual(response['data']['attributes']['distance'], 0)
+
+            # Check in database
+            move = Move.query.filter(Move.id == response["data"]["id"]).one()
+            self.assertEqual(move.distance, 670)
 
     def test_delete_list(self):
         """
