@@ -794,7 +794,58 @@ class TestMove(ResponsesMixin, GeokretyTestCase):
 
             # Check in database
             move = Move.query.filter(Move.id == response["data"]["id"]).one()
-            self.assertEqual(move.distance, 670)
+            self.assertEqual(move.distance, 671)
+
+    def test_update_geokrety_total_distance(self):
+        """Check Move: POST GeoKret will be amended with updated total distance"""
+        with app.test_request_context():
+            self._blend()
+
+            geokret = mixer.blend(Geokret, owner=self.user1, holder=None,
+                                  created_on_date_time="2017-12-01T14:18:22")
+
+            # insert moves
+            payload = MovePayload(MOVE_TYPE_DROPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-01T14:18:22').coordinates(52.06453, 9.32880)  # 0km
+            response = self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_COMMENT).tracking_code(
+                geokret.tracking_code).moved_date_time('2017-12-02T14:18:22')
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_GRABBED).tracking_code(
+                geokret.tracking_code).moved_date_time('2017-12-03T14:18:22')
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-04T14:18:22').coordinates(52.06255, 9.34737)  # 1km
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-05T14:18:22').coordinates(52.06313, 9.32412)  # 2km
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-06T14:18:22').coordinates(52.07567, 9.35367)  # 2km
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-07T14:18:22').coordinates(52.08638, 9.50065)  # 10km
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED).tracking_code(geokret.tracking_code).moved_date_time(
+                '2017-12-08T14:18:22').coordinates(52.07258, 9.35628)  # 10km
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+
+            # Check in database
+            geokret = Geokret.query.filter(
+                Geokret.id == geokret.id
+            ).one()
+            self.assertEqual(geokret.distance, 25)
+
+    def test_update_geokrety_total_move_count(self):
+        """Check Move: POST GeoKret will be amended with updated total move count"""
+        pass
 
     def test_delete_list(self):
         """

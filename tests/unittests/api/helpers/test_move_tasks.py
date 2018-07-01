@@ -6,6 +6,7 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
                                          MOVE_TYPE_SEEN)
 from app.api.helpers.move_tasks import (update_country_and_altitude,
                                         update_move_distances)
+from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.user import User
@@ -61,6 +62,7 @@ class TestMoveTasksHelper(GeokretyTestCase):
 
             # run the function
             update_move_distances(self.geokret1.id)
+            db.session.commit()
 
             # Check in database
             moves = Move.query.filter(Move.geokret_id == self.geokret1.id) \
@@ -68,11 +70,11 @@ class TestMoveTasksHelper(GeokretyTestCase):
             self.assertEqual(moves[0].distance, 0)
             self.assertEqual(moves[1].distance, 0)
             self.assertEqual(moves[2].distance, 0)
-            self.assertEqual(moves[3].distance, int(0.428142805874))
-            self.assertEqual(moves[4].distance, int(1.44869620611))
-            self.assertEqual(moves[5].distance, int(2.69014884056))
+            self.assertEqual(moves[3].distance, int(round(0.428142805874)))
+            self.assertEqual(moves[4].distance, int(round(1.44869620611)))
+            self.assertEqual(moves[5].distance, int(round(2.69014884056)))
             self.assertEqual(moves[6].distance, 0)
-            self.assertEqual(moves[7].distance, int(3.09681445874))
+            self.assertEqual(moves[7].distance, int(round(3.09681445874)))
 
     @responses.activate
     def test_update_country_and_altitude(self):
@@ -88,6 +90,9 @@ class TestMoveTasksHelper(GeokretyTestCase):
 
             # run the function
             update_country_and_altitude(self.move1.id)
+            db.session.commit()
+
+            # Check in database
             move = Move.query.get(self.move1.id)
             self.assertEqual(move.country, 'FR')
             self.assertNotEqual(move.altitude, '720')
@@ -111,6 +116,9 @@ class TestMoveTasksHelper(GeokretyTestCase):
                                        latitude=0, longitude=0)
             # run the function
             update_country_and_altitude(another_move.id)
+            db.session.commit()
+
+            # Check in database
             move = Move.query.get(another_move.id)
             self.assertEqual(move.country, 'XYZ')
             self.assertNotEqual(move.altitude, '-2000')

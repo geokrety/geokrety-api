@@ -132,12 +132,22 @@ class MovesList(ResourceList):
             data["author_id"] = current_identity.id
 
     def after_post(self, result):
-        from app.api.helpers.move_tasks import (update_country_and_altitude,
-                                                update_move_distances)
+        from app.api.helpers.move_tasks import (
+            update_country_and_altitude,
+            update_move_distances,
+            update_geokret_total_distance,
+            update_geokret_total_moves_count,
+        )
 
-        # Enhance move content
+        # Enhance Move content
         update_country_and_altitude.delay(result['data']['id'])
         update_move_distances.delay(result['data']['attributes']['geokret-id'])
+        db.session.commit()
+
+        # Enhance GeoKret content
+        update_geokret_total_distance.delay(result['data']['attributes']['geokret-id'])
+        update_geokret_total_moves_count.delay(result['data']['attributes']['geokret-id'])
+        db.session.commit()
 
     current_identity = current_identity
     schema = MoveWithCoordinatesSchema

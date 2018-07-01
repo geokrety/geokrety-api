@@ -1,9 +1,12 @@
 import requests
 
 import geopy.distance
-from app import make_celery, current_app
+from app import current_app, make_celery
 from app.models import db
+from app.models.geokret import Geokret
 from app.models.move import Move
+
+from sqlalchemy.sql import func
 
 celery = make_celery(current_app)
 
@@ -23,9 +26,8 @@ def update_move_distances(geokret_id):
             continue
 
         distance = geopy.distance.distance((last.latitude, last.longitude), (move.latitude, move.longitude)).km
-        move.distance = int(distance)
+        move.distance = int(round(distance))
         last = move
-    db.session.commit()
 
 
 @celery.task(name='update.move.country.and.elevation')
@@ -46,4 +48,19 @@ def update_country_and_altitude(move_id):
     else:
         move.altitude = '-2000'
 
-    db.session.commit()
+
+@celery.task(name='update.geokret.distance')
+def update_geokret_total_distance(geokret_id):
+    """ Update GeoKret total distance
+    """
+    distance = db.session.query(func.sum(Move.distance)) \
+        .filter(Move.geokret_id == geokret_id).one()
+
+    geokret = Geokret.query.get(geokret_id)
+    geokret.distance = distance
+
+
+@celery.task(name='update.geokret.total.moves.count')
+def update_geokret_total_moves_count(geokret_id):
+    """ Update GeoKret total move count
+    """
