@@ -15,11 +15,11 @@ from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase, MovePayload, ResponsesMixin
 
 
-class TestMove(ResponsesMixin, GeokretyTestCase):
+class TestMove(ResponsesMixin, GeoKretyTestCase):
     """Test Move CRUD operations"""
 
     def _blend(self):
-        """Create mocked Geokret/User"""
+        """Create mocked GeoKret/User"""
         mixer.init_app(app)
         with mixer.ctx(commit=False):
             # Users
