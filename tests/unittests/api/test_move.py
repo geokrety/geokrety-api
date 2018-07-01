@@ -807,7 +807,7 @@ class TestMove(ResponsesMixin, GeokretyTestCase):
             # insert moves
             payload = MovePayload(MOVE_TYPE_DROPPED).tracking_code(geokret.tracking_code).moved_date_time(
                 '2017-12-01T14:18:22').coordinates(52.06453, 9.32880)  # 0km
-            response = self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
 
             payload = MovePayload(MOVE_TYPE_COMMENT).tracking_code(
                 geokret.tracking_code).moved_date_time('2017-12-02T14:18:22')

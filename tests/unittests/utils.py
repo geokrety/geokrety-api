@@ -70,7 +70,6 @@ class ResponsesMixin(object):
         responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=52.07258&lon=9.35628',
                       status=200, body='154')
 
-
         super(ResponsesMixin, self).setUp()
 
     def tearDown(self):
