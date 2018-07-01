@@ -385,8 +385,8 @@ class TestGeokret(GeokretyTestCase):
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user1)
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user2)
 
-    def test_get_geokrety_by_types_traditional(self):
-        """ Check Geokret: GET geokrety by types traditional"""
+    def test_get_geokrety_by_traditional_type(self):
+        """ Check Geokret: GET geokrety by traditional type"""
         with app.test_request_context():
             self._blend()
             url = '/v1/geokrety-types/%s/geokrety' % GEOKRET_TYPE_TRADITIONAL
@@ -416,8 +416,8 @@ class TestGeokret(GeokretyTestCase):
             self._check_geokret(response[0], self.geokret1)
             self._check_geokret(response[1], self.geokret2)
 
-    def test_get_geokrety_by_types_coin(self):
-        """ Check Geokret: GET geokrety by types coin"""
+    def test_get_geokrety_by_coin_type(self):
+        """ Check Geokret: GET geokrety by coin type"""
         with app.test_request_context():
             self._blend()
             url = '/v1/geokrety-types/%s/geokrety' % GEOKRET_TYPE_COIN
@@ -441,6 +441,13 @@ class TestGeokret(GeokretyTestCase):
             response = self._send_get(url, code=200, user=self.user3)['data']
             self.assertEqual(len(response), 1)
             self._check_geokret(response[0], self.geokret3)
+
+    def test_get_geokrety_by_unexistent_type(self):
+        """ Check Geokret: GET geokrety by unexistent type"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety-types/%s/geokrety' % 666
+            self._send_get(url, code=404)
 
     def test_patch_list(self):
         """

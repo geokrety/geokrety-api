@@ -1,7 +1,6 @@
 # coding=utf-8
 import datetime
 
-import responses
 from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_COIN, GEOKRET_TYPE_HUMAN,
                                          GEOKRET_TYPE_TRADITIONAL,

@@ -27,7 +27,7 @@ class TestGeokretyType(GeokretyTestCase):
             db.session.add(self.geokret2)
             db.session.commit()
 
-    def test_create_authenticated_only(self):
+    def test_create_is_forbidden(self):
         """Check GeokretyType: POST is forbidden"""
         with app.test_request_context():
             self._blend()
