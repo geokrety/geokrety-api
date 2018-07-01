@@ -15,7 +15,7 @@ from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase, MovePayload, ResponsesMixin
 
 
-class TestMove(ResponsesMixin, GeoKretyTestCase):
+class TestMove(ResponsesMixin, GeokretyTestCase):
     """Test Move CRUD operations"""
 
     def _blend(self):
