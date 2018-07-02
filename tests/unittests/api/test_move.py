@@ -845,7 +845,99 @@ class TestMove(ResponsesMixin, GeokretyTestCase):
 
     def test_update_geokrety_total_move_count(self):
         """Check Move: POST GeoKret will be amended with updated total move count"""
-        pass
+        with app.test_request_context():
+            self._blend()
+
+            geokret = mixer.blend(Geokret, owner=self.user1, holder=self.admin,
+                                  created_on_date_time="2017-12-01T14:18:22")
+
+            payload = MovePayload(MOVE_TYPE_DROPPED) \
+                .tracking_code(geokret.tracking_code) \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_DROPPED) \
+                .tracking_code(geokret.tracking_code) \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_COMMENT) \
+                .tracking_code(geokret.tracking_code)
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_COMMENT) \
+                .tracking_code(geokret.tracking_code)
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_SEEN) \
+                .tracking_code(geokret.tracking_code) \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_ARCHIVED) \
+                .tracking_code(geokret.tracking_code)
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED) \
+                .tracking_code(geokret.tracking_code) \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.caches_count, 4)
+
+    def test_update_geokrety_holder(self):
+        """Check Move: POST GeoKret will be amended with new holder"""
+        with app.test_request_context():
+            self._blend()
+
+            geokret = mixer.blend(Geokret, owner=self.user1, holder=self.admin,
+                                  created_on_date_time="2017-12-01T14:18:22")
+
+            payload = MovePayload(MOVE_TYPE_DROPPED) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-01T14:18:22') \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, None)
+
+            payload = MovePayload(MOVE_TYPE_GRABBED) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-02T14:18:22')
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, self.user1.id)
+
+            payload = MovePayload(MOVE_TYPE_DIPPED) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-03T14:18:22') \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, self.user1.id)
+
+            payload = MovePayload(MOVE_TYPE_COMMENT) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-04T14:18:22')
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, self.user1.id)
+
+            payload = MovePayload(MOVE_TYPE_SEEN) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-05T14:18:22') \
+                .coordinates()
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user2)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, None)
+
+            payload = MovePayload(MOVE_TYPE_ARCHIVED) \
+                .tracking_code(geokret.tracking_code) \
+                .moved_date_time('2017-12-06T14:18:22')
+            self._send_post("/v1/moves", payload=payload, code=201, user=self.user1)
+            geokret = Geokret.query.filter(Geokret.id == geokret.id).one()
+            self.assertEqual(geokret.holder_id, None)
 
     def test_delete_list(self):
         """

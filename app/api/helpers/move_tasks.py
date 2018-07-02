@@ -2,10 +2,12 @@ import requests
 
 import geopy.distance
 from app import current_app, make_celery
+from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
+                                         MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
+                                         MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
-
 from sqlalchemy.sql import func
 
 celery = make_celery(current_app)
@@ -64,3 +66,31 @@ def update_geokret_total_distance(geokret_id):
 def update_geokret_total_moves_count(geokret_id):
     """ Update GeoKret total move count
     """
+    moves = Move.query \
+        .filter(Move.geokret_id == geokret_id) \
+        .filter(Move.move_type_id.in_((MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED))) \
+        .order_by(Move.moved_on_date_time.desc())
+
+    geokret = Geokret.query.get(geokret_id)
+    geokret.caches_count = moves.count()
+
+
+@celery.task(name='update.geokret.holder')
+def update_geokret_holder(geokret_id):
+    """ Update GeoKret holder
+    """
+    moves = Move.query \
+        .filter(Move.geokret_id == geokret_id) \
+        .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
+        .order_by(Move.moved_on_date_time.desc())
+
+    geokret = Geokret.query.get(geokret_id)
+
+    geokret.holder_id = None
+    if moves.count():
+        for move in moves:
+            if move.move_type_id in [MOVE_TYPE_DROPPED, MOVE_TYPE_ARCHIVED, MOVE_TYPE_SEEN]:
+                break
+            elif move.move_type_id in [MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED]:
+                geokret.holder_id = move.author_id
+                break

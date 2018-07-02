@@ -137,6 +137,7 @@ class MovesList(ResourceList):
             update_move_distances,
             update_geokret_total_distance,
             update_geokret_total_moves_count,
+            update_geokret_holder,
         )
 
         # Enhance Move content
@@ -147,6 +148,7 @@ class MovesList(ResourceList):
         # Enhance GeoKret content
         update_geokret_total_distance.delay(result['data']['attributes']['geokret-id'])
         update_geokret_total_moves_count.delay(result['data']['attributes']['geokret-id'])
+        update_geokret_holder.delay(result['data']['attributes']['geokret-id'])
         db.session.commit()
 
     current_identity = current_identity
