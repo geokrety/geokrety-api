@@ -33,7 +33,7 @@ def update_move_distances(geokret_id):
 
 
 @celery.task(name='update.move.country.and.elevation')
-def update_country_and_altitude(move_id):
+def update_move_country_and_altitude(move_id):
     """ Obtain and update country and altitude of a move
     """
     move = Move.query.get(move_id)

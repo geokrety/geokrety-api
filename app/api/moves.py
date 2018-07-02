@@ -133,15 +133,17 @@ class MovesList(ResourceList):
 
     def after_post(self, result):
         from app.api.helpers.move_tasks import (
-            update_country_and_altitude,
+            update_move_country_and_altitude,
             update_move_distances,
             update_geokret_total_distance,
             update_geokret_total_moves_count,
             update_geokret_holder,
+            # update_user_owner_stat,
+            # update_user_mover_stat,
         )
 
         # Enhance Move content
-        update_country_and_altitude.delay(result['data']['id'])
+        update_move_country_and_altitude.delay(result['data']['id'])
         update_move_distances.delay(result['data']['attributes']['geokret-id'])
         db.session.commit()
 
@@ -150,6 +152,14 @@ class MovesList(ResourceList):
         update_geokret_total_moves_count.delay(result['data']['attributes']['geokret-id'])
         update_geokret_holder.delay(result['data']['attributes']['geokret-id'])
         db.session.commit()
+
+        # TODO Generate static files
+        # * gpx
+        # * csv
+        # * geojson
+        # * statpic owner
+        # * statpic mover
+        # *
 
     current_identity = current_identity
     schema = MoveWithCoordinatesSchema

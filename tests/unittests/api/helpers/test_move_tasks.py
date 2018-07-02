@@ -4,7 +4,7 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
                                          MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
                                          MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
                                          MOVE_TYPE_SEEN)
-from app.api.helpers.move_tasks import (update_country_and_altitude,
+from app.api.helpers.move_tasks import (update_move_country_and_altitude,
                                         update_move_distances)
 from app.models import db
 from app.models.geokret import Geokret
@@ -89,7 +89,7 @@ class TestMoveTasksHelper(GeokretyTestCase):
             self._blend()
 
             # run the function
-            update_country_and_altitude(self.move1.id)
+            update_move_country_and_altitude(self.move1.id)
             db.session.commit()
 
             # Check in database
@@ -115,7 +115,7 @@ class TestMoveTasksHelper(GeokretyTestCase):
                                        author=self.user2, moved_on_date_time="2017-12-01T17:17:17",
                                        latitude=0, longitude=0)
             # run the function
-            update_country_and_altitude(another_move.id)
+            update_move_country_and_altitude(another_move.id)
             db.session.commit()
 
             # Check in database
