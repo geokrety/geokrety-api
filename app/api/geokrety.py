@@ -1,10 +1,11 @@
 from app.api.bootstrap import api
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_COMMENT
 from app.api.helpers.db import safe_query
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
+from app.models.move import Move
 from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
@@ -43,11 +44,11 @@ class GeokretList(ResourceList):
             if has_access('is_admin', user_id=current_identity.id):
                 self.schema = GeokretSchema
 
-            # List owned geokret
+            # List owned GeoKret
             if kwargs.get('owner_id') is not None and kwargs.get('owner_id') == current_identity.id:
                 self.schema = GeokretSchema
 
-            # List held geokret
+            # List held GeoKret
             if kwargs.get('holder_id') is not None and kwargs.get('holder_id') == current_identity.id:
                 self.schema = GeokretSchema
 
@@ -77,10 +78,20 @@ class GeokretDetail(ResourceDetail):
             if has_access('is_admin', user_id=current_identity.id):
                 self.schema = GeokretSchema
 
-            # Is GeoKret owner?
             if kwargs.get('id') is not None:
                 geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'geokret_owned_id')
+
+                # Is GeoKret owner?
                 if geokret.owner_id == current_identity.id:
+                    self.schema = GeokretSchema
+
+                # Is GeoKret already seen?
+                if current_identity.id and \
+                    Move.query \
+                        .filter(Move.geokret_id == kwargs.get('id')) \
+                        .filter(Move.author_id == current_identity.id) \
+                        .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
+                        .count():
                     self.schema = GeokretSchema
 
     current_identity = current_identity

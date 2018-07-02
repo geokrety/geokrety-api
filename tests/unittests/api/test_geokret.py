@@ -1,7 +1,12 @@
 from app import current_app as app
+from app.api.helpers.data_layers import (GEOKRET_TYPE_COIN,
+                                         GEOKRET_TYPE_TRADITIONAL,
+                                         MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
+                                         MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
+                                         MOVE_TYPE_SEEN)
 from app.models import db
 from app.models.geokret import Geokret
-from app.api.helpers.data_layers import GEOKRET_TYPE_TRADITIONAL, GEOKRET_TYPE_COIN
+from app.models.move import Move
 from app.models.user import User
 from mixer.backend.flask import mixer
 from tests.unittests.utils import GeokretyTestCase
@@ -149,7 +154,8 @@ class TestGeokret(GeokretyTestCase):
             self._check_geokret(response['data'], geokret, with_private=True)
 
     def test_create_geokret(self):
-        """ Check Geokret: POST and Read back a geokret"""
+        """ Check Geokret: POST and Read back a GeoKret
+        """
         with app.test_request_context():
             mixer.init_app(app)
             admin = mixer.blend(User)
@@ -285,6 +291,111 @@ class TestGeokret(GeokretyTestCase):
             response = self._send_get(url, code=200, user=self.user2)
             self._check_geokret(response['data'], self.geokret1)
 
+    def test_get_geokrety_details_already_dropped(self):
+        """ Check Geokret: GET geokrety has tracking-code when already dropped"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety/%d' % self.geokret1.id
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_DROPPED,
+                                     geokret=self.geokret1, author=self.user2)
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
+
+    def test_get_geokrety_details_already_grabbed(self):
+        """ Check Geokret: GET geokrety has tracking-code when already grabbed"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety/%d' % self.geokret1.id
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_GRABBED,
+                                     geokret=self.geokret1, author=self.user2)
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
+
+    def test_get_geokrety_details_already_comment(self):
+        """ Check Geokret: GET geokrety has tracking-code when posted a comment"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety/%d' % self.geokret1.id
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_COMMENT,
+                                     geokret=self.geokret1, author=self.user2)
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+    def test_get_geokrety_details_already_seen(self):
+        """ Check Geokret: GET geokrety has tracking-code when already seen"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety/%d' % self.geokret1.id
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_SEEN,
+                                     geokret=self.geokret1, author=self.user2)
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
+
+    def test_get_geokrety_details_already_dipped(self):
+        """ Check Geokret: GET geokrety has tracking-code when already dipped"""
+        with app.test_request_context():
+            self._blend()
+            url = '/v1/geokrety/%d' % self.geokret1.id
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_DIPPED,
+                                     geokret=self.geokret1, author=self.user2)
+
+            response = self._send_get(url, code=200, user=None)
+            self._check_geokret(response['data'], self.geokret1, with_private=False)
+
+            response = self._send_get(url, code=200, user=self.user2)
+            self._check_geokret(response['data'], self.geokret1, with_private=True)
+
     def test_get_geokrety_owned(self):
         """ Check Geokret: GET geokrety owned"""
         with app.test_request_context():
@@ -384,6 +495,40 @@ class TestGeokret(GeokretyTestCase):
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.admin)
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user1)
             self._send_get('/v1/users/666/geokrety-held', code=404, user=self.user2)
+
+    #  # Current implementation could not achieve this with a low cost database
+    #  # request. We should think introducing an intermediate table: gk found by users
+    #
+    # def test_get_geokrety_list_with_already_seen_geokret(self):
+    #     """ Check Geokret: GET geokrety has tracking-code when already dipped"""
+    #     with app.test_request_context():
+    #         self._blend()
+    #         url = '/v1/geokrety'
+    #
+    #         response = self._send_get(url, code=200, user=None)
+    #
+    #         self.assertEqual(len(response['data']), 3)
+    #         self.assertEqual(response['data'][0]['id'], '1')
+    #         self.assertEqual(response['data'][1]['id'], '2')
+    #         self.assertEqual(response['data'][2]['id'], '3')
+    #
+    #         self.assertNotIn('tracking-code', response['data'][0]['attributes'])
+    #         self.assertNotIn('tracking-code', response['data'][1]['attributes'])
+    #         self.assertNotIn('tracking-code', response['data'][2]['attributes'])
+    #
+    #         self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_DIPPED,
+    #                                  geokret=self.geokret1, author=self.user2)
+    #
+    #         response = self._send_get(url, code=200, user=None)
+    #
+    #         self.assertEqual(len(response['data']), 3)
+    #         self.assertEqual(response['data'][0]['id'], '1')
+    #         self.assertEqual(response['data'][1]['id'], '2')
+    #         self.assertEqual(response['data'][2]['id'], '3')
+    #
+    #         self.assertIn('tracking-code', response['data'][0]['attributes'])
+    #         self.assertNotIn('tracking-code', response['data'][1]['attributes'])
+    #         self.assertNotIn('tracking-code', response['data'][2]['attributes'])
 
     def test_get_geokrety_by_traditional_type(self):
         """ Check Geokret: GET geokrety by traditional type"""
