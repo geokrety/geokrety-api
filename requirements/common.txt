@@ -20,4 +20,4 @@ flask-script==2.0.6
 htmlentities==0.2.1
 geopy==1.16.0
 responses==0.9.0
-celery[redis]==4.2.0
+celery[redis]==4.2.1
