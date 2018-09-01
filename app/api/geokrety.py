@@ -66,7 +66,7 @@ class GeokretList(ResourceList):
         'model': Geokret,
         'methods': {
             'query': query,
-        }
+        },
     }
 
 
