@@ -1,4 +1,6 @@
+from app.api.helpers.data_layers import MOVE_TYPE_COMMENT
 from app.api.helpers.utilities import dasherize
+from app.models.move import Move
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
@@ -43,6 +45,22 @@ class GeokretSchemaPublic(Schema):
         schema='UserSchemaPublic',
         type_='user'
     )
+    tracking_code = fields.Method('tracking_code_or_none')
+
+    def tracking_code_or_none(self, geokret):
+        """Add the tracking_code only if user has already touched the GK
+        """
+        if not self.context['current_identity']:
+            return None
+
+        # Is GeoKret already seen?
+        count = Move.query \
+            .filter(Move.geokret_id == geokret.id) \
+            .filter(Move.author_id == self.context['current_identity'].id) \
+            .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
+            .count()
+        if count:
+            return geokret.tracking_code
 
 
 class GeokretSchema(GeokretSchemaPublic):

@@ -255,12 +255,12 @@ class GeokretyTestCase(unittest.TestCase):
             self.assertTrue('attributes' in data)
             attributes = data['attributes']
 
+            self.assertTrue('tracking-code' in attributes)
             if with_private:
-                self.assertTrue('tracking-code' in attributes)
                 if 'tracking-code' not in skip_check:
                     self.assertEqual(attributes['tracking-code'], geokret.tracking_code)
             else:
-                self.assertFalse('tracking-code' in attributes)
+                self.assertIsNone(attributes['tracking-code'])
 
     def _check_move(self, data, move, skip_check=None):
         skip_check = skip_check or []
