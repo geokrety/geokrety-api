@@ -67,9 +67,6 @@ class UserSchemaPublic(Schema):
 
 class UserSchema(UserSchemaPublic):
 
-    # class Meta(UserSchemaPublic.Meta):
-    #     pass
-
     @validates('name')
     def validate_username_uniqueness(self, data):
         if User.query.filter_by(name=data).count():

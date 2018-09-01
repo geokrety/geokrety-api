@@ -55,8 +55,8 @@ class TestUser(GeokretyTestCase):
         if 'times' not in skip_check:
             if attributes['last-login-date-time']:
                 self.assertDateTimeEqual(attributes['last-login-date-time'], user.last_login_date_time)
-            if attributes['last-mail-date-time']:
-                self.assertDateTimeEqual(attributes['last-mail-date-time'], user.last_mail_date_time)
+            # if attributes['last-mail-date-time']:
+            #     self.assertDateTimeEqual(attributes['last-mail-date-time'], user.last_mail_date_time)
             if attributes['last-update-date-time']:
                 self.assertDateTimeEqual(attributes['last-update-date-time'], user.last_update_date_time)
 

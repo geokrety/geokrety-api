@@ -92,6 +92,13 @@ class Geokret(db.Model):
         db.ForeignKey('gk-users.id'),
         key='holder_id'
     )
+    moves = db.relationship(
+        'Move',
+        backref="geokret",
+        foreign_keys="Move.geokret_id",
+        cascade="all,delete"
+    )
+
     # last_position_id = db.Column(
     #     'ost_pozycja_id',
     #     db.Integer,

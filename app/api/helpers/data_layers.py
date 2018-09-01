@@ -15,14 +15,21 @@ GEOKRETY_TYPES = [
     {'id': GEOKRET_TYPE_COIN, 'name': 'A coin'},
     {'id': GEOKRET_TYPE_KRETYPOST, 'name': 'KretyPost'},
 ]
-GEOKRETY_TYPES_COUNT = 5
 
-MOVE_TYPE_DROPPED = 0
-MOVE_TYPE_GRABBED = 1
-MOVE_TYPE_COMMENT = 2
-MOVE_TYPE_SEEN = 3
-MOVE_TYPE_ARCHIVED = 4
-MOVE_TYPE_VISITED = 5
+GEOKRETY_TYPES_LIST = [
+    GEOKRET_TYPE_TRADITIONAL,
+    GEOKRET_TYPE_BOOK,
+    GEOKRET_TYPE_HUMAN,
+    GEOKRET_TYPE_COIN,
+    GEOKRET_TYPE_KRETYPOST,
+]
+
+MOVE_TYPE_DROPPED = "0"
+MOVE_TYPE_GRABBED = "1"
+MOVE_TYPE_COMMENT = "2"
+MOVE_TYPE_SEEN = "3"
+MOVE_TYPE_ARCHIVED = "4"
+MOVE_TYPE_DIPPED = "5"
 
 MOVE_TYPES = [
     {'id': MOVE_TYPE_DROPPED, 'name': 'Dropped to'},
@@ -30,9 +37,18 @@ MOVE_TYPES = [
     {'id': MOVE_TYPE_COMMENT, 'name': 'A comment'},
     {'id': MOVE_TYPE_SEEN, 'name': 'Seen in'},
     {'id': MOVE_TYPE_ARCHIVED, 'name': 'Archived'},
-    {'id': MOVE_TYPE_VISITED, 'name': 'Visiting'},
+    {'id': MOVE_TYPE_DIPPED, 'name': 'Dipped'},
 ]
-MOVE_TYPES_COUNT = 6
+
+MOVE_TYPES_LIST = [
+    MOVE_TYPE_DROPPED,
+    MOVE_TYPE_GRABBED,
+    MOVE_TYPE_COMMENT,
+    MOVE_TYPE_SEEN,
+    MOVE_TYPE_ARCHIVED,
+    MOVE_TYPE_DIPPED,
+]
+# MOVE_TYPES_COUNT = 6
 
 
 class GeoKretyTypeDataLayer(BaseDataLayer):
@@ -60,7 +76,7 @@ class GeoKretyTypeDataLayer(BaseDataLayer):
         :param dict view_kwargs: kwargs from the resource view
         :return tuple: the number of object and the list of objects
         """
-        return GEOKRETY_TYPES_COUNT, GEOKRETY_TYPES
+        return len(GEOKRETY_TYPES), GEOKRETY_TYPES
 
 
 class MovesTypeDataLayer(BaseDataLayer):
@@ -81,4 +97,4 @@ class MovesTypeDataLayer(BaseDataLayer):
         :param dict view_kwargs: kwargs from the resource view
         :return tuple: the number of object and the list of objects
         """
-        return MOVE_TYPES_COUNT, MOVE_TYPES
+        return len(MOVE_TYPES_LIST), MOVE_TYPES

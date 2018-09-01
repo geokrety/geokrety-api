@@ -1,14 +1,15 @@
 from app.api.bootstrap import api
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
 from app.api.helpers.db import safe_query
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
-from app.api.helpers.data_layers import GEOKRETY_TYPES_COUNT
 from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
 class GeokretList(ResourceList):
@@ -29,9 +30,9 @@ class GeokretList(ResourceList):
 
         # /geokrety-types/<int:geokrety_type_id>/geokrety
         if view_kwargs.get('geokrety_type_id') is not None:
-            if view_kwargs['geokrety_type_id'] < 0 or view_kwargs['geokrety_type_id'] > GEOKRETY_TYPES_COUNT:
-                raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},
-                                     "{}: {} not found".format(model.__name__, value))
+            if str(view_kwargs['geokrety_type_id']) not in GEOKRETY_TYPES_LIST:
+                raise ObjectNotFound({'parameter': '{}'.format('geokrety_type_id')},
+                                     "{}: {} not found".format('geokrety_type', view_kwargs['geokrety_type_id']))
             query_ = query_.filter_by(type=str(view_kwargs['geokrety_type_id']))
 
         return query_
@@ -42,11 +43,11 @@ class GeokretList(ResourceList):
             if has_access('is_admin', user_id=current_identity.id):
                 self.schema = GeokretSchema
 
-            # List owned geokret
+            # List owned GeoKret
             if kwargs.get('owner_id') is not None and kwargs.get('owner_id') == current_identity.id:
                 self.schema = GeokretSchema
 
-            # List held geokret
+            # List held GeoKret
             if kwargs.get('holder_id') is not None and kwargs.get('holder_id') == current_identity.id:
                 self.schema = GeokretSchema
 
@@ -56,6 +57,7 @@ class GeokretList(ResourceList):
 
     current_identity = current_identity
     schema = GeokretSchemaPublic
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     decorators = (
         api.has_permission('auth_required', methods="POST"),
     )
@@ -64,7 +66,7 @@ class GeokretList(ResourceList):
         'model': Geokret,
         'methods': {
             'query': query,
-        }
+        },
     }
 
 
@@ -76,9 +78,10 @@ class GeokretDetail(ResourceDetail):
             if has_access('is_admin', user_id=current_identity.id):
                 self.schema = GeokretSchema
 
-            # Is GeoKret owner?
             if kwargs.get('id') is not None:
                 geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'geokret_owned_id')
+
+                # Is GeoKret owner?
                 if geokret.owner_id == current_identity.id:
                     self.schema = GeokretSchema
 
@@ -90,6 +93,7 @@ class GeokretDetail(ResourceDetail):
     )
     methods = ('GET', 'PATCH', 'DELETE')
     schema = GeokretSchemaPublic
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {
         'session': db.session,
         'model': Geokret,
@@ -99,6 +103,7 @@ class GeokretDetail(ResourceDetail):
 class GeokretRelationship(ResourceRelationship):
     methods = ['GET']
     schema = GeokretSchemaPublic
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {
         'session': db.session,
         'model': Geokret,

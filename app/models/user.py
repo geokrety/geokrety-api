@@ -93,7 +93,8 @@ class User(db.Model):
         'ostatni_mail',
         db.DateTime,
         nullable=True,
-        key='last_mail_date_time'
+        key='last_mail_date_time',
+        default=None
     )
     last_login_date_time = db.Column(
         'ostatni_login',
@@ -139,6 +140,12 @@ class User(db.Model):
         foreign_keys="Geokret.holder_id",
         cascade="all,delete"
     )
+    geokrety_moves = db.relationship(
+        'Move',
+        backref="author",
+        foreign_keys="Move.author_id",
+        cascade="all,delete"
+    )
 
     @hybrid_property
     def password(self):
@@ -159,15 +166,6 @@ class User(db.Model):
         self._password = t_hasher.hash_password(
             password.encode('utf-8') + app.config['PASSWORD_HASH_SALT']
         )
-
-    def get_id(self):
-        return self.id
-
-    def is_active(self):
-        return True
-
-    def is_authenticated(self):
-        return True
 
     @property
     def is_super_admin(self):

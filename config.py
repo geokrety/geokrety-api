@@ -42,6 +42,7 @@ class Config(object):
     SERVE_STATIC = env.bool('SERVE_STATIC', default=False)
     DATABASE_QUERY_TIMEOUT = 0.1
     SENTRY_DSN = env('SENTRY_DSN', default=None)
+    REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
     PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='')
 
     # API configs

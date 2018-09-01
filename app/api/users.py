@@ -15,6 +15,7 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 class UserList(ResourceList):
 
     schema = UserSchema
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     decorators = (
         api.has_permission('auth_required', methods="GET"),
     )
@@ -59,6 +60,7 @@ class UserDetail(ResourceDetail):
     )
     methods = ('GET', 'PATCH', 'DELETE')
     schema = UserSchemaPublic
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {'session': db.session,
                   'model': User,
                   'methods': {
@@ -69,5 +71,6 @@ class UserDetail(ResourceDetail):
 class UserRelationship(ResourceRelationship):
     methods = ['GET']
     schema = UserSchema
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {'session': db.session,
                   'model': User}

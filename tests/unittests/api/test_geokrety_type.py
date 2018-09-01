@@ -1,5 +1,5 @@
 from app import current_app as app
-from app.api.helpers.data_layers import GEOKRETY_TYPES, GEOKRETY_TYPES_COUNT
+from app.api.helpers.data_layers import GEOKRETY_TYPES, GEOKRETY_TYPES_LIST
 from app.api.helpers.data_layers import GEOKRET_TYPE_TRADITIONAL, GEOKRET_TYPE_COIN
 from app.models import db
 from app.models.user import User
@@ -27,7 +27,7 @@ class TestGeokretyType(GeokretyTestCase):
             db.session.add(self.geokret2)
             db.session.commit()
 
-    def test_create_authenticated_only(self):
+    def test_create_is_forbidden(self):
         """Check GeokretyType: POST is forbidden"""
         with app.test_request_context():
             self._blend()
@@ -51,7 +51,8 @@ class TestGeokretyType(GeokretyTestCase):
             self._blend()
 
             def check(response):
-                self.assertEqual(len(response), GEOKRETY_TYPES_COUNT)
+                self.assertEqual(len(response), len(GEOKRETY_TYPES_LIST))
+                self.assertEqual(len(response), len(GEOKRETY_TYPES))
                 self.assertTrue('attributes' in response[0])
                 self.assertTrue('name' in response[0]['attributes'])
                 self.assertTrue('name' in response[1]['attributes'])
