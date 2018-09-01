@@ -45,8 +45,8 @@ def safe_query(self, model, column_name, value, parameter_name):
         record = db.session.query(model).filter(
             getattr(model, column_name) == value).one()
     except NoResultFound:
-        raise ObjectNotFound({'parameter': '{}'.format(parameter_name)},
-                             "{}: {} not found".format(model.__name__, value))
+        raise ObjectNotFound({u'parameter': '{}'.format(parameter_name)},
+                             u"{}: {} not found".format(model.__name__, value))
     else:
         return record
 

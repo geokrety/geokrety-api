@@ -30,13 +30,21 @@ class TestMove(GeokretyTestCase):
 
             with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), -1)
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), 1)
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), 6)
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), "-1")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), "6")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), "")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), "100")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), "A")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_move_type_id_valid(MoveSchema(), u"jeśli")
 
     def test_validate_tracking_code_is_valid(self):
@@ -47,9 +55,12 @@ class TestMove(GeokretyTestCase):
 
             MoveSchema.validate_tracking_code_is_valid(MoveSchema(), geokret1.tracking_code)
 
+            self.assertNotEqual(geokret1.tracking_code, "AAAAA")
             with self.assertRaises(UnprocessableEntity):
-                self.assertNotEqual(geokret1.tracking_code, "AAAAA")
                 MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "AAAAA")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_tracking_code_is_valid(MoveSchema(), u"jeśli")
+            with self.assertRaises(UnprocessableEntity):
                 MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "1234567890")

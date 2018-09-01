@@ -83,7 +83,7 @@ permissions = {
 }
 
 
-def is_multiple(data):
+def is_multiple(data):  # pragma: no cover
     if isinstance(data, list):
         return True
     if isinstance(data, str):
@@ -92,7 +92,7 @@ def is_multiple(data):
     return False
 
 
-def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
+def permission_manager(view, view_args, view_kwargs, *args, **kwargs):  # pragma: no cover
     """The function use to check permissions
 
     :param callable view: the view
@@ -122,28 +122,6 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):
         check = kwargs['check']
         if not check(view_kwargs):
             return ForbiddenError({'source': ''}, 'Access forbidden').respond()
-
-    # leave_if checks if we have to bypass this request on the basis of lambda function
-    if 'leave_if' in kwargs:
-        check = kwargs['leave_if']
-        if check(view_kwargs):
-            return view(*view_args, **view_kwargs)
-
-    # # If event_identifier in route instead of event_id
-    # if 'event_identifier' in view_kwargs:
-    #     try:
-    #         event = Event.query.filter_by(identifier=view_kwargs['event_identifier']).one()
-    #     except NoResultFound as e:
-    #         return NotFoundError({'parameter': 'event_identifier'}, 'Event not found').respond()
-    #     view_kwargs['event_id'] = event.id
-
-    # # Only for events API
-    # if 'identifier' in view_kwargs:
-    #     try:
-    #         event = Event.query.filter_by(identifier=view_kwargs['identifier']).one()
-    #     except NoResultFound as e:
-    #         return NotFoundError({'parameter': 'identifier'}, 'Event not found').respond()
-    #     view_kwargs['id'] = event.id
 
     if 'fetch' in kwargs:
         fetched = None
