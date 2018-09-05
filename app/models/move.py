@@ -3,7 +3,7 @@ import datetime
 from app.models import db
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
-import htmlentities
+import characterentities
 
 # TODO add unicity constraint on geokret_id + moved_on_date_time
 
@@ -13,11 +13,11 @@ class Move(db.Model):
 
     @hybrid_property
     def comment(self):
-        return htmlentities.decode(self._comment)
+        return characterentities.decode(self._comment)
 
     @comment.setter
     def comment(self, comment):
-        self._comment = htmlentities.encode(comment)
+        self._comment = characterentities.encode(comment)
 
     @comment.expression
     def comment(cls):
