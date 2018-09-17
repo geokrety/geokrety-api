@@ -17,11 +17,11 @@ python:
   # - 3.3
   # - 3.4
   # - 3.5
-before-install:
-  - npm -g install npm@latest
+# before-install:
+#   - npm -g install npm@latest
 install:
-  - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
-  - npm list -g aglio --depth=0 || npm install -g aglio
+  # - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
+  # - npm list -g aglio --depth=0 || npm install -g aglio
   - pip install -r requirements/tests.txt
 env:
   - >-
@@ -37,9 +37,9 @@ script:
   - nosetests tests/unittests -v --with-coverage
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cat docs/*.apib > apiary.apib; dredd; fi'
+  # - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cat docs/*.apib > apiary.apib; dredd; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then python-codacy-coverage -r coverage.xml; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense; fi'
+  # - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense; fi'
 deploy:
   provider: pages
   skip_cleanup: true
