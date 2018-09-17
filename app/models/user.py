@@ -2,11 +2,13 @@ import datetime
 import random
 
 import phpass
-from app.models import db
 from flask import current_app as app
 from flask import request
 from sqlalchemy import event
+from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
+
+from app.models import db
 
 
 class User(db.Model):
@@ -24,6 +26,13 @@ class User(db.Model):
         key='name',
         nullable=False,
         unique=True
+    )
+    is_admin = db.Column(
+        'is_admin',
+        db.Boolean,
+        key='is_admin',
+        nullable=True,
+        default=False
     )
     _password = db.Column(
         'haslo2',
@@ -55,15 +64,17 @@ class User(db.Model):
     )
     latitude = db.Column(
         'lat',
-        db.Float,
+        DOUBLE(precision=8, scale=5),
         key='latitude',
-        default=48.8566
+        nullable=True,
+        default=None
     )
     longitude = db.Column(
         'lon',
-        db.Float,
+        DOUBLE(precision=8, scale=5),
         key='longitude',
-        default=2.3522
+        nullable=True,
+        default=None
     )
     observation_radius = db.Column(
         'promien',
@@ -169,11 +180,12 @@ class User(db.Model):
 
     @property
     def is_super_admin(self):
-        return self.id in [1, 26422]
+        return self.is_admin
+        # return self.id in [1, 26422]x
 
-    @property
-    def is_admin(self):
-        return self.id in [1, 26422]
+    # @property
+    # def is_admin(self):
+    #     return self.id in [1, 26422]
 
 
 @event.listens_for(User, 'init')

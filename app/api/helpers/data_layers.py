@@ -1,6 +1,7 @@
+from flask_rest_jsonapi.data_layers.base import BaseDataLayer
+
 from app.api.helpers.db import safe_query
 from app.models.geokret import Geokret
-from flask_rest_jsonapi.data_layers.base import BaseDataLayer
 
 GEOKRET_TYPE_TRADITIONAL = "0"
 GEOKRET_TYPE_BOOK = "1"
@@ -8,12 +9,20 @@ GEOKRET_TYPE_HUMAN = "2"
 GEOKRET_TYPE_COIN = "3"
 GEOKRET_TYPE_KRETYPOST = "4"
 
+GEOKRET_TYPE_TEXT = {
+    GEOKRET_TYPE_TRADITIONAL: "Traditional",
+    GEOKRET_TYPE_BOOK: "A book/CD/DVD",
+    GEOKRET_TYPE_HUMAN: "A Human",
+    GEOKRET_TYPE_COIN: "A coin",
+    GEOKRET_TYPE_KRETYPOST: "KretyPost"
+}
+
 GEOKRETY_TYPES = [
-    {'id': GEOKRET_TYPE_TRADITIONAL, 'name': 'Traditional'},
-    {'id': GEOKRET_TYPE_BOOK, 'name': 'A book/CD/DVD'},
-    {'id': GEOKRET_TYPE_HUMAN, 'name': 'A Human'},
-    {'id': GEOKRET_TYPE_COIN, 'name': 'A coin'},
-    {'id': GEOKRET_TYPE_KRETYPOST, 'name': 'KretyPost'},
+    {'id': GEOKRET_TYPE_TRADITIONAL, 'name': GEOKRET_TYPE_TEXT[GEOKRET_TYPE_TRADITIONAL]},
+    {'id': GEOKRET_TYPE_BOOK, 'name': GEOKRET_TYPE_TEXT[GEOKRET_TYPE_BOOK]},
+    {'id': GEOKRET_TYPE_HUMAN, 'name': GEOKRET_TYPE_TEXT[GEOKRET_TYPE_HUMAN]},
+    {'id': GEOKRET_TYPE_COIN, 'name': GEOKRET_TYPE_TEXT[GEOKRET_TYPE_COIN]},
+    {'id': GEOKRET_TYPE_KRETYPOST, 'name': GEOKRET_TYPE_TEXT[GEOKRET_TYPE_KRETYPOST]},
 ]
 
 GEOKRETY_TYPES_LIST = [

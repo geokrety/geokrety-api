@@ -18,14 +18,12 @@ class MoveSchema(Schema):
         try:
             safe_query(self, Geokret, 'tracking_code', data, 'tracking_code')
         except ObjectNotFound:
-            raise UnprocessableEntity({'pointer': '/data/attributes/tracking_code'},
-                                      "Tracking Code is invalid")
+            raise UnprocessableEntity("Tracking Code is invalid", {'pointer': '/data/attributes/tracking_code'})
 
     @validates('move_type_id')
     def validate_move_type_id_valid(self, data):
         if data not in MOVE_TYPES_LIST:
-            raise UnprocessableEntity({'pointer': '/data/attributes/move_type_id'},
-                                      "Move Type Id is invalid")
+            raise UnprocessableEntity("Move Type Id is invalid", {'pointer': '/data/attributes/move_type_id'})
 
     class Meta:
         type_ = 'move'

@@ -1,8 +1,8 @@
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 from app.api.helpers.exceptions import UnprocessableEntity, ConflictException, ForbiddenException, MethodNotAllowed
 
 
-class TestExceptionsHelperValidation(GeokretyTestCase):
+class TestExceptionsHelperValidation(BaseTestCase):
 
     def test_exceptions(self):
         """Check ExceptionsHelper: exceptions types"""

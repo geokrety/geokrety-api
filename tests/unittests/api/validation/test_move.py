@@ -7,16 +7,11 @@ from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.schema.moves import MoveSchema
 from app.models.geokret import Geokret
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestMove(GeokretyTestCase):
+class TestMove(BaseTestCase):
     """Test Move Schema"""
-
-    def test_validate_(self):
-        """Check Form Move: validates move_type_id"""
-        with app.test_request_context():
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_GRABBED)
 
     def test_validate_move_type_id(self):
         """Check Form Move: validates move_type_id"""

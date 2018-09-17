@@ -1,7 +1,8 @@
 from app.api.bootstrap import api
 from app.api.geokrety import GeokretDetail, GeokretList, GeokretRelationship
-from app.api.geokrety_types import GeokretTypeDetail, GeokretTypeList
-from app.api.moves import MoveDetail, MovesList, MoveRelationship
+from app.api.geokrety_types import (GeokretTypeDetail, GeokretTypeList,
+                                    GeokretTypeRelationship)
+from app.api.moves import MoveDetail, MoveRelationship, MovesList
 from app.api.moves_types import MovesTypeDetail, MovesTypeList
 from app.api.news import NewsDetail, NewsList, NewsRelationship
 from app.api.news_comments import (NewsCommentDetail, NewsCommentList,
@@ -52,6 +53,7 @@ api.route(GeokretTypeList, 'geokrety_type_list', '/geokrety-types')
 api.route(GeokretTypeDetail, 'geokrety_type_details',
           '/geokrety-types/<int:id>',
           '/geokrety/<int:geokret_id>/geokrety-types')
+api.route(GeokretTypeRelationship, 'geokrety_type_geokret', '/geokrety-types/<int:id>/relationship/geokrety')
 
 api.route(GeokretList, 'geokrety_list', '/geokrety',
           '/users/<int:owner_id>/geokrety-owned',
@@ -60,16 +62,19 @@ api.route(GeokretList, 'geokrety_list', '/geokrety',
 api.route(GeokretDetail, 'geokret_details', '/geokrety/<int:id>')
 api.route(GeokretRelationship, 'geokret_owner', '/geokrety/<int:id>/relationship/owner')
 api.route(GeokretRelationship, 'geokret_holder', '/geokrety/<int:id>/relationship/holder')
+api.route(GeokretRelationship, 'geokret_type', '/geokrety/<int:id>/relationship/type')
 
 api.route(
     MovesList,
     'moves_list',
-    '/moves'
+    '/moves',
+    '/geokrety/<int:geokret_id>/moves',
 )
 api.route(
     MoveDetail,
     'move_details',
     '/moves/<int:id>'
 )
+api.route(MoveRelationship, 'move_geokret', '/geokret/<int:id>/relationship/moves')
 api.route(MoveRelationship, 'move_author', '/moves/<int:id>/relationship/author')
 api.route(MoveRelationship, 'move_type', '/moves/<int:id>/relationship/type')

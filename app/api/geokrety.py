@@ -1,15 +1,23 @@
-from app.api.bootstrap import api
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
-from app.api.helpers.db import safe_query
-from app.api.helpers.permission_manager import has_access
-from app.api.schema.geokrety import GeokretSchema, GeokretSchemaPublic
-from app.models import db
-from app.models.geokret import Geokret
-from app.models.user import User
+
+from datetime import datetime
+
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
 from flask_rest_jsonapi.exceptions import ObjectNotFound
+
+import bleach
+import htmlentities
+from app.api.bootstrap import api
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
+from app.api.helpers.db import safe_query
+from app.api.helpers.permission_manager import has_access
+from app.api.schema.geokrety import (GeokretSchema, GeokretSchemaCreate,
+                                     GeokretSchemaPublic)
+from app.models import db
+from app.models.geokret import Geokret
+from app.models.move import Move
+from app.models.user import User
 
 
 class GeokretList(ResourceList):
@@ -52,8 +60,63 @@ class GeokretList(ResourceList):
                 self.schema = GeokretSchema
 
     def post(self, *args, **kwargs):
-        self.schema = GeokretSchema
+        self.schema = GeokretSchemaCreate
         return super(GeokretList, self).post(args, kwargs)
+
+    def before_post(self, args, kwargs, data=None):
+
+        # Enforce owner to current user
+        if not current_identity.is_admin or 'owner' not in data:
+            data['owner'] = current_identity.id
+
+        # Enforce holder to owner
+        data['holder'] = data['owner']
+
+        if 'name' in data:
+            # Clean html
+            data['name'] = bleach.clean(data['name'], tags=[], strip=True)
+
+            # encode html entities
+            data['name'] = htmlentities.decode(data['name'])
+
+            # remove leading spaces
+            data['name'] = data['name'].strip()
+
+        if 'description' in data:
+            # Clean html
+            data['description'] = bleach.clean(data['description'], strip=True)
+
+            # encode html entities
+            data['description'] = htmlentities.decode(data['description'])
+
+            # remove leading spaces
+            data['description'] = data['description'].strip()
+
+        if 'born_at_home' in data and data['born_at_home']:
+            self.create_first_move = True
+            del data['born_at_home']
+        else:
+            self.create_first_move = False
+
+    def create_object(self, data, kwargs):
+        geokret = self._data_layer.create_object(data, kwargs)
+
+        # Create first move if requested
+        if self.create_first_move:
+            # But only if user has home coordinates
+            owner = safe_query(self, User, 'id', geokret.owner_id, 'id')
+            if owner.latitude and owner.longitude:
+                move = Move(
+                    author_id=geokret.owner_id,
+                    geokret_id=geokret.id,
+                    move_type_id=MOVE_TYPE_DIPPED,
+                    moved_on_date_time=datetime.utcnow(),
+                    latitude = owner.latitude,
+                    longitude = owner.longitude,
+                )
+                db.session.add(move)
+                db.session.commit()
+        return geokret
 
     current_identity = current_identity
     schema = GeokretSchemaPublic

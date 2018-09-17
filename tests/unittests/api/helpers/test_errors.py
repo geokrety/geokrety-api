@@ -1,8 +1,8 @@
 from app import current_app as app
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 from app.api.helpers.errors import ErrorResponse, ForbiddenError, NotFoundError, ServerError
 
-class TestErrorsHelperValidation(GeokretyTestCase):
+class TestErrorsHelperValidation(BaseTestCase):
 
     def test_errors(self):
         """Check ErrorsHelper: errors codes"""

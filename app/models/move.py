@@ -104,8 +104,7 @@ class Move(db.Model):
         'logtype',
         db.Enum('0', '1', '2', '3', '4', '5', '6'),
         key='move_type',
-        nullable=True,
-        default='0'
+        nullable=False,
     )
     author_id = db.Column(
         'user',
@@ -146,13 +145,13 @@ class Move(db.Model):
         'app',
         db.String(16),
         key='application_name',
-        nullable=False
+        nullable=True
     )
     application_version = db.Column(
         'app_ver',
         db.String(16),
         key='application_version',
-        nullable=False
+        nullable=True
     )
 
     # geokret = db.relationship('Geokret',

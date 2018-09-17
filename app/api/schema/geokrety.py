@@ -1,11 +1,27 @@
-from app.api.helpers.data_layers import MOVE_TYPE_COMMENT
-from app.api.helpers.utilities import dasherize
-from app.models.move import Move
+from marshmallow import validates
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
+import htmlentities
+# import bleach
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_COMMENT
+from app.api.helpers.exceptions import UnprocessableEntity
+from app.api.helpers.utilities import dasherize
+from app.models.move import Move
+
 
 class GeokretSchemaPublic(Schema):
+
+    @validates('name')
+    def validate_name_blank(self, data):
+        data = htmlentities.decode(data).replace('\x00', '').strip()
+        if not data:
+            raise UnprocessableEntity("GeoKrety name cannot be blank", {'pointer': '/data/attributes/name'})
+
+    @validates('type')
+    def validate_geokrety_type_id_valid(self, data):
+        if data not in GEOKRETY_TYPES_LIST:
+            raise UnprocessableEntity("GeoKrety Type Id is invalid", {'pointer': '/data/relationships/type'})
 
     class Meta:
         type_ = 'geokret'
@@ -45,6 +61,28 @@ class GeokretSchemaPublic(Schema):
         schema='UserSchemaPublic',
         type_='user'
     )
+
+    type = Relationship(
+        attribute='type',
+        self_view='v1.geokrety_type_geokret',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.geokrety_type_details',
+        related_view_kwargs={'id': '<type>'},
+        schema='GeoKretyTypesSchema',
+        type_='type'
+    )
+
+    moves = Relationship(
+        self_view='v1.move_geokret',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.moves_list',
+        related_view_kwargs={'geokret_id': '<id>'},
+        many=True,
+        schema='MoveSchema',
+        type_='moves',
+        #   include_resource_linkage=True
+    )
+
     tracking_code = fields.Method('tracking_code_or_none')
 
     def tracking_code_or_none(self, geokret):
@@ -74,3 +112,16 @@ class GeokretSchema(GeokretSchemaPublic):
         ordered = True
 
     tracking_code = fields.Str(dump_only=True)
+
+
+class GeokretSchemaCreate(GeokretSchema):
+
+    class Meta:
+        type_ = 'geokret'
+        self_view = 'v1.geokret_details'
+        self_view_kwargs = {'id': '<id>'}
+        self_view_many = 'v1.geokrety_list'
+        inflect = dasherize
+        ordered = True
+
+    born_at_home = fields.Boolean()

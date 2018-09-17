@@ -4,10 +4,10 @@ from app import current_app as app
 from app.models import db
 from app.models.user import User
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestAuthentication(GeokretyTestCase):
+class TestAuthentication(BaseTestCase):
     username = "kumy"
     password = "password"
     password_bad = "bad_password"

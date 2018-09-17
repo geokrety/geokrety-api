@@ -72,13 +72,14 @@ class Geokret(db.Model):
         db.DateTime,
         nullable=False,
         key='created_on_date_time',
-        default=datetime.datetime.utcnow
+        default=datetime.datetime.utcnow,
     )
     updated_on_date_time = db.Column(
         'timestamp',
         db.TIMESTAMP(timezone=True),
         key='updated_on_date_time',
-        default=datetime.datetime.utcnow
+        default=datetime.datetime.now,
+        onupdate=datetime.datetime.now,
     )
     owner_id = db.Column(
         'owner',
