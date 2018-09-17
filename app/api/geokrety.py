@@ -6,8 +6,6 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 
-import bleach
-import htmlentities
 from app.api.bootstrap import api
 from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
 from app.api.helpers.db import safe_query
@@ -72,26 +70,6 @@ class GeokretList(ResourceList):
         # Enforce holder to owner
         data['holder'] = data['owner']
 
-        if 'name' in data:
-            # Clean html
-            data['name'] = bleach.clean(data['name'], tags=[], strip=True)
-
-            # encode html entities
-            data['name'] = htmlentities.decode(data['name'])
-
-            # remove leading spaces
-            data['name'] = data['name'].strip()
-
-        if 'description' in data:
-            # Clean html
-            data['description'] = bleach.clean(data['description'], strip=True)
-
-            # encode html entities
-            data['description'] = htmlentities.decode(data['description'])
-
-            # remove leading spaces
-            data['description'] = data['description'].strip()
-
         if 'born_at_home' in data and data['born_at_home']:
             self.create_first_move = True
             del data['born_at_home']
@@ -111,8 +89,8 @@ class GeokretList(ResourceList):
                     geokret_id=geokret.id,
                     move_type_id=MOVE_TYPE_DIPPED,
                     moved_on_date_time=datetime.utcnow(),
-                    latitude = owner.latitude,
-                    longitude = owner.longitude,
+                    latitude=owner.latitude,
+                    longitude=owner.longitude,
                 )
                 db.session.add(move)
                 db.session.commit()

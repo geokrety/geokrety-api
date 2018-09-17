@@ -1,8 +1,12 @@
 import datetime
 import random
 
-from app.models import db
 from sqlalchemy import event
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app.models import db
+import bleach
+import htmlentities
 
 
 class Geokret(db.Model):
@@ -21,13 +25,13 @@ class Geokret(db.Model):
         nullable=False,
         unique=True
     )
-    name = db.Column(
+    _name = db.Column(
         'nazwa',
         db.String(75),
         key='name',
         nullable=False
     )
-    description = db.Column(
+    _description = db.Column(
         'opis',
         db.Text(),
         key='description',
@@ -123,6 +127,40 @@ class Geokret(db.Model):
     def average_rating(self):
         # TODO note should come from database
         return 0
+
+    @hybrid_property
+    def name(self):
+        print "kiki"
+        print "read: %s" % htmlentities.decode(self._name)
+        return htmlentities.decode(self._name)
+
+    @name.setter
+    def name(self, name):
+        # Drop all html tags
+        name_clean = bleach.clean(name, tags=[], strip=True)
+        # Strip spaces
+        name_clean = htmlentities.decode(name_clean).strip()
+        self._name = htmlentities.encode(name_clean)
+
+    @name.expression
+    def name(cls):
+        return cls._name
+
+    @hybrid_property
+    def description(self):
+        return htmlentities.decode(self._description)
+
+    @description.setter
+    def description(self, description):
+        # Drop all unallowed html tags
+        description_clean = bleach.clean(description, strip=True)
+        # Strip spaces
+        description_clean = htmlentities.decode(description_clean).strip()
+        self._description = htmlentities.encode(description_clean)
+
+    @description.expression
+    def description(cls):
+        return cls._description
 
 
 @event.listens_for(Geokret, 'init')
