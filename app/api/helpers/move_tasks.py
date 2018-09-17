@@ -17,7 +17,7 @@ celery = make_celery(current_app)
 def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret
     """
-    moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_date_time.asc())
+    moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_datetime.asc())
 
     last = None
     for move in moves:
@@ -45,7 +45,7 @@ def update_move_country_and_altitude(move_id):
         move.country = 'XYZ'
 
     response = requests.get('https://geo.kumy.org/api/getElevation?lat={}&lon={}'.format(move.latitude, move.longitude))
-    if response.ok:
+    if response.ok and response.text != 'None':
         move.altitude = response.text
     else:
         move.altitude = '-2000'
@@ -68,8 +68,8 @@ def update_geokret_total_moves_count(geokret_id):
     """
     moves = Move.query \
         .filter(Move.geokret_id == geokret_id) \
-        .filter(Move.move_type_id.in_((MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED))) \
-        .order_by(Move.moved_on_date_time.desc())
+        .filter(Move.type.in_((MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED))) \
+        .order_by(Move.moved_on_datetime.desc())
 
     geokret = Geokret.query.get(geokret_id)
     geokret.caches_count = moves.count()
@@ -81,16 +81,16 @@ def update_geokret_holder(geokret_id):
     """
     moves = Move.query \
         .filter(Move.geokret_id == geokret_id) \
-        .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
-        .order_by(Move.moved_on_date_time.desc())
+        .filter(Move.type != MOVE_TYPE_COMMENT) \
+        .order_by(Move.moved_on_datetime.desc())
 
     geokret = Geokret.query.get(geokret_id)
 
     geokret.holder_id = None
     if moves.count():
         for move in moves:
-            if move.move_type_id in [MOVE_TYPE_DROPPED, MOVE_TYPE_ARCHIVED, MOVE_TYPE_SEEN]:
+            if move.type in [MOVE_TYPE_DROPPED, MOVE_TYPE_ARCHIVED, MOVE_TYPE_SEEN]:
                 break
-            elif move.move_type_id in [MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED]:
+            elif move.type in [MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED]:
                 geokret.holder_id = move.author_id
                 break

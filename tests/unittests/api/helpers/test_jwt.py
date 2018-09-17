@@ -3,10 +3,10 @@ from app.api.helpers.jwt import get_identity, jwt_authenticate
 from app.models.user import User
 from flask_jwt import _default_jwt_encode_handler
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestJWTHelperValidation(GeokretyTestCase):
+class TestJWTHelperValidation(BaseTestCase):
 
     def test_jwt_authenticate(self):
         """Check JWTHelper: authenticate"""

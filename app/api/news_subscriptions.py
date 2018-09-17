@@ -1,14 +1,13 @@
-from app.api.bootstrap import api
-from app.api.helpers.db import safe_query
-from app.api.helpers.exceptions import ForbiddenException
-from app.api.schema.news_subscriptions import NewsSubscriptionSchema
-from app.models import db
-from app.models.news import News
-from app.models.news_subscription import NewsSubscription
-from app.models.user import User
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
+
+from app.api.bootstrap import api
+from app.api.helpers.exceptions import ForbiddenException, UnprocessableEntity
+from app.api.helpers.permission_manager import has_access
+from app.api.schema.news_subscriptions import NewsSubscriptionSchema
+from app.models import db
+from app.models.news_subscription import NewsSubscription
 
 
 class NewsSubscriptionList(ResourceList):
@@ -16,44 +15,34 @@ class NewsSubscriptionList(ResourceList):
     def query(self, view_kwargs):
         """Filter news-subscriptions"""
         query_ = self.session.query(NewsSubscription)
-
         user = current_identity
-        if not user.is_admin:
-            if view_kwargs.get('user_id') is not None and user.id != view_kwargs['user_id']:
-                raise ForbiddenException({'parameter': 'user_id'}, 'User {} must be yourself ({})'.format(
-                    view_kwargs['user_id'], user.id))
 
-            query_ = query_.filter(User.id == user.id)
+        if user.is_admin:
+            return query_
 
-        if view_kwargs.get('news_id') is not None:
-            safe_query(self, News, 'id', view_kwargs['news_id'], 'news_id')
-            query_ = query_.join(News).filter(News.id == view_kwargs['news_id'])
-
-        if view_kwargs.get('user_id') is not None:
-            safe_query(self, User, 'id', view_kwargs['user_id'], 'user_id')
-            query_ = query_.join(User).filter(User.id == view_kwargs['user_id'])
+        query_ = query_.filter(NewsSubscription.user_id == user.id)
 
         return query_
 
     def before_create_object(self, data, view_kwargs):
+
+        # Check author_id
+        if not data.get('subscribed'):
+            raise UnprocessableEntity('Setting subscribed to False has no sense',
+                                      {'pointer': '/data/attributes/subscribed'})
+
         # Set author to current user by default
         user = current_identity
         if 'user' not in data:
             data['user'] = user.id
 
-        # Check author_id
-        if not user.is_admin and data['user'] != user.id:
-            raise ForbiddenException({'parameter': 'user'}, 'User {} must be yourself ({})'.format(
-                data['user'], user.id))
+        if has_access('is_admin'):
+            return
 
-    def after_create_object(self, obj, data, view_kwargs):
-        # Delete row if subscribe is false
-        print(obj.user_id, obj.news_id)
-        if not obj.subscribed:
-            self.session.query(NewsSubscription).filter(
-                NewsSubscription.user_id == obj.user_id,
-                NewsSubscription.news_id == obj.news_id
-            ).delete()
+        # Check author_id
+        if data['user'] != user.id:
+            raise ForbiddenException('User {} must be yourself ({})'.format(data['user'], user.id),
+                                     {'pointer': '/data/relationships/user'})
 
     decorators = (
         api.has_permission('auth_required', methods="GET,POST"),
@@ -66,7 +55,6 @@ class NewsSubscriptionList(ResourceList):
         'methods': {
             'query': query,
             'before_create_object': before_create_object,
-            'after_create_object': after_create_object
         }
     }
 
@@ -74,10 +62,10 @@ class NewsSubscriptionList(ResourceList):
 class NewsSubscriptionDetail(ResourceDetail):
 
     decorators = (
-        api.has_permission('is_user_itself', methods="GET,DELETE",
+        api.has_permission('is_user_itself', methods="GET,PATCH,DELETE",
                            fetch="user_id", fetch_as="user_id", model=NewsSubscription),
     )
-    methods = ['GET', 'DELETE']
+    methods = ['GET', 'PATCH', 'DELETE']
     schema = NewsSubscriptionSchema
     data_layer = {
         'session': db.session,

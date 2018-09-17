@@ -4,10 +4,10 @@ from app.models import db
 from app.models.user import User
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestDBHelperValidation(GeokretyTestCase):
+class TestDBHelperValidation(BaseTestCase):
 
     def test_save_to_db(self):
         """Check DBHelper: save to db"""

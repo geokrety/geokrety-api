@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import current_app as app
 from flask_jwt import _jwt_required
+from app.api.helpers.exceptions import AuthenticationRequired
 
 
 def jwt_required(fn, realm=None):
@@ -12,7 +13,9 @@ def jwt_required(fn, realm=None):
     """
     @wraps(fn)
     def decorator(*args, **kwargs):
-        _jwt_required(realm or app.config['JWT_DEFAULT_REALM'])
+        try:
+            _jwt_required(realm or app.config['JWT_DEFAULT_REALM'])
+        except Exception:  ## JWTError
+            raise AuthenticationRequired('Authentication is required', {'source': ''})
         return fn(*args, **kwargs)
-
     return decorator

@@ -1,8 +1,12 @@
 import datetime
 import random
 
-from app.models import db
 from sqlalchemy import event
+from sqlalchemy.ext.hybrid import hybrid_property
+
+import bleach
+import characterentities
+from app.models import db
 
 
 class Geokret(db.Model):
@@ -21,13 +25,13 @@ class Geokret(db.Model):
         nullable=False,
         unique=True
     )
-    name = db.Column(
+    _name = db.Column(
         'nazwa',
         db.String(75),
         key='name',
         nullable=False
     )
-    description = db.Column(
+    _description = db.Column(
         'opis',
         db.Text(),
         key='description',
@@ -37,7 +41,8 @@ class Geokret(db.Model):
     type = db.Column(
         'typ',
         db.Enum('0', '1', '2', '3', '4'),
-        key='type'
+        key='type',
+        nullable=False,
     )
     missing = db.Column(
         'missing',
@@ -67,18 +72,19 @@ class Geokret(db.Model):
         nullable=False,
         default=0
     )
-    created_on_date_time = db.Column(
+    created_on_datetime = db.Column(
         'data',
         db.DateTime,
         nullable=False,
-        key='created_on_date_time',
-        default=datetime.datetime.utcnow
+        key='created_on_datetime',
+        default=datetime.datetime.utcnow,
     )
-    updated_on_date_time = db.Column(
+    updated_on_datetime = db.Column(
         'timestamp',
         db.TIMESTAMP(timezone=True),
-        key='updated_on_date_time',
-        default=datetime.datetime.utcnow
+        key='updated_on_datetime',
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
     )
     owner_id = db.Column(
         'owner',
@@ -123,8 +129,37 @@ class Geokret(db.Model):
         # TODO note should come from database
         return 0
 
+    @hybrid_property
+    def name(self):
+        return characterentities.decode(self._name)
+
+    @name.setter
+    def name(self, name):
+        # Drop all html tags
+        name_clean = bleach.clean(name, tags=[], strip=True)
+        # Strip spaces
+        self._name = characterentities.decode(name_clean).strip()
+
+    @name.expression
+    def name(cls):
+        return cls._name
+
+    @hybrid_property
+    def description(self):
+        return characterentities.decode(self._description)
+
+    @description.setter
+    def description(self, description):
+        # Drop all unallowed html tags
+        description_clean = bleach.clean(description, strip=True)
+        # Strip spaces
+        self._description = characterentities.decode(description_clean).strip()
+
+    @description.expression
+    def description(cls):
+        return cls._description
+
 
 @event.listens_for(Geokret, 'init')
 def receive_init(target, args, kwargs):
     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
-    target.created_on_date_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

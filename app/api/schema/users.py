@@ -1,12 +1,93 @@
-from app.api.helpers.exceptions import UnprocessableEntity
-from app.api.helpers.utilities import dasherize
-from app.models.user import User
-from marshmallow import validates
+
+from marshmallow import post_dump, pre_load, validate, validates
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
+from app.api.helpers.data_layers import COUNTRIES, LANGUAGES
+from app.api.helpers.exceptions import UnprocessableEntity
+from app.api.helpers.permission_manager import has_access
+from app.api.helpers.utilities import dasherize
+from app.models.user import User
 
-class UserSchemaPublic(Schema):
+
+def drop_private_attributes(item):
+    item['attributes'].pop('email', None)
+    item['attributes'].pop('password', None)
+    item['attributes'].pop('latitude', None)
+    item['attributes'].pop('longitude', None)
+    item['attributes'].pop('daily-mails', None)
+    item['attributes'].pop('observation-radius', None)
+    item['attributes'].pop('hour', None)
+    item['attributes'].pop('secid', None)
+    item['attributes'].pop('statpic-id', None)
+    item['attributes'].pop('last-update-datetime', None)
+    item['attributes'].pop('last-mail-datetime', None)
+    item['attributes'].pop('last-login-datetime', None)
+    return item
+
+
+class UserSchema(Schema):
+
+    @post_dump(pass_many=True)
+    def remove_private_attributes(self, data, many):
+        if many:
+            for item in data['data']:
+                if not has_access('is_user_itself', user_id=item['id']):
+                    item = drop_private_attributes(item)
+            return data
+        if not has_access('is_user_itself', user_id=data['data']['id']):
+            data['data'] = drop_private_attributes(data['data'])
+        return data
+
+    @pre_load()
+    def set_default_language(self, data):
+        if 'language' not in data or not data['language']:
+            data['language'] = 'en'
+
+    @pre_load()
+    def set_default_country(self, data):
+        if 'country' not in data or not data['country']:
+            data['country'] = None
+
+    @validates('name')
+    def validate_username_uniqueness(self, data):
+        if User.query.filter_by(name=data).count():
+            raise UnprocessableEntity("Username already taken",
+                                      {'pointer': '/data/attributes/name'})
+
+    @validates('email')
+    def validate_email_uniqueness(self, data):
+        if User.query.filter_by(email=data).count():
+            raise UnprocessableEntity("Email already taken",
+                                      {'pointer': '/data/attributes/email'})
+
+    @validates('language')
+    def validate_language_value(self, data):
+        if data not in LANGUAGES.keys():
+            raise UnprocessableEntity("Invalid language",
+                                      {'pointer': '/data/attributes/language'})
+
+    @validates('country')
+    def validate_country_value(self, data):
+        if data is not None and data not in COUNTRIES.keys():
+            raise UnprocessableEntity("Invalid country",
+                                      {'pointer': '/data/attributes/country'})
+
+    @validates('observation_radius')
+    def validate_observation_radius_value(self, data):
+        if data is None:
+            return
+        if data < 0 or data > 10:
+            raise UnprocessableEntity("Observation radius must be between 0 and 10",
+                                      {'pointer': '/data/attributes/observation-radius'})
+
+    @validates('hour')
+    def validate_hour_value(self, data):
+        if data is None:
+            return
+        if data < 0 or data > 23:
+            raise UnprocessableEntity("Hour must be between 0 and 23",
+                                      {'pointer': '/data/attributes/hour'})
 
     class Meta:
         type_ = 'user'
@@ -18,9 +99,23 @@ class UserSchemaPublic(Schema):
 
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
-    language = fields.Str()
-    country = fields.Str(dump_only=True)
-    join_date_time = fields.Date(dump_only=True)
+    language = fields.Str(validate=validate.Length(max=2), allow_none=True)
+    country = fields.Str(allow_none=True)
+    join_datetime = fields.Date(dump_only=True)
+
+    email = fields.Email(required=True)
+    password = fields.Str(load_only=True, required=True)
+    latitude = fields.Float(allow_none=True)
+    longitude = fields.Float(allow_none=True)
+    daily_mails = fields.Boolean(allow_none=True)
+    observation_radius = fields.Integer(allow_none=True)
+    hour = fields.Integer(allow_none=True)
+    secid = fields.Str(dump_only=True)
+    # ip = fields.Str(dump_only=True)  # Do not use this field a all GDPR?
+    statpic_id = fields.Integer()
+    last_update_datetime = fields.Date(dump_only=True)
+    last_mail_datetime = fields.Date(dump_only=True)
+    last_login_datetime = fields.Date(dump_only=True)
 
     # statpic = Relationship()
     news = Relationship(
@@ -44,6 +139,17 @@ class UserSchemaPublic(Schema):
         # include_resource_linkage=True
     )
 
+    news_subscriptions = Relationship(
+        self_view='v1.user_news_subscriptions',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.news_subscriptions_list',
+        related_view_kwargs={'user_id': '<id>'},
+        many=True,
+        schema='NewsSubscriptionSchema',
+        type_='news-subscription',
+        # include_resource_linkage=True
+    )
+
     geokrety_owned = Relationship(
         self_view='v1.user_geokrety_owned',
         self_view_kwargs={'id': '<id>'},
@@ -64,38 +170,12 @@ class UserSchemaPublic(Schema):
         type_='geokret',
     )
 
-
-class UserSchema(UserSchemaPublic):
-
-    @validates('name')
-    def validate_username_uniqueness(self, data):
-        if User.query.filter_by(name=data).count():
-            raise UnprocessableEntity({'pointer': '/data/attributes/name'},
-                                      "Username already taken")
-
-    @validates('email')
-    def validate_email_uniqueness(self, data):
-        if User.query.filter_by(email=data).count():
-            raise UnprocessableEntity({'pointer': '/data/attributes/email'},
-                                      "Email already taken")
-
-    class Meta:
-        type_ = 'user'
-        self_view = 'v1.user_details'
-        self_view_kwargs = {'id': '<id>'}
-        self_view_many = 'v1.users_list'
-        inflect = dasherize
-        ordered = True
-
-    email = fields.Email(required=True)
-    password = fields.Str(load_only=True, required=True)
-    latitude = fields.Float()
-    longitude = fields.Float()
-    daily_mails = fields.Boolean()
-    observation_radius = fields.Integer()
-    hour = fields.Integer(dump_only=True)
-    secid = fields.Str()
-    statpic_id = fields.Integer()
-    last_update_date_time = fields.Date(dump_only=True)
-    last_mail_date_time = fields.Date(dump_only=True)
-    last_login_date_time = fields.Date(dump_only=True)
+    moves = Relationship(
+        self_view='v1.user_moves',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.moves_list',
+        related_view_kwargs={'user_id': '<id>'},
+        many=True,
+        schema='MoveWithCoordinatesSchema',
+        type_='move',
+    )

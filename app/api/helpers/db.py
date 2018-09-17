@@ -3,11 +3,11 @@
 import logging
 import traceback
 
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 from sqlalchemy import func
+from sqlalchemy.orm.exc import NoResultFound
 
 from app.models import db
-from sqlalchemy.orm.exc import NoResultFound
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 
 def save_to_db(item, msg="Saved to db", print_error=True):
@@ -45,8 +45,8 @@ def safe_query(self, model, column_name, value, parameter_name):
         record = db.session.query(model).filter(
             getattr(model, column_name) == value).one()
     except NoResultFound:
-        raise ObjectNotFound({u'parameter': '{}'.format(parameter_name)},
-                             u"{}: {} not found".format(model.__name__, value))
+        raise ObjectNotFound(u"{}: {} not found".format(model.__name__, value),
+                             {u'pointer': '{}'.format(parameter_name)})
     else:
         return record
 

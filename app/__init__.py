@@ -5,12 +5,6 @@ import os
 import sys
 from datetime import timedelta
 
-from app.api.helpers.auth import AuthManager
-from app.api.helpers.jwt import jwt_authenticate, jwt_identity
-from app.models import db
-from app.views import BlueprintsManager
-from app.views.celery_ import celery
-from app.views.sentry import sentry
 from envparse import env
 from flask import Flask, json, make_response
 from flask_cors import CORS
@@ -18,6 +12,12 @@ from flask_jwt import JWT
 from flask_rest_jsonapi.errors import jsonapi_errors
 from flask_rest_jsonapi.exceptions import JsonApiException
 from flask_script import Manager
+
+from app.api.helpers.auth import AuthManager
+from app.api.helpers.jwt import jwt_authenticate, jwt_identity
+from app.models import db
+from app.views.celery_ import celery
+from app.views.sentry import sentry
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,14 +27,8 @@ app = Flask(__name__, static_folder=static_dir, template_folder=template_dir)
 
 env.read_envfile()
 
-app_created = False
-
 
 def create_app():
-    global app_created
-    if not app_created:
-        BlueprintsManager.register(app)
-
     app.config.from_object(env('APP_CONFIG', default='config.ProductionConfig'))
     db.init_app(app)
 
@@ -61,9 +55,7 @@ def create_app():
 
     with app.app_context():
         from app.api.bootstrap import api_v1
-        # from app.api.auth import auth_routes
         app.register_blueprint(api_v1)
-        # app.register_blueprint(auth_routes)
 
     if app.config['SERVE_STATIC']:
         app.add_url_rule('/static/<path:filename>',
@@ -74,12 +66,10 @@ def create_app():
     if 'SENTRY_DSN' in app.config:
         sentry.init_app(app, dsn=app.config['SENTRY_DSN'])
 
-    app_created = True
-
     return app, _manager, db, _jwt
 
 
-current_app, manager, database, jwt = create_app()
+current_app, manager, db, jwt = create_app()
 
 # @app.before_request
 # def track_user():

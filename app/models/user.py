@@ -2,11 +2,19 @@ import datetime
 import random
 
 import phpass
-from app.models import db
 from flask import current_app as app
 from flask import request
 from sqlalchemy import event
+from sqlalchemy.dialects.mysql import DOUBLE, INTEGER
 from sqlalchemy.ext.hybrid import hybrid_property
+
+import bleach
+import characterentities
+from app.models import db
+
+
+def random_0_23():
+    return random.randrange(0, 23)
 
 
 class User(db.Model):
@@ -16,135 +24,151 @@ class User(db.Model):
         'userid',
         db.Integer,
         primary_key=True,
-        key='id'
+        key='id',
     )
-    name = db.Column(
+    _name = db.Column(
         'user',
         db.String(80),
         key='name',
         nullable=False,
-        unique=True
+        unique=True,
+    )
+    is_admin = db.Column(
+        'is_admin',
+        db.Boolean,
+        key='is_admin',
+        nullable=True,
+        default=False,
     )
     _password = db.Column(
         'haslo2',
         db.String(120),
         key='password',
-        nullable=False
+        nullable=False,
     )
     email = db.Column(
         db.String(150),
         nullable=False,
-        unique=True
+        unique=True,
     )
     daily_mails = db.Column(
         'wysylacmaile',
         db.Boolean,
         key='daily_news',
         nullable=False,
-        default=True
+        default=False,
     )
     ip = db.Column(
-        db.String(39)
+        db.String(39),
+        nullable=True,
+        default=None,
     )
     language = db.Column(
         'lang',
         db.String(2),
         key='language',
         nullable=False,
-        default=""
+        default="",
     )
     latitude = db.Column(
         'lat',
-        db.Float,
+        DOUBLE(precision=8, scale=5),
         key='latitude',
-        default=48.8566
+        nullable=True,
+        default=None,
     )
     longitude = db.Column(
         'lon',
-        db.Float,
+        DOUBLE(precision=8, scale=5),
         key='longitude',
-        default=2.3522
+        nullable=True,
+        default=None,
     )
     observation_radius = db.Column(
         'promien',
-        db.Integer,
+        INTEGER(unsigned=True),
         key='observation_radius',
-        default=0
+        default=0,
     )
     country = db.Column(
-        db.String(3)
+        db.String(3),
+        nullable=True,
+        default=None,
     )
     hour = db.Column(
         'godzina',
         db.Integer,
-        key='hour'
+        key='hour',
+        default=random_0_23,
     )
     statpic_id = db.Column(
         'statpic',
         db.Integer,
         key='statpic_id',
-        default=1
+        default=1,
     )
-    join_date_time = db.Column(
+    join_datetime = db.Column(
         'joined',
-        db.DateTime, key='join_date_time'
+        db.DateTime,
+        key='join_datetime',
+        default=datetime.datetime.utcnow,
     )
-    last_mail_date_time = db.Column(
+    last_mail_datetime = db.Column(
         'ostatni_mail',
         db.DateTime,
         nullable=True,
-        key='last_mail_date_time',
-        default=None
+        key='last_mail_datetime',
+        default=None,
     )
-    last_login_date_time = db.Column(
+    last_login_datetime = db.Column(
         'ostatni_login',
         db.DateTime,
-        nullable=False,
-        key='last_login_date_time',
-        default=datetime.datetime.utcnow
+        nullable=True,
+        key='last_login_datetime',
+        default=None,
     )
-    last_update_date_time = db.Column(
+    last_update_datetime = db.Column(
         'timestamp',
         db.DateTime,
-        key='last_update_date_time',
-        default=datetime.datetime.utcnow
+        key='last_update_datetime',
+        default=datetime.datetime.utcnow,
     )
     secid = db.Column(
-        db.String(128)
+        db.String(128),
     )
 
     news = db.relationship(
         'News',
         backref="author",
-        cascade="all,delete"
+        cascade="all,delete",
     )
     news_comments = db.relationship(
         'NewsComment',
         backref="author",
-        cascade="all,delete"
+        cascade="all,delete",
     )
     news_subscriptions = db.relationship(
         'NewsSubscription',
         backref="user",
-        cascade="all,delete"
+        cascade="all,delete",
     )
     geokrety_owned = db.relationship(
         'Geokret',
         backref="owner",
         foreign_keys="Geokret.owner_id",
-        cascade="all,delete"
+        cascade="all,delete",
     )
     geokrety_held = db.relationship(
         'Geokret',
         backref="holder",
         foreign_keys="Geokret.holder_id",
-        cascade="all,delete"
+        cascade="all,delete",
     )
-    geokrety_moves = db.relationship(
+    moves = db.relationship(
         'Move',
         backref="author",
         foreign_keys="Move.author_id",
-        cascade="all,delete"
+        cascade="all,delete",
     )
 
     @hybrid_property
@@ -167,19 +191,25 @@ class User(db.Model):
             password.encode('utf-8') + app.config['PASSWORD_HASH_SALT']
         )
 
-    @property
-    def is_super_admin(self):
-        return self.id in [1, 26422]
+    @password.expression
+    def password(cls):
+        return cls._password
 
-    @property
-    def is_admin(self):
-        return self.id in [1, 26422]
+    @hybrid_property
+    def name(self):
+        return characterentities.decode(self._name)
+
+    @name.setter
+    def name(self, name):
+        name_clean = bleach.clean(name, tags=[], strip=True)
+        self._name = characterentities.decode(name_clean).strip()
+
+    @name.expression
+    def name(cls):
+        return cls._name
 
 
 @event.listens_for(User, 'init')
 def receive_init(target, args, kwargs):
-    target.hour = random.randrange(0, 23)
-    target.secid = "todo"  # TODO
-    target.join_date_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    target.secid = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(84))  # TODO
     target.ip = request.remote_addr
-    target.country = 'fr'  # TODO

@@ -1,27 +1,17 @@
 import datetime
 
-from app.models import db
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
-import characterentities
 
-# TODO add unicity constraint on geokret_id + moved_on_date_time
+import bleach
+import characterentities
+from app.models import db
+
+# TODO add unicity constraint on geokret_id + moved_on_datetime
 
 
 class Move(db.Model):
     __tablename__ = 'gk-ruchy'
-
-    @hybrid_property
-    def comment(self):
-        return characterentities.decode(self._comment)
-
-    @comment.setter
-    def comment(self, comment):
-        self._comment = characterentities.encode(comment)
-
-    @comment.expression
-    def comment(cls):
-        return cls._comment
 
     id = db.Column(
         'ruch_id',
@@ -82,7 +72,7 @@ class Move(db.Model):
     _comment = db.Column(
         'koment',
         db.String(5120),
-        key='_comment',
+        key='comment',
         nullable=False,
         default=''
     )
@@ -100,20 +90,19 @@ class Move(db.Model):
         nullable=False,
         default=0
     )
-    move_type_id = db.Column(
+    type = db.Column(
         'logtype',
-        db.Enum('0', '1', '2', '3', '4', '5', '6'),
-        key='move_type',
-        nullable=True,
-        default='0'
+        db.Enum('0', '1', '2', '3', '4', '5'),
+        key='type',
+        nullable=False,
     )
     author_id = db.Column(
         'user',
         db.Integer,
         db.ForeignKey('gk-users.id'),
         key='author_id',
-        nullable=True,
-        default=None
+        nullable=False,
+        default=None,
     )
     username = db.Column(
         'username',
@@ -122,38 +111,95 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
-    moved_on_date_time = db.Column(
+    moved_on_datetime = db.Column(
         'data',
         db.DateTime,
-        key='moved_on_date_time',
-        nullable=False,
-    )
-    created_on_date_time = db.Column(
-        'data_dodania',
-        db.DateTime,
-        key='created_on_date_time',
+        key='moved_on_datetime',
         nullable=False,
         default=datetime.datetime.utcnow,
     )
-    updated_on_date_time = db.Column(
+    created_on_datetime = db.Column(
+        'data_dodania',
+        db.DateTime,
+        key='created_on_datetime',
+        nullable=False,
+        default=datetime.datetime.utcnow,
+    )
+    updated_on_datetime = db.Column(
         'timestamp',
         db.DateTime,
-        key='updated_on_date_time',
+        key='updated_on_datetime',
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow
     )
-    application_name = db.Column(
+    _application_name = db.Column(
         'app',
         db.String(16),
         key='application_name',
-        nullable=False
+        nullable=True
     )
-    application_version = db.Column(
+    _application_version = db.Column(
         'app_ver',
         db.String(16),
         key='application_version',
-        nullable=False
+        nullable=True
     )
 
     # geokret = db.relationship('Geokret',
     #     backref=db.backref('moves', lazy=True))
+
+    @hybrid_property
+    def comment(self):
+        return characterentities.decode(self._comment)
+
+    @comment.setter
+    def comment(self, comment):
+        comment_clean = bleach.clean(comment, strip=True)
+        self._comment = characterentities.decode(comment_clean).strip()
+
+    @comment.expression
+    def comment(cls):
+        return cls._comment
+
+    @hybrid_property
+    def application_version(self):
+        if self._application_version is None:
+            return None
+        return characterentities.decode(self._application_version)
+
+    @application_version.setter
+    def application_version(self, application_version):
+        if application_version is None:
+            self._application_version = None
+        else:
+            application_version_clean = bleach.clean(application_version, tags=[], strip=True)
+            self._application_version = characterentities.decode(application_version_clean).strip()
+
+    @application_version.expression
+    def application_version(cls):
+        return cls._application_version
+
+    @hybrid_property
+    def application_name(self):
+        if self._application_name is None:
+            return None
+        return characterentities.decode(self._application_name)
+
+    @application_name.setter
+    def application_name(self, application_name):
+        if application_name is None:
+            self._application_name = None
+        else:
+            application_name_clean = bleach.clean(application_name, tags=[], strip=True)
+            self._application_name = characterentities.decode(application_name_clean).strip()
+
+    @application_name.expression
+    def application_name(cls):
+        return cls._application_name
+
+
+# TODO launch async tasks
+# @event.listens_for(Move, 'init')
+# def receive_init(target, args, kwargs):
+#     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
+#     target.created_on_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
