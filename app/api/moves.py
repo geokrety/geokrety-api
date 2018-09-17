@@ -1,4 +1,10 @@
-import datetime
+from datetime import datetime, timedelta
+
+from flask import request
+from flask_jwt import current_identity
+from flask_rest_jsonapi import (ResourceDetail, ResourceList,
+                                ResourceRelationship)
+from sqlalchemy.orm.exc import NoResultFound
 
 from app.api.bootstrap import api
 from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
@@ -14,16 +20,9 @@ from app.api.schema.moves import (MoveArchiveSchema, MoveCommentSchema,
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
-from flask import current_app as app
-from flask import request
-from flask_jwt import _jwt_required, current_identity
-from flask_rest_jsonapi import (ResourceDetail, ResourceList,
-                                ResourceRelationship)
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def get_schema_by_move_type(move_type_id):
-    move_type_id = move_type_id
     if move_type_id == MOVE_TYPE_GRABBED:
         return MoveGrabbedSchema
     if move_type_id == MOVE_TYPE_COMMENT:
@@ -37,8 +36,8 @@ def get_schema_by_move_type(move_type_id):
     if move_type_id == MOVE_TYPE_DIPPED:
         return MoveDippedSchema
 
-    raise UnprocessableEntity({'pointer': '/data/attributes/move_type_id'},
-                              "Move Type Id is invalid")
+    raise UnprocessableEntity("Move Type Id is invalid",
+                              {'pointer': '/data/attributes/type'})
 
 
 class MovesList(ResourceList):
@@ -46,27 +45,19 @@ class MovesList(ResourceList):
     def post(self, *args, **kwargs):
         json_data = request.get_json()
 
-        # Configure schema dynamically
-        if 'data' in json_data and \
-            'attributes' in json_data['data'] and \
-                'move_type_id' in json_data['data']['attributes']:
-            move_type_id = json_data['data']['attributes']['move_type_id']
-            self.schema = get_schema_by_move_type(move_type_id)
+        if 'data' in json_data:
+            # Configure schema dynamically
+            if 'relationships' in json_data['data'] and \
+                    'type' in json_data['data']['relationships']:
+                move_type_id = json_data['data']['relationships']['type']['data']['id']
+                self.schema = get_schema_by_move_type(move_type_id)
 
-        # Disallow override author relationship for non admin user
-        if 'data' in json_data and \
-            'relationships' in json_data['data'] and \
-                'author' in json_data['data']['relationships']:
-            if not current_identity or current_identity and not current_identity.is_admin:
-                raise ForbiddenException({'source': '/data/relationships/author'},
-                                         'Author Relationship override disallowed')
-
-        # Disallow override author_id for non admin user
-        if 'data' in json_data and \
-            'attributes' in json_data['data'] and \
-                'author_id' in json_data['data']['attributes']:
-            if not current_identity or current_identity and not current_identity.is_admin:
-                raise ForbiddenException({'source': '/data/attributes/author_id'}, 'author_id override disallowed')
+            # Disallow override author relationship for non admin user
+            if 'relationships' in json_data['data'] and \
+                    'author' in json_data['data']['relationships']:
+                if not current_identity or current_identity and not current_identity.is_admin:
+                    raise ForbiddenException('Author Relationship override disallowed',
+                                             {'pointer': '/data/relationships/author'})
 
         return super(MovesList, self).post(args, kwargs)
 
@@ -77,59 +68,41 @@ class MovesList(ResourceList):
             del data['tracking_code']
 
         # Get GeoKret ID from tracking_code
-        geokret = safe_query(self, Geokret, 'tracking_code', tracking_code, 'tracking_code')
-        data["geokret_id"] = geokret.id
+        self.geokret = safe_query(self, Geokret, 'tracking_code', tracking_code, 'tracking-code')
+        data["geokret"] = self.geokret.id
 
-        # Archived move type has special security requirements
-        if data['move_type_id'] == MOVE_TYPE_ARCHIVED:
-            if not current_identity:
-                _jwt_required(app.config['JWT_DEFAULT_REALM'])
+        # Move cannot be done before GeoKret birth
+        if data['moved_on_datetime'] < self.geokret.created_on_datetime:
+            raise UnprocessableEntity("Move date cannot be prior GeoKret birth date",
+                                      {'pointer': '/data/attributes/moved-on-datetime'})
 
-            if has_access('is_admin', user_id=current_identity.id):
-                return
-
-            if geokret.owner_id != current_identity.id:
-                raise ForbiddenException({'source': ''}, 'Owner access is required')
-
-        # Move date restrictions
-        if 'moved_on_date_time' not in data:
-            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
-                                      "Move date time is mandatory")
-        else:
-            # Move cannot be done before GeoKret birth
-            if data['moved_on_date_time'] < geokret.created_on_date_time:
-                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
-                                          "Move date cannot be prior GeoKret birth date")
-
-            # Move cannot be done in the future
-            if data['moved_on_date_time'] > datetime.datetime.utcnow():
-                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
-                                          "Move date cannot be in the future")
+        # Move cannot be done in the future
+        if data['moved_on_datetime'] > datetime.utcnow().replace(microsecond=0) + timedelta(seconds=1):
+            raise UnprocessableEntity("Move date cannot be in the future",
+                                      {'pointer': '/data/attributes/moved-on-datetime'})
 
         # Identical move date is forbidden
         try:
             db.session.query(Move).filter(
-                Move.moved_on_date_time == str(data['moved_on_date_time']),
-                Move.geokret_id == str(geokret.id)
+                Move.moved_on_datetime == str(data['moved_on_datetime']),
+                Move.geokret_id == str(self.geokret.id)
             ).one()
-            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
-                                      "There is already a move at that time")
+            raise UnprocessableEntity("There is already a move at that time",
+                                      {'pointer': '/data/attributes/moved-on-datetime'})
         except NoResultFound:
             pass
 
-        # Anonymous logs need username field
-        if not current_identity:
-            if 'username' not in data or not data['username']:
-                raise UnprocessableEntity({'pointer': '/data/attributes/username'},
-                                          "Username field missing")
-
-        # Drop Username if authenticated
-        if current_identity and 'username' in data:
-            del data['username']
-
         # Force current connected user as author
-        if current_identity:
-            data["author_id"] = current_identity.id
+        if has_access('is_admin'):
+            if "author" not in data:
+                data["author"] = current_identity.id
+        else:
+            data["author"] = current_identity.id
+
+        # Archived move type has special security requirements
+        if data['type'] == MOVE_TYPE_ARCHIVED:
+            if not has_access('is_geokret_owner', geokret_id=self.geokret.id):
+                raise ForbiddenException('Must be the GeoKret Owner', {'pointer': '/data/attributes/geokret-id'})
 
     def after_post(self, result):
         from app.api.helpers.move_tasks import (
@@ -144,13 +117,13 @@ class MovesList(ResourceList):
 
         # Enhance Move content
         update_move_country_and_altitude.delay(result['data']['id'])
-        update_move_distances.delay(result['data']['attributes']['geokret-id'])
+        update_move_distances.delay(self.geokret.id)
         db.session.commit()
 
         # Enhance GeoKret content
-        update_geokret_total_distance.delay(result['data']['attributes']['geokret-id'])
-        update_geokret_total_moves_count.delay(result['data']['attributes']['geokret-id'])
-        update_geokret_holder.delay(result['data']['attributes']['geokret-id'])
+        update_geokret_total_distance.delay(self.geokret.id)
+        update_geokret_total_moves_count.delay(self.geokret.id)
+        update_geokret_holder.delay(self.geokret.id)
         db.session.commit()
 
         # TODO Generate static files
@@ -161,8 +134,12 @@ class MovesList(ResourceList):
         # * statpic mover
         # *
 
-    current_identity = current_identity
     schema = MoveWithCoordinatesSchema
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
+    decorators = (
+        api.has_permission('auth_required', methods="POST"),
+    )
+
     data_layer = {
         'session': db.session,
         'model': Move,
@@ -179,7 +156,7 @@ class MoveDetail(ResourceDetail):
         # Configure schema dynamically
         if kwargs.get('id') is not None:
             move = safe_query(self, Move, 'id', kwargs['id'], 'id')
-            self.schema = get_schema_by_move_type(move.move_type_id)
+            self.schema = get_schema_by_move_type(move.type)
 
     current_identity = current_identity
     decorators = (

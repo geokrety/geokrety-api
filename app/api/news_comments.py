@@ -1,14 +1,17 @@
+from flask_jwt import current_identity
+from flask_rest_jsonapi import (ResourceDetail, ResourceList,
+                                ResourceRelationship)
+
 from app.api.bootstrap import api
 from app.api.helpers.db import safe_query, save_to_db
 from app.api.helpers.exceptions import ForbiddenException
+from app.api.helpers.permission_manager import has_access
 from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
+from app.models.news_subscription import NewsSubscription
 from app.models.user import User
-from flask_jwt import current_identity
-from flask_rest_jsonapi import (ResourceDetail, ResourceList,
-                                ResourceRelationship)
 
 
 class NewsCommentList(ResourceList):
@@ -27,13 +30,36 @@ class NewsCommentList(ResourceList):
 
         return query_
 
-    def before_create_object(self, data, view_kwargs):
+    def before_post(self, args, kwargs, data=None):
         user = current_identity
 
+        self.subscribe = data.pop('subscribe', False)
+
+        # Defaults to current user
+        if 'author' not in data:
+            data['author'] = user.id
+
+        if has_access('is_admin'):
+            return
+
         # Check author_id
-        if not user.is_admin and not user.is_super_admin and data['author'] != user.id:
-            raise ForbiddenException({'parameter': 'author'}, 'Author {} must be yourself ({})'.format(
-                data['author'], user.id))
+        if data.get('author') != user.id:
+            raise ForbiddenException('Author must be yourself',
+                                     {'pointer': '/data/relationships/author/data'})
+
+    def create_object(self, data, kwargs):
+        news_comment = super(NewsCommentList, self).create_object(data, kwargs)
+
+        # Create first move if requested
+        if self.subscribe:
+            news_subscription = NewsSubscription(
+                news_id=news_comment.news_id,
+                user_id=news_comment.author_id,
+                subscribed=True,
+            )
+            db.session.add(news_subscription)
+            db.session.commit()
+        return news_comment
 
     def after_create_object(self, obj, data, view_kwargs):
         # Increment comment count on news
@@ -50,7 +76,6 @@ class NewsCommentList(ResourceList):
         'model': NewsComment,
         'methods': {
             'query': query,
-            'before_create_object': before_create_object,
             'after_create_object': after_create_object
         }
     }
@@ -58,11 +83,59 @@ class NewsCommentList(ResourceList):
 
 class NewsCommentDetail(ResourceDetail):
 
+    def before_patch(self, args, kwargs, data=None):
+        user = current_identity
+
+        self.subscribe = data.pop('subscribe', None)
+
+        if has_access('is_admin'):
+            return
+
+        # Check author_id
+        if data.get('author', user.id) != user.id:
+            raise ForbiddenException('Author must be yourself',
+                                     {'pointer': '/data/relationships/author/data'})
+
+    def update_object(self, data, qs, kwargs):
+        news_comment = super(NewsCommentDetail, self).update_object(data, qs, kwargs)
+
+        # Create subscription if requested
+        if self.subscribe:
+            news_subscription = NewsSubscription(
+                news_id=news_comment.news_id,
+                user_id=news_comment.author_id,
+                subscribed=True,
+            )
+            db.session.add(news_subscription)
+            db.session.commit()
+        elif self.subscribe is False:
+            news_subscription = db.session \
+                .query(NewsSubscription) \
+                .filter(
+                    NewsSubscription.user_id == news_comment.author_id,
+                    NewsSubscription.news_id == news_comment.news_id
+                )
+            if news_subscription.count():
+                db.session.delete(news_subscription.one())
+                db.session.commit()
+        return news_comment
+
     def after_delete_object(self, obj, view_kwargs):
         # Decrement comment count on news
         news = safe_query(self, News, 'id', obj.news_id, 'id')
         news.comments_count -= 1
         save_to_db(news)
+
+        # Drop subscriptions
+        news_subscription = db.session \
+            .query(NewsSubscription) \
+            .filter(
+                NewsSubscription.user_id == obj.author_id,
+                NewsSubscription.news_id == obj.news_id
+            )
+        if news_subscription.count():
+            db.session.delete(news_subscription.one())
+            db.session.commit()
 
     decorators = (
         api.has_permission('is_user_itself', methods="PATCH,DELETE",

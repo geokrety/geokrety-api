@@ -21,3 +21,13 @@ class Setup(object):
         with app.test_request_context():
             db.session.remove()
             db.drop_all()
+
+    @staticmethod
+    def truncate_db():
+        with app.test_request_context():
+            meta = db.metadata
+            db.session.execute('SET FOREIGN_KEY_CHECKS = 0;')
+            for table in reversed(meta.sorted_tables):
+                db.session.execute(table.delete())
+            db.session.execute('SET FOREIGN_KEY_CHECKS = 1;')
+            db.session.commit()

@@ -1,5 +1,5 @@
-from app.api.helpers.db import safe_query
-from app.models.geokret import Geokret
+# -*- coding: utf-8 -*-
+
 from flask_rest_jsonapi.data_layers.base import BaseDataLayer
 
 GEOKRET_TYPE_TRADITIONAL = "0"
@@ -8,12 +8,20 @@ GEOKRET_TYPE_HUMAN = "2"
 GEOKRET_TYPE_COIN = "3"
 GEOKRET_TYPE_KRETYPOST = "4"
 
+GEOKRET_TYPES_TEXT = {
+    GEOKRET_TYPE_TRADITIONAL: "Traditional",
+    GEOKRET_TYPE_BOOK: "A book/CD/DVD",
+    GEOKRET_TYPE_HUMAN: "A Human",
+    GEOKRET_TYPE_COIN: "A coin",
+    GEOKRET_TYPE_KRETYPOST: "KretyPost",
+}
+
 GEOKRETY_TYPES = [
-    {'id': GEOKRET_TYPE_TRADITIONAL, 'name': 'Traditional'},
-    {'id': GEOKRET_TYPE_BOOK, 'name': 'A book/CD/DVD'},
-    {'id': GEOKRET_TYPE_HUMAN, 'name': 'A Human'},
-    {'id': GEOKRET_TYPE_COIN, 'name': 'A coin'},
-    {'id': GEOKRET_TYPE_KRETYPOST, 'name': 'KretyPost'},
+    {'id': GEOKRET_TYPE_TRADITIONAL, 'name': GEOKRET_TYPES_TEXT[GEOKRET_TYPE_TRADITIONAL]},
+    {'id': GEOKRET_TYPE_BOOK, 'name': GEOKRET_TYPES_TEXT[GEOKRET_TYPE_BOOK]},
+    {'id': GEOKRET_TYPE_HUMAN, 'name': GEOKRET_TYPES_TEXT[GEOKRET_TYPE_HUMAN]},
+    {'id': GEOKRET_TYPE_COIN, 'name': GEOKRET_TYPES_TEXT[GEOKRET_TYPE_COIN]},
+    {'id': GEOKRET_TYPE_KRETYPOST, 'name': GEOKRET_TYPES_TEXT[GEOKRET_TYPE_KRETYPOST]},
 ]
 
 GEOKRETY_TYPES_LIST = [
@@ -31,13 +39,22 @@ MOVE_TYPE_SEEN = "3"
 MOVE_TYPE_ARCHIVED = "4"
 MOVE_TYPE_DIPPED = "5"
 
+MOVE_TYPES_TEXT = {
+    MOVE_TYPE_DROPPED: 'Dropped to',
+    MOVE_TYPE_GRABBED: 'Grabbed from',
+    MOVE_TYPE_COMMENT: 'A comment',
+    MOVE_TYPE_SEEN: 'Seen in',
+    MOVE_TYPE_ARCHIVED: 'Archived',
+    MOVE_TYPE_DIPPED: 'Dipped',
+}
+
 MOVE_TYPES = [
-    {'id': MOVE_TYPE_DROPPED, 'name': 'Dropped to'},
-    {'id': MOVE_TYPE_GRABBED, 'name': 'Grabbed from'},
-    {'id': MOVE_TYPE_COMMENT, 'name': 'A comment'},
-    {'id': MOVE_TYPE_SEEN, 'name': 'Seen in'},
-    {'id': MOVE_TYPE_ARCHIVED, 'name': 'Archived'},
-    {'id': MOVE_TYPE_DIPPED, 'name': 'Dipped'},
+    {'id': MOVE_TYPE_DROPPED, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_DROPPED]},
+    {'id': MOVE_TYPE_GRABBED, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_GRABBED]},
+    {'id': MOVE_TYPE_COMMENT, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_COMMENT]},
+    {'id': MOVE_TYPE_SEEN, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_SEEN]},
+    {'id': MOVE_TYPE_ARCHIVED, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_ARCHIVED]},
+    {'id': MOVE_TYPE_DIPPED, 'name': MOVE_TYPES_TEXT[MOVE_TYPE_DIPPED]},
 ]
 
 MOVE_TYPES_LIST = [
@@ -50,25 +67,33 @@ MOVE_TYPES_LIST = [
 ]
 # MOVE_TYPES_COUNT = 6
 
+LANGUAGES = {
+    'fr': u'France',
+    'pl': u'Polska',
+    'de': u'Deutschland',
+    'en': u'English',
+    'ru': u'Россия',
+    'ro': u'România',
+}
+
+COUNTRIES = {
+    'fr': u'France',
+    'pl': u'Polska',
+    'de': u'Deutschland',
+    'uk': u'England',
+    'ru': u'Россия',
+    'ro': u'România',
+}
+
 
 class GeoKretyTypeDataLayer(BaseDataLayer):
 
-    def get_object(self, view_kwargs):
+    def get_object(self, view_kwargs, qs=None):
         """Retrieve an object
         :params dict view_kwargs: kwargs from the resource view
         :return DeclarativeMeta: an object
         """
-        if 'id' in view_kwargs:
-            type_id = view_kwargs['id']
-        elif 'geokret_id' in view_kwargs:
-            geokret = safe_query(self, Geokret, 'id', view_kwargs['geokret_id'], 'id')
-            type_id = int(geokret.type)
-        else:  # pragma: no cover
-            return None
-        try:
-            return GEOKRETY_TYPES[type_id]
-        except IndexError:
-            return None
+        return GEOKRETY_TYPES[view_kwargs.get('id')]
 
     def get_collection(self, qs, view_kwargs):
         """Retrieve a collection of objects
@@ -81,15 +106,12 @@ class GeoKretyTypeDataLayer(BaseDataLayer):
 
 class MovesTypeDataLayer(BaseDataLayer):
 
-    def get_object(self, view_kwargs):
+    def get_object(self, view_kwargs, qs=None):
         """Retrieve an object
         :params dict view_kwargs: kwargs from the resource view
         :return DeclarativeMeta: an object
         """
-        try:
-            return MOVE_TYPES[view_kwargs['id']]
-        except IndexError:
-            return None
+        return MOVE_TYPES[view_kwargs.get('id')]
 
     def get_collection(self, qs, view_kwargs):
         """Retrieve a collection of objects

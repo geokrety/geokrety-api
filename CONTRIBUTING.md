@@ -22,18 +22,29 @@ nosetests tests/unittests/ --verbose
 
 ### Launch tests on a specific file:
 ```
-nosetests tests/unittests/api/test_news_subscription.py --verbose
+nosetests --verbose --nologcapture tests/unittests/api/test_geokrety_create.py
 ```
 
 ### Launch tests on a specific file and specific function:
 ```
-nosetests tests/unittests/api/test_geokret.py:TestGeokret.test_patch_full_admin_someone --verbose
+nosetests --verbose --nologcapture tests/unittests/api/test_geokrety_create.py:TestGeokretCreate.test_owner_enforced_to_current_user
 ```
 
 ### Launch tests automatically on file change:
-You need to install `inotify-tools` (On Ubuntu: `sudo apt install inotify-tools`)
+
+```
+nosetests --verbose --with-watcher --filetype .py --nologcapture tests/
+```
+
+Alternatively, you can use `inotify`. You need to install `inotify-tools` (On Ubuntu: `sudo apt install inotify-tools`)
 ```
 inotifywait -r -m -e close_write --exclude '\.pyc$' . | while read path _ file; do nosetests tests/unittests/api/test_geokret.py --verbose; done
+```
+
+### Check code coverage
+Please do your best to reach/stay at 100%!
+```
+nosetests --verbose --nologcapture  --with-coverage --cover-package=app --cover-inclusive tests/unittests/
 ```
 
 ## Validating documentation

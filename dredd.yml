@@ -3,7 +3,7 @@ dry-run: null
 hookfiles: ./tests/hook_main.py
 language: python
 sandbox: false
-server: gunicorn -w 1 -b 0.0.0.0:5000 --reload app:app
+server: gunicorn -w 1 -b 0.0.0.0:5002 --reload app:app
 server-wait: 3
 init: false
 names: false
@@ -30,4 +30,4 @@ hooks-worker-handler-host: 127.0.0.1
 hooks-worker-handler-port: 61321
 config: ./dredd.yml
 blueprint: apiary.apib
-endpoint: 'http://localhost:5000'
+endpoint: 'http://localhost:5002'

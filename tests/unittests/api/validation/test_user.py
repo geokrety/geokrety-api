@@ -3,10 +3,10 @@ from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.schema.users import UserSchema
 from app.models.user import User
 from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestUser(GeokretyTestCase):
+class TestUser(BaseTestCase):
     """Test User CRUD operations"""
 
     def test_user_name_uniqueness(self):

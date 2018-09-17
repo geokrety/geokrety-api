@@ -46,6 +46,7 @@ class Config(object):
     PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='')
 
     # API configs
+    PAGE_SIZE = 20
     SOFT_DELETE = True
     PROPOGATE_ERROR = env.bool('PROPOGATE_ERROR', default=False)
     DASHERIZE_API = True

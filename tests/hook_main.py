@@ -12,6 +12,7 @@ sys.path.insert(1, path.abspath(path.join(__file__, "../..")))
 from app.models import db
 
 from app.models.user import User
+from app.models.geokret import Geokret
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.news_subscription import NewsSubscription
@@ -21,7 +22,7 @@ from mixer.backend.flask import mixer
 stash = {}
 api_username = "someone"
 api_password = "strong password"
-api_uri = "http://localhost:5000/auth/session"
+api_uri = "http://localhost:5002/auth/session"
 
 
 def obtain_token():
@@ -58,20 +59,24 @@ def before_each(transaction):
         with stash['app'].test_request_context():
             mixer.init_app(stash['app'])
             with mixer.ctx(commit=False):
-                user = mixer.blend(User, name=api_username)
-                user.password = api_password
-                news = mixer.blend(News, author=user)
-                news2 = mixer.blend(News, author=None)
-                news_comment = mixer.blend(NewsComment, author=user, news=news)
-                new_subscription1 = mixer.blend(NewsSubscription, user=user, news=news)
+                user_1 = mixer.blend(User, name=api_username)
+                user_1.password = api_password
+                user_2 = mixer.blend(User)
 
-                user2 = mixer.blend(User)
-        db.session.add(user)
-        db.session.add(user2)
-        db.session.add(news)
-        db.session.add(news2)
+                news_1 = mixer.blend(News, author=user_1)
+                news_2 = mixer.blend(News, author=None)
+                news_comment = mixer.blend(NewsComment, author=user_1, news=news_1)
+                new_subscription1 = mixer.blend(NewsSubscription, user=user_1, news=news_1)
+
+                geokret_1 = mixer.blend(Geokret)
+
+        db.session.add(user_1)
+        db.session.add(user_2)
+        db.session.add(news_1)
+        db.session.add(news_2)
         db.session.add(news_comment)
         db.session.add(new_subscription1)
+        db.session.add(geokret_1)
         db.session.commit()
 
     if 'token' not in stash:

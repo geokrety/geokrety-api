@@ -1,4 +1,6 @@
 # coding=utf-8
+from mixer.backend.flask import mixer
+
 from app import current_app as app
 from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
@@ -6,61 +8,55 @@ from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.schema.moves import MoveSchema
 from app.models.geokret import Geokret
-from mixer.backend.flask import mixer
-from tests.unittests.utils import GeokretyTestCase
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestMove(GeokretyTestCase):
+class TestMove(BaseTestCase):
     """Test Move Schema"""
 
-    def test_validate_(self):
-        """Check Form Move: validates move_type_id"""
+    def test_validate_type(self):
+        """Check Form Move: validates type"""
         with app.test_request_context():
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_GRABBED)
-
-    def test_validate_move_type_id(self):
-        """Check Form Move: validates move_type_id"""
-        with app.test_request_context():
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_GRABBED)
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_COMMENT)
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_DROPPED)
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_SEEN)
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_ARCHIVED)
-            MoveSchema.validate_move_type_id_valid(MoveSchema(), MOVE_TYPE_DIPPED)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_GRABBED)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_COMMENT)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_DROPPED)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_SEEN)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_ARCHIVED)
+            MoveSchema.validate_type(MoveSchema(), MOVE_TYPE_DIPPED)
 
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), -1)
+                MoveSchema.validate_type(MoveSchema(), -1)
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), 1)
+                MoveSchema.validate_type(MoveSchema(), 1)
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), 6)
+                MoveSchema.validate_type(MoveSchema(), 6)
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), "-1")
+                MoveSchema.validate_type(MoveSchema(), "-1")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), "6")
+                MoveSchema.validate_type(MoveSchema(), "6")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), "")
+                MoveSchema.validate_type(MoveSchema(), "")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), "100")
+                MoveSchema.validate_type(MoveSchema(), "100")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), "A")
+                MoveSchema.validate_type(MoveSchema(), "A")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_move_type_id_valid(MoveSchema(), u"jeśli")
+                MoveSchema.validate_type(MoveSchema(), u"jeśli")
 
-    def test_validate_tracking_code_is_valid(self):
+    def test_validate_tracking_code(self):
         """Check Form Move: validates tracking_code"""
         with app.test_request_context():
             mixer.init_app(app)
             geokret1 = mixer.blend(Geokret)
 
-            MoveSchema.validate_tracking_code_is_valid(MoveSchema(), geokret1.tracking_code)
+            MoveSchema.validate_tracking_code(MoveSchema(), geokret1.tracking_code)
 
             self.assertNotEqual(geokret1.tracking_code, "AAAAA")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "AAAAA")
+                MoveSchema.validate_tracking_code(MoveSchema(), "AAAAA")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "")
+                MoveSchema.validate_tracking_code(MoveSchema(), "")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_tracking_code_is_valid(MoveSchema(), u"jeśli")
+                MoveSchema.validate_tracking_code(MoveSchema(), u"jeśli")
             with self.assertRaises(UnprocessableEntity):
-                MoveSchema.validate_tracking_code_is_valid(MoveSchema(), "1234567890")
+                MoveSchema.validate_tracking_code(MoveSchema(), "1234567890")

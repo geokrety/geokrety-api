@@ -1,10 +1,9 @@
 from app import current_app as app
-from app.api.helpers.exceptions import UnprocessableEntity
-from tests.unittests.utils import GeokretyTestCase
-from app.api.helpers.utilities import dasherize, require_relationship
+from tests.unittests.utils.base_test_case import BaseTestCase
+from app.api.helpers.utilities import dasherize
 
 
-class TestUtilitiesHelperValidation(GeokretyTestCase):
+class TestUtilitiesHelperValidation(BaseTestCase):
 
     def test_dasherize(self):
         """Check UtilitiesHelper: dasherize"""
@@ -13,9 +12,3 @@ class TestUtilitiesHelperValidation(GeokretyTestCase):
             dasherized_field = "starts-at"
             result = dasherize(field)
             self.assertEqual(result, dasherized_field)
-
-    def test_require_relationship(self):
-        """Check UtilitiesHelper: require relationship"""
-        with self.assertRaises(UnprocessableEntity):
-            data = ['event']
-            require_relationship(['sponsor', 'event'], data)

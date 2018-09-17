@@ -1,8 +1,10 @@
-from tests.unittests.utils import GeokretyTestCase
-from app.api.helpers.exceptions import UnprocessableEntity, ConflictException, ForbiddenException, MethodNotAllowed
+from app.api.helpers.exceptions import (AuthenticationRequired,
+                                        ConflictException, ForbiddenException,
+                                        MethodNotAllowed, UnprocessableEntity)
+from tests.unittests.utils.base_test_case import BaseTestCase
 
 
-class TestExceptionsHelperValidation(GeokretyTestCase):
+class TestExceptionsHelperValidation(BaseTestCase):
 
     def test_exceptions(self):
         """Check ExceptionsHelper: exceptions types"""
@@ -14,6 +16,10 @@ class TestExceptionsHelperValidation(GeokretyTestCase):
         # Conflict Exception
         with self.assertRaises(ConflictException):
             raise ConflictException({'pointer': '/data/attributes/email'}, "Email already exists")
+
+        # Authentication Required Exception
+        with self.assertRaises(AuthenticationRequired):
+            raise AuthenticationRequired({'source': ''}, "Authentication Required")
 
         # Forbidden Exception
         with self.assertRaises(ForbiddenException):
