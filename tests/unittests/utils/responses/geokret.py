@@ -9,14 +9,17 @@ class GeokretResponse(BaseResponse):
     def holder(self):
         self._get_attribute('holder')
 
-    def assertHasRelationshipOwner(self, user, response):
-        self.assertHasRelationship('owner', '/v1/users/%s' % (user.id), response)
+    def assertHasRelationshipOwner(self, response, user):
+        self.assertHasRelationship(response, 'owner', '/v1/users/%s' % (user.id))
 
-    def assertHasRelationshipGeokretyType(self, geokrety_type, response):
-        self.assertHasRelationship('type', '/v1/geokrety-types/%s' % (geokrety_type), response)
+    def assertHasRelationshipGeokretyType(self, response, geokrety_type):
+        self.assertHasRelationship(response, 'type', '/v1/geokrety-types/%s' % (geokrety_type))
 
     def assertHasRelationshipMoves(self, response):
-        self.assertHasRelationship('moves', '/v1/geokrety/%s/moves' % (response.id), response)
+        self.assertHasRelationship(response, 'moves', '/v1/geokrety/%s/moves' % (response.id))
 
     def assertHasIncludeHolder(self, response, user):
-        self.assertHasIncludeId('holder', user.id, response)
+        self.assertHasIncludeId(response, 'holder', user.id)
+
+    def assertHasPublicAttributes(self, response, obj):
+        self.assertHasAttribute(response, 'name', obj.name)

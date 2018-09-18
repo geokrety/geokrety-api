@@ -30,7 +30,7 @@ class BaseResponse(dict):
             pprint.pprint(self)
             raise AttributeError("Attribute '%s' not found in response." % attribute)
 
-    def assertHasRelationship(self, relation_type, link, response):
+    def assertHasRelationship(self, response, relation_type, link):
         """Assert an error response has a specific pointer
         """
         if not isinstance(response, dict):
@@ -47,7 +47,7 @@ class BaseResponse(dict):
             pprint.pprint(response)
             raise AttributeError("Link '%s' not found in relationship '%s'" % (link, relation_type))
 
-    def assertHasAttribute(self, attribute, value, response):
+    def assertHasAttribute(self, response, attribute, value):
         """Assert a response attribute has a specific value
         """
         if not isinstance(response, dict):
@@ -62,7 +62,7 @@ class BaseResponse(dict):
             pprint.pprint(response)
             raise
 
-    def assertHasIncludeId(self, relationships, value, response):
+    def assertHasIncludeId(self, response, relationships, value):
         """Assert a response relation has a specific value
         """
         if not isinstance(response, dict):
@@ -80,16 +80,16 @@ class BaseResponse(dict):
             pprint.pprint(response)
             raise
 
-    def assertHasIncludes(self, relationships, value, response):
+    def assertHasIncludes(self, response, relationships, value):
         raise Unimplemented("Function assertHasIncludes is not yet implemented")
 
     def assertCreationDateTime(self, response):
-        self.assertDateTimePresent('created-on-date-time', response)
+        self.assertDateTimePresent(response, 'created-on-date-time')
 
     def assertUpdatedDateTime(self, response):
-        self.assertDateTimePresent('updated-on-date-time', response)
+        self.assertDateTimePresent(response, 'updated-on-date-time')
 
-    def assertDateTimePresent(self, attribute, response):
+    def assertDateTimePresent(self, response, attribute):
         if not isinstance(response, dict):
             raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
 
@@ -103,7 +103,7 @@ class BaseResponse(dict):
             pprint.pprint(response)
             raise
 
-    def assertRaiseJsonApiError(self, pointer, response):
+    def assertRaiseJsonApiError(self, response, pointer):
         """Assert an error response has a specific pointer
         """
         if not isinstance(response, dict):
