@@ -19,6 +19,9 @@ class GeokretResponse(BaseResponse):
     def updated_on_datetime(self):
         return datetime.strptime(self.get_attribute('updated-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
+    def assertHasTrackingCode(self, tracking_code):
+        self.assertHasAttribute('tracking-code', tracking_code)
+
     def assertHasRelationshipOwner(self):
         self.assertHasRelationshipSelf('owner', '/v1/geokrety/%s/relationships/owner' % self.id)
         self.assertHasRelationshipRelated('owner', '/v1/geokrety/%s/owner' % self.id)

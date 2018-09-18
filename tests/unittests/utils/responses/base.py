@@ -72,12 +72,15 @@ class BaseResponse(dict):
             assert self.get_attribute(attribute) == value
         except AssertionError:
             self.pprint()
-            raise AttributeError("Attribute '%s' not found in response." % attribute)
+            raise AttributeError("Attribute value '%s' not the expected one (%s)." % (self.get_attribute(attribute), value))
 
     def assertHasRelationshipData(self, relationships, value, type):
         """Assert a response relation has a specific value
         """
         rel = self._get_relationships(relationships)
+        if value is None:
+            print "DEBUG: %s" % rel['data']
+            assert rel['data'] is None
         assert rel['data'] is not None
         try:
             assert 'id' in rel['data']

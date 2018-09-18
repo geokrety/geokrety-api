@@ -106,9 +106,12 @@ class GeokretSchemaPublic(Schema):
         count = Move.query \
             .filter(Move.geokret_id == geokret.id) \
             .filter(Move.author_id == self.context['current_identity'].id) \
-            .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
-            .count()
-        if count:
+            .filter(Move.move_type_id != MOVE_TYPE_COMMENT)
+
+        print "COUNT: %s" % count.count()
+        if count.count():
+            print "LIST: %s" % count
+            print "LIST: %s" % count.one()
             return geokret.tracking_code
 
 

@@ -9,7 +9,7 @@ from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
                                          GEOKRET_TYPE_HUMAN,
                                          GEOKRET_TYPE_KRETYPOST,
-                                         GEOKRET_TYPE_TEXT,
+                                         GEOKRET_TYPES_TEXT,
                                          GEOKRET_TYPE_TRADITIONAL,
                                          MOVE_TYPE_DIPPED)
 from app.api.helpers.db import safe_query
