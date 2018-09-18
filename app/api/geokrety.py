@@ -91,6 +91,7 @@ class GeokretList(ResourceList):
                     moved_on_date_time=datetime.utcnow(),
                     latitude=owner.latitude,
                     longitude=owner.longitude,
+                    comment="Born here",
                 )
                 db.session.add(move)
                 db.session.commit()

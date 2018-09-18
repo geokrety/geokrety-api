@@ -244,3 +244,4 @@ class TestGeokretCreate(BaseTestCase):
             self.assertEqual(move.longitude, user.longitude)
             assertIsDateTime(move.moved_on_date_time)
             self.assertEqual(move.author_id, user.id)
+            self.assertEqual(move.comment, "Born here")
