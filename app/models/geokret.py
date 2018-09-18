@@ -130,8 +130,6 @@ class Geokret(db.Model):
 
     @hybrid_property
     def name(self):
-        print "kiki"
-        print "read: %s" % htmlentities.decode(self._name)
         return htmlentities.decode(self._name)
 
     @name.setter

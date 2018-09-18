@@ -7,8 +7,16 @@ from datetime import date, datetime
 
 import phpass
 from mixer.backend.flask import mixer
+from parameterized import parameterized
 
 from app import current_app as app
+from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
+                                         GEOKRET_TYPE_HUMAN,
+                                         GEOKRET_TYPE_KRETYPOST,
+                                         GEOKRET_TYPE_TEXT,
+                                         GEOKRET_TYPE_TRADITIONAL,
+                                         MOVE_TYPE_DIPPED)
+from app.models.geokret import Geokret
 from app.models.user import User
 from tests.unittests.setup_database import Setup
 
@@ -32,6 +40,16 @@ def json_serial(obj):  # pragma: no cover
     if isinstance(obj, date):
         return obj.strftime('%Y-%m-%d')
     raise TypeError("Type %s not serializable" % type(obj))
+
+
+def custom_name_geokrety_type(testcase_func, param_num, param):
+    id = unicode(param.args[0])
+    name = GEOKRET_TYPE_TEXT[id] if id in GEOKRET_TYPE_TEXT else id
+    return u"%s_%s (%s)" % (
+        testcase_func.__name__,
+        parameterized.to_safe_name(name),
+        testcase_func.__name__,
+    )
 
 
 class BaseTestCase(unittest.TestCase):
@@ -63,108 +81,9 @@ class BaseTestCase(unittest.TestCase):
         self.admin = self.blend_admin(**kwargs)
         self.user_1 = self.blend_user(**kwargs)
 
-    def assertRaiseJsonApiError(self, pointer, response):
-        """Assert an error response has a specific pointer
-        """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
-        try:
-            assert 'errors' in response
-            for error in response['errors']:
-                assert 'source' in error
-                assert 'pointer' in error['source']
-                if pointer in error['source']['pointer']:
-                    return True
-        except AssertionError:
-            pprint.pprint(response)
-            raise
-
-    def assertHasRelationship(self, relation_type, link, response):
-        """Assert an error response has a specific pointer
-        """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
-        try:
-            assert 'data' in response
-            assert 'relationships' in response['data']
-            assert relation_type in response['data']['relationships']
-            assert 'links' in response['data']['relationships'][relation_type]
-            assert 'related' in response['data']['relationships'][relation_type]['links']
-            assert link in response['data']['relationships'][relation_type]['links']['related']
-        except AssertionError:
-            pprint.pprint(response)
-            raise AttributeError("Link '%s' not found in relationship '%s'" % (link, relation_type))
-
-    def assertHasAttribute(self, attribute, value, response):
-        """Assert a response attribute has a specific value
-        """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
-        try:
-            assert 'data' in response
-            assert 'attributes' in response['data']
-            assert attribute in response['data']['attributes']
-            self.assertEqual(response['data']['attributes'][attribute], value)
-        except AssertionError:
-            pprint.pprint(response)
-            raise
-
-    def assertHasIncludeId(self, relationships, value, response):
-        """Assert a response relation has a specific value
-        """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
-        try:
-            assert 'data' in response
-            assert 'relationships' in response['data']
-            assert relationships in response['data']['relationships']
-            assert 'data' in response['data']['relationships'][relationships]
-            assert response['data']['relationships'][relationships]['data'] is not None
-            assert 'id' in response['data']['relationships'][relationships]['data']
-            self.assertEqual(
-                response['data']['relationships'][relationships]['data']['id'],
-                str(value),
-            )
-        except AssertionError:
-            pprint.pprint(response)
-            raise
-
-    def assertHasIncludes(self, relationships, value, response):
-        raise Unimplemented("Function assertHasIncludes is not yet implemented")
-
-    def assertCreationDateTime(self, response):
-        self.assertDateTimePresent('created-on-date-time', response)
-
-    def assertUpdatedDateTime(self, response):
-        self.assertDateTimePresent('updated-on-date-time', response)
-
-    def assertDateTimePresent(self, attribute, response):
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
-        try:
-            assert 'data' in response
-            assert 'attributes' in response['data']
-            assert attribute in response['data']['attributes']
-            date_time = response['data']['attributes'][attribute]
-            self.assertIsDateTime(date_time)
-        except AssertionError:
-            pprint.pprint(response)
-            raise
-
-    def assertIsDateTime(self, date_time):
-        if isinstance(date_time, datetime):
-            return
-
-        try:
-            datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
-        except ValueError:
-            self.assertTrue(False, 'Date is not parsable')
-            raise
+    def blend_geokret(self, *args, **kwargs):
+        with mixer.ctx():
+            return mixer.blend(Geokret, **kwargs)
 
     def _login(self, username="kumy", password="password"):
         """

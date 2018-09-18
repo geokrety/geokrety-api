@@ -120,7 +120,7 @@ class GeokretDetail(ResourceDetail):
                 self.schema = GeokretSchema
 
             if kwargs.get('id') is not None:
-                geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'geokret_owned_id')
+                geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'id')
 
                 # Is GeoKret owner?
                 if geokret.owner_id == current_identity.id:
