@@ -47,9 +47,10 @@ class GeokretSchemaPublic(Schema):
         self_view='v1.geokret_owner',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
-        related_view_kwargs={'id': '<owner_id>'},
+        related_view_kwargs={'geokret_owned_id': '<id>'},
         schema='UserSchemaPublic',
-        type_='user'
+        type_='user',
+        include_resource_linkage=True,
     )
 
     holder = Relationship(
@@ -57,19 +58,21 @@ class GeokretSchemaPublic(Schema):
         self_view='v1.geokret_holder',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
-        related_view_kwargs={'id': '<holder_id>'},
+        related_view_kwargs={'geokret_held_id': '<id>'},
         schema='UserSchemaPublic',
-        type_='user'
+        type_='user',
+        include_resource_linkage=True,
     )
 
     type = Relationship(
         attribute='type',
-        self_view='v1.geokrety_type_geokret',
+        self_view='v1.geokret_type',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.geokrety_type_details',
-        related_view_kwargs={'id': '<type>'},
+        related_view_kwargs={'geokret_id': '<id>'},
         schema='GeoKretyTypesSchema',
-        type_='type'
+        type_='type',
+        include_resource_linkage=True,
     )
 
     moves = Relationship(
@@ -90,6 +93,14 @@ class GeokretSchemaPublic(Schema):
         """
         if not self.context['current_identity']:
             return None
+
+        # Is holder?
+        if geokret.holder_id == self.context['current_identity'].id:
+            return geokret.tracking_code
+
+        # Is owner?
+        if geokret.owner_id == self.context['current_identity'].id:
+            return geokret.tracking_code
 
         # Is GeoKret already seen?
         count = Move.query \

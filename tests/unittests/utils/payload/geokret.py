@@ -2,7 +2,8 @@
 
 from mixer.backend.flask import mixer
 
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
+from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
+                                         GEOKRETY_TYPES_LIST)
 from app.models.geokret import Geokret
 from app.models.user import User
 
@@ -12,6 +13,7 @@ from .base import BasePayload
 class GeokretyPayload(BasePayload):
     def __init__(self):
         super(GeokretyPayload, self).__init__('geokret')
+        self.set_geokrety_type(GEOKRET_TYPE_TRADITIONAL)
 
     def set_name(self, name):
         self._set_attribute('name', name)

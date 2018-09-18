@@ -1,9 +1,10 @@
 import datetime
 
-from app.models import db
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
+
 import htmlentities
+from app.models import db
 
 # TODO add unicity constraint on geokret_id + moved_on_datetime
 
@@ -156,3 +157,10 @@ class Move(db.Model):
 
     # geokret = db.relationship('Geokret',
     #     backref=db.backref('moves', lazy=True))
+
+
+# TODO launch async tasks
+# @event.listens_for(Move, 'init')
+# def receive_init(target, args, kwargs):
+#     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
+#     target.created_on_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

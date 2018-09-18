@@ -28,12 +28,9 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 class TestGeokretCreate(BaseTestCase):
     """Test Geokrety creation"""
 
-    def _send_post(self, payload=None, code=201, user=None, content_type='application/vnd.api+json', include=None):
-        url = "/v1/geokrety"
-        if include:
-            url = "%s?include=%s" % (url, ','.join(include))
+    def _send_post(self, payload=None, code=201, user=None, content_type='application/vnd.api+json'):
         return GeokretResponse(super(TestGeokretCreate, self)._send_post(
-            url,
+            "/v1/geokrety",
             code=code,
             payload=payload,
             user=user,
@@ -81,14 +78,15 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1)
-            response.assertHasRelationshipOwner(self.user_1)
+            response.pprint()
+            response.assertHasRelationshipOwnerData(self.user_1.id)
 
     def test_owner_is_the_connected_user_if_undefined_even_for_admin(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.admin)
-            response.assertHasRelationshipOwner(self.admin)
+            response.assertHasRelationshipOwnerData(self.admin.id)
 
     def test_owner_enforced_to_current_user(self):
         payload = GeokretyPayload()
@@ -97,7 +95,7 @@ class TestGeokretCreate(BaseTestCase):
             user_2 = self.blend_user()
             payload.set_owner(user_2)
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasRelationshipOwner(self.user_1)
+            response.assertHasRelationshipOwnerData(self.user_1.id)
 
     def test_owner_enforced_by_admin(self):
         payload = GeokretyPayload()
@@ -105,7 +103,7 @@ class TestGeokretCreate(BaseTestCase):
             self.blend_users()
             payload.set_owner(self.user_1)
             response = self._send_post(payload, user=self.admin, code=201)
-            response.assertHasRelationshipOwner(self.user_1)
+            response.assertHasRelationshipOwnerData(self.user_1.id)
 
     @parameterized.expand([
         [GEOKRET_TYPE_TRADITIONAL],
@@ -120,7 +118,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.admin)
-            response.assertHasRelationshipGeokretyType(geokret_type)
+            response.assertHasRelationshipGeokretyType()
 
     @parameterized.expand([
         [666],
@@ -209,23 +207,23 @@ class TestGeokretCreate(BaseTestCase):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
-            response = self._send_post(payload, user=self.user_1, code=201, include=['holder'])
-            response.assertHasIncludeHolder(self.user_1)
+            response = self._send_post(payload, user=self.user_1, code=201)
+            response.assertHasRelationshipHolderData(self.user_1.id)
 
     def test_holder_is_owner_for_himself_as_admin(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
-            response = self._send_post(payload, user=self.admin, code=201, include=['holder'])
-            response.assertHasIncludeHolder(self.admin)
+            response = self._send_post(payload, user=self.admin, code=201)
+            response.assertHasRelationshipHolderData(self.admin.id)
 
     def test_holder_is_owner_for_someone_else_by_admin(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             payload.set_owner(self.user_1)
-            response = self._send_post(payload, user=self.admin, code=201, include=['holder'])
-            response.assertHasIncludeHolder(self.user_1)
+            response = self._send_post(payload, user=self.admin, code=201)
+            response.assertHasRelationshipHolderData(self.user_1.id)
 
     def test_geokret_may_be_born_at_home_no_home_coordinates(self):
         payload = GeokretyPayload()

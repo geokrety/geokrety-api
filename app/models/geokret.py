@@ -41,7 +41,8 @@ class Geokret(db.Model):
     type = db.Column(
         'typ',
         db.Enum('0', '1', '2', '3', '4'),
-        key='type'
+        key='type',
+        nullable=False,
     )
     missing = db.Column(
         'missing',

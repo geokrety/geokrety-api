@@ -80,6 +80,7 @@ class BaseTestCase(unittest.TestCase):
     def blend_users(self, *args, **kwargs):
         self.admin = self.blend_admin(**kwargs)
         self.user_1 = self.blend_user(**kwargs)
+        self.user_2 = self.blend_user(**kwargs)
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
