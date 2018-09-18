@@ -36,7 +36,7 @@ def json_serial(obj):  # pragma: no cover
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, datetime):
-        return obj.strftime('%Y-%m-%d %H:%M:%S')
+        return obj.strftime('%Y-%m-%dT%H:%M:%S')
     if isinstance(obj, date):
         return obj.strftime('%Y-%m-%d')
     raise TypeError("Type %s not serializable" % type(obj))
