@@ -21,7 +21,7 @@ class NewsSchema(Schema):
     content = fields.Str(required=True)
     username = fields.Str()
     comments_count = fields.Integer(dump_only=True)
-    created_on_date_time = fields.Date(dump_only=True)
+    created_on_datetime = fields.Date(dump_only=True)
     last_comment_date_time = fields.Date(dump_only=True)
 
     author = Relationship(attribute='author',

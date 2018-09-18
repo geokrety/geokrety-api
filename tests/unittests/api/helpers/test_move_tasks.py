@@ -29,29 +29,29 @@ class TestMoveTasksHelper(BaseTestCase):
 
             self.geokret1 = mixer.blend(Geokret, type=GEOKRET_TYPE_TRADITIONAL,
                                         owner=self.user1, holder=self.user1, tracking_code="ABC123",
-                                        created_on_date_time="2017-12-01T14:18:22")
+                                        created_on_datetime="2017-12-01T14:18:22")
 
             # Moves
             self.move1 = mixer.blend(Move, move_type_id=MOVE_TYPE_DROPPED, geokret=self.geokret1,
-                                     author=self.user2, moved_on_date_time="2017-12-01T14:21:22",
+                                     author=self.user2, moved_on_datetime="2017-12-01T14:21:22",
                                      latitude=43.694483, longitude=6.85575)
             self.move2 = mixer.blend(Move, move_type_id=MOVE_TYPE_COMMENT, geokret=self.geokret1,
-                                     author=self.user1, moved_on_date_time="2017-12-01T14:24:22")
+                                     author=self.user1, moved_on_datetime="2017-12-01T14:24:22")
             self.move3 = mixer.blend(Move, move_type_id=MOVE_TYPE_DIPPED, geokret=self.geokret1,
-                                     author=self.user4, moved_on_date_time="2017-12-01T14:25:22",
+                                     author=self.user4, moved_on_datetime="2017-12-01T14:25:22",
                                      latitude=43.704233, longitude=6.869833)
             self.move4 = mixer.blend(Move, move_type_id=MOVE_TYPE_DIPPED, geokret=self.geokret1,
-                                     author=self.user4, moved_on_date_time="2017-12-01T14:23:22",
+                                     author=self.user4, moved_on_datetime="2017-12-01T14:23:22",
                                      latitude=43.6792, longitude=6.852933)
             self.move5 = mixer.blend(Move, move_type_id=MOVE_TYPE_SEEN, geokret=self.geokret1,
-                                     author=self.user3, moved_on_date_time="2017-12-01T14:22:22",
+                                     author=self.user3, moved_on_datetime="2017-12-01T14:22:22",
                                      latitude=43.701767, longitude=6.84085)
             self.move6 = mixer.blend(Move, move_type_id=MOVE_TYPE_GRABBED, geokret=self.geokret1,
-                                     author=self.user2, moved_on_date_time="2017-12-01T14:19:22")
+                                     author=self.user2, moved_on_datetime="2017-12-01T14:19:22")
             self.move7 = mixer.blend(Move, move_type_id=MOVE_TYPE_COMMENT, geokret=self.geokret1,
-                                     author=self.user2, moved_on_date_time="2017-12-01T14:20:22")
+                                     author=self.user2, moved_on_datetime="2017-12-01T14:20:22")
             self.move8 = mixer.blend(Move, move_type_id=MOVE_TYPE_DROPPED, geokret=self.geokret1,
-                                     author=self.user1, moved_on_date_time="2017-12-01T14:18:22",
+                                     author=self.user1, moved_on_datetime="2017-12-01T14:18:22",
                                      latitude=43.693633, longitude=6.860933)
 
     def test_update_move_distances(self):
@@ -66,7 +66,7 @@ class TestMoveTasksHelper(BaseTestCase):
 
             # Check in database
             moves = Move.query.filter(Move.geokret_id == self.geokret1.id) \
-                .order_by(Move.moved_on_date_time.asc()).all()
+                .order_by(Move.moved_on_datetime.asc()).all()
             self.assertEqual(moves[0].distance, 0)
             self.assertEqual(moves[1].distance, 0)
             self.assertEqual(moves[2].distance, 0)
@@ -112,7 +112,7 @@ class TestMoveTasksHelper(BaseTestCase):
 
             # Check api error responses
             another_move = mixer.blend(Move, move_type_id=MOVE_TYPE_DROPPED, geokret=self.geokret1,
-                                       author=self.user2, moved_on_date_time="2017-12-01T17:17:17",
+                                       author=self.user2, moved_on_datetime="2017-12-01T17:17:17",
                                        latitude=0, longitude=0)
             # run the function
             update_move_country_and_altitude(another_move.id)

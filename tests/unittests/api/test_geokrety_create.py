@@ -66,11 +66,16 @@ class TestGeokretCreate(BaseTestCase):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
-            result = self._send_post(payload, user=self.user_1)
-            self.assertEqual(
-                result['data']['attributes']['created-on-date-time'],
-                result['data']['attributes']['updated-on-date-time']
+            response = self._send_post(payload, user=self.user_1)
+            self.assertAlmostEqual(
+                response.created_on_datetime,
+                response.updated_on_datetime,
+                delta=timedelta(seconds=1)
             )
+            # self.assertAlmostEqual(
+            #     response['data']['attributes']['created-on-datetime'],
+            #     response['data']['attributes']['updated-on-datetime']
+            # )
 
     def test_owner_is_the_connected_user_if_undefined(self):
         payload = GeokretyPayload()
@@ -242,6 +247,6 @@ class TestGeokretCreate(BaseTestCase):
             self.assertEqual(move.move_type_id, MOVE_TYPE_DIPPED)
             self.assertEqual(move.latitude, user.latitude)
             self.assertEqual(move.longitude, user.longitude)
-            assertIsDateTime(move.moved_on_date_time)
+            assertIsDateTime(move.moved_on_datetime)
             self.assertEqual(move.author_id, user.id)
             self.assertEqual(move.comment, "Born here")

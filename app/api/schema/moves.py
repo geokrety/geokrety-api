@@ -40,7 +40,7 @@ class MoveSchema(Schema):
     author_id = fields.Str(load_only=True)
     comment = fields.Str()
     username = fields.Str()
-    moved_on_date_time = fields.DateTime()
+    moved_on_datetime = fields.DateTime()
     application_name = fields.Str(required=True)
     application_version = fields.Str(required=True)
     move_type_id = fields.Str(required=True)
@@ -49,8 +49,8 @@ class MoveSchema(Schema):
     distance = fields.Integer(dump_only=True)
     pictures_count = fields.Integer(dump_only=True)
     comments_count = fields.Integer(dump_only=True)
-    created_on_date_time = fields.DateTime(dump_only=True)
-    updated_on_date_time = fields.DateTime(dump_only=True)
+    created_on_datetime = fields.DateTime(dump_only=True)
+    updated_on_datetime = fields.DateTime(dump_only=True)
 
     author = Relationship(
         attribute='author',

@@ -88,7 +88,7 @@ class GeokretList(ResourceList):
                     author_id=geokret.owner_id,
                     geokret_id=geokret.id,
                     move_type_id=MOVE_TYPE_DIPPED,
-                    moved_on_date_time=datetime.utcnow(),
+                    moved_on_datetime=datetime.utcnow(),
                     latitude=owner.latitude,
                     longitude=owner.longitude,
                     comment="Born here",

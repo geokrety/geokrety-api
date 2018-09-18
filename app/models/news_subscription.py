@@ -21,10 +21,10 @@ class NewsSubscription(db.Model):
         db.ForeignKey('gk-users.id'),
         nullable=False,
     )
-    subscribed_on_date_time = db.Column(
+    subscribed_on_datetime = db.Column(
         'read',
         db.DateTime,
-        key='subscribed_on_date_time',
+        key='subscribed_on_datetime',
         default=datetime.datetime.utcnow,
     )
     post = db.Column(

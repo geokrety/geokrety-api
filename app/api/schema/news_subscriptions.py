@@ -16,7 +16,7 @@ class NewsSubscriptionSchema(Schema):
 
     id = fields.Str(dump_only=True)
     subscribed = fields.Boolean(required=True)
-    subscribed_on_date_time = fields.DateTime(dump_only=True)
+    subscribed_on_datetime = fields.DateTime(dump_only=True)
 
     user = Relationship(
         attribute='user',

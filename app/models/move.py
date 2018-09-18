@@ -5,7 +5,7 @@ from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
 import htmlentities
 
-# TODO add unicity constraint on geokret_id + moved_on_date_time
+# TODO add unicity constraint on geokret_id + moved_on_datetime
 
 
 class Move(db.Model):
@@ -121,23 +121,23 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
-    moved_on_date_time = db.Column(
+    moved_on_datetime = db.Column(
         'data',
         db.DateTime,
-        key='moved_on_date_time',
+        key='moved_on_datetime',
         nullable=False,
     )
-    created_on_date_time = db.Column(
+    created_on_datetime = db.Column(
         'data_dodania',
         db.DateTime,
-        key='created_on_date_time',
+        key='created_on_datetime',
         nullable=False,
         default=datetime.datetime.utcnow,
     )
-    updated_on_date_time = db.Column(
+    updated_on_datetime = db.Column(
         'timestamp',
         db.DateTime,
-        key='updated_on_date_time',
+        key='updated_on_datetime',
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow
     )

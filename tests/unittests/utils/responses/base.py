@@ -84,10 +84,10 @@ class BaseResponse(dict):
         raise Unimplemented("Function assertHasIncludes is not yet implemented")
 
     def assertCreationDateTime(self, response):
-        self.assertDateTimePresent(response, 'created-on-date-time')
+        self.assertDateTimePresent(response, 'created-on-datetime')
 
     def assertUpdatedDateTime(self, response):
-        self.assertDateTimePresent(response, 'updated-on-date-time')
+        self.assertDateTimePresent(response, 'updated-on-datetime')
 
     def assertDateTimePresent(self, response, attribute):
         if not isinstance(response, dict):

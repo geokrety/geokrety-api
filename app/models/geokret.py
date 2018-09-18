@@ -71,17 +71,17 @@ class Geokret(db.Model):
         nullable=False,
         default=0
     )
-    created_on_date_time = db.Column(
+    created_on_datetime = db.Column(
         'data',
         db.DateTime,
         nullable=False,
-        key='created_on_date_time',
+        key='created_on_datetime',
         default=datetime.datetime.utcnow,
     )
-    updated_on_date_time = db.Column(
+    updated_on_datetime = db.Column(
         'timestamp',
         db.TIMESTAMP(timezone=True),
-        key='updated_on_date_time',
+        key='updated_on_datetime',
         default=datetime.datetime.now,
         onupdate=datetime.datetime.now,
     )
@@ -164,4 +164,4 @@ class Geokret(db.Model):
 @event.listens_for(Geokret, 'init')
 def receive_init(target, args, kwargs):
     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
-    target.created_on_date_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    target.created_on_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

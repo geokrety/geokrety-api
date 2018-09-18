@@ -39,8 +39,8 @@ class GeokretSchemaPublic(Schema):
     caches_count = fields.Integer(dump_only=True)
     pictures_count = fields.Integer(dump_only=True)
     average_rating = fields.Float(dump_only=True)
-    created_on_date_time = fields.Date(dump_only=True)
-    updated_on_date_time = fields.Date(dump_only=True)
+    created_on_datetime = fields.Date(dump_only=True)
+    updated_on_datetime = fields.Date(dump_only=True)
 
     owner = Relationship(
         attribute='owner',

@@ -232,8 +232,8 @@ class BaseTestCase(unittest.TestCase):
     #     self.assertTrue('caches-count' in attributes)
     #     self.assertTrue('pictures-count' in attributes)
     #     self.assertTrue('average-rating' in attributes)
-    #     self.assertTrue('created-on-date-time' in attributes)
-    #     self.assertTrue('updated-on-date-time' in attributes)
+    #     self.assertTrue('created-on-datetime' in attributes)
+    #     self.assertTrue('updated-on-datetime' in attributes)
     #
     #     self.assertEqual(attributes['name'], geokret.name)
     #     self.assertEqual(attributes['description'], geokret.description)
@@ -244,8 +244,8 @@ class BaseTestCase(unittest.TestCase):
     #     self.assertEqual(attributes['average-rating'], geokret.average_rating)
     #
     #     if 'times' not in skip_check:
-    #         self.assertDateTimeEqual(attributes['created-on-date-time'], geokret.created_on_date_time)
-    #         self.assertDateTimeEqual(attributes['updated-on-date-time'], geokret.updated_on_date_time)
+    #         self.assertDateTimeEqual(attributes['created-on-datetime'], geokret.created_on_datetime)
+    #         self.assertDateTimeEqual(attributes['updated-on-datetime'], geokret.updated_on_datetime)
     #
     #     if with_private is not None:
     #         self.assertTrue('attributes' in data)
@@ -273,9 +273,9 @@ class BaseTestCase(unittest.TestCase):
     #     self.assertTrue('application-version' in attributes)
     #     self.assertTrue('pictures-count' in attributes)
     #     self.assertTrue('comments-count' in attributes)
-    #     self.assertTrue('moved-on-date-time' in attributes)
-    #     self.assertTrue('created-on-date-time' in attributes)
-    #     self.assertTrue('updated-on-date-time' in attributes)
+    #     self.assertTrue('moved-on-datetime' in attributes)
+    #     self.assertTrue('created-on-datetime' in attributes)
+    #     self.assertTrue('updated-on-datetime' in attributes)
     #
     #     self.assertEqual(attributes['move-type-id'], move.move_type_id)
     #     self.assertEqual(attributes['altitude'], move.altitude)
@@ -288,8 +288,8 @@ class BaseTestCase(unittest.TestCase):
     #     self.assertEqual(attributes['pictures-count'], move.pictures_count)
     #     self.assertEqual(attributes['comments-count'], move.comments_count)
     #
-    #     if attributes['moved-on-date-time'] is not None:
-    #         self.assertDateTimeEqual(attributes['moved-on-date-time'], move.moved_on_date_time)
+    #     if attributes['moved-on-datetime'] is not None:
+    #         self.assertDateTimeEqual(attributes['moved-on-datetime'], move.moved_on_datetime)
     #
     #     if attributes['move-type-id'] in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED):
     #         self.assertTrue('latitude' in attributes)
@@ -300,5 +300,5 @@ class BaseTestCase(unittest.TestCase):
     #         self.assertEqual(attributes['waypoint'], move.waypoint)
     #
     #     if 'times' not in skip_check:
-    #         self.assertDateTimeEqual(attributes['created-on-date-time'], move.created_on_date_time)
-    #         self.assertDateTimeEqual(attributes['updated-on-date-time'], move.updated_on_date_time)
+    #         self.assertDateTimeEqual(attributes['created-on-datetime'], move.created_on_datetime)
+    #         self.assertDateTimeEqual(attributes['updated-on-datetime'], move.updated_on_datetime)

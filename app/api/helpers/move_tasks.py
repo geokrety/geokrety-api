@@ -17,7 +17,7 @@ celery = make_celery(current_app)
 def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret
     """
-    moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_date_time.asc())
+    moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_datetime.asc())
 
     last = None
     for move in moves:
@@ -69,7 +69,7 @@ def update_geokret_total_moves_count(geokret_id):
     moves = Move.query \
         .filter(Move.geokret_id == geokret_id) \
         .filter(Move.move_type_id.in_((MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_DIPPED))) \
-        .order_by(Move.moved_on_date_time.desc())
+        .order_by(Move.moved_on_datetime.desc())
 
     geokret = Geokret.query.get(geokret_id)
     geokret.caches_count = moves.count()
@@ -82,7 +82,7 @@ def update_geokret_holder(geokret_id):
     moves = Move.query \
         .filter(Move.geokret_id == geokret_id) \
         .filter(Move.move_type_id != MOVE_TYPE_COMMENT) \
-        .order_by(Move.moved_on_date_time.desc())
+        .order_by(Move.moved_on_datetime.desc())
 
     geokret = Geokret.query.get(geokret_id)
 

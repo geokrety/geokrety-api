@@ -92,27 +92,27 @@ class MovesList(ResourceList):
                 raise ForbiddenException({'source': ''}, 'Owner access is required')
 
         # Move date restrictions
-        if 'moved_on_date_time' not in data:
-            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
+        if 'moved_on_datetime' not in data:
+            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_datetime'},
                                       "Move date time is mandatory")
         else:
             # Move cannot be done before GeoKret birth
-            if data['moved_on_date_time'] < geokret.created_on_date_time:
-                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
+            if data['moved_on_datetime'] < geokret.created_on_datetime:
+                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_datetime'},
                                           "Move date cannot be prior GeoKret birth date")
 
             # Move cannot be done in the future
-            if data['moved_on_date_time'] > datetime.datetime.utcnow():
-                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
+            if data['moved_on_datetime'] > datetime.datetime.utcnow():
+                raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_datetime'},
                                           "Move date cannot be in the future")
 
         # Identical move date is forbidden
         try:
             db.session.query(Move).filter(
-                Move.moved_on_date_time == str(data['moved_on_date_time']),
+                Move.moved_on_datetime == str(data['moved_on_datetime']),
                 Move.geokret_id == str(geokret.id)
             ).one()
-            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_date_time'},
+            raise UnprocessableEntity({'pointer': '/data/attributes/moved_on_datetime'},
                                       "There is already a move at that time")
         except NoResultFound:
             pass

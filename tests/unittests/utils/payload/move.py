@@ -69,9 +69,9 @@ class MovePayload(BasePayload):
             )).strftime("%Y-%m-%dT%H:%M:%S")
 
         if date_time:
-            self._set_attribute('moved_on_date_time', date_time)
+            self._set_attribute('moved_on_datetime', date_time)
         else:
-            self._set_attribute('moved_on_date_time', random_date("2017-12-01T14:18:22"))
+            self._set_attribute('moved_on_datetime', random_date("2017-12-01T14:18:22"))
         return self
 
     def set_obj(self, obj):

@@ -49,10 +49,10 @@ class News(db.Model):
         nullable=False,
         default="0000-00-00 00:00:00"
     )
-    created_on_date_time = db.Column(
+    created_on_datetime = db.Column(
         'date',
         db.DateTime,
-        key='created_on_date_time',
+        key='created_on_datetime',
         default=datetime.datetime.utcnow
     )
     czas_postu = db.Column(
