@@ -37,16 +37,19 @@ class TestGeokretDetails(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
-            assert self.send_get(geokret.id, user=None)
+            response = self.send_get(geokret.id, user=None)
+            response.assertHasPublicAttributes(geokret)
 
     def test_as_authenticated_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
-            assert self.send_get(geokret.id, user=self.user_1)
+            response = self.send_get(geokret.id, user=self.user_1)
+            response.assertHasPublicAttributes(geokret)
 
     def test_as_admin_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
-            assert self.send_get(geokret.id, user=self.admin)
+            response = self.send_get(geokret.id, user=self.admin)
+            response.assertHasPublicAttributes(geokret)

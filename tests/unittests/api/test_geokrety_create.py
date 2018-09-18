@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import timedelta
+
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 from parameterized import parameterized
 
@@ -53,15 +55,15 @@ class TestGeokretCreate(BaseTestCase):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
-            result = self._send_post(payload, user=self.user_1)
-            result.assertCreationDateTime(result)
+            response = self._send_post(payload, user=self.user_1)
+            response.assertCreationDateTime()
 
     def test_field_update_date_time_is_auto_managed(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
-            result = self._send_post(payload, user=self.user_1)
-            result.assertUpdatedDateTime(result)
+            response = self._send_post(payload, user=self.user_1)
+            response.assertUpdatedDateTime()
 
     def test_field_creation_date_time_is_equal_to_update_date_time(self):
         payload = GeokretyPayload()
@@ -73,24 +75,20 @@ class TestGeokretCreate(BaseTestCase):
                 response.updated_on_datetime,
                 delta=timedelta(seconds=1)
             )
-            # self.assertAlmostEqual(
-            #     response['data']['attributes']['created-on-datetime'],
-            #     response['data']['attributes']['updated-on-datetime']
-            # )
 
     def test_owner_is_the_connected_user_if_undefined(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1)
-            response.assertHasRelationshipOwner(response, self.user_1)
+            response.assertHasRelationshipOwner(self.user_1)
 
     def test_owner_is_the_connected_user_if_undefined_even_for_admin(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.admin)
-            response.assertHasRelationshipOwner(response, self.admin)
+            response.assertHasRelationshipOwner(self.admin)
 
     def test_owner_enforced_to_current_user(self):
         payload = GeokretyPayload()
@@ -99,7 +97,7 @@ class TestGeokretCreate(BaseTestCase):
             user_2 = self.blend_user()
             payload.set_owner(user_2)
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasRelationshipOwner(response, self.user_1)
+            response.assertHasRelationshipOwner(self.user_1)
 
     def test_owner_enforced_by_admin(self):
         payload = GeokretyPayload()
@@ -107,7 +105,7 @@ class TestGeokretCreate(BaseTestCase):
             self.blend_users()
             payload.set_owner(self.user_1)
             response = self._send_post(payload, user=self.admin, code=201)
-            response.assertHasRelationshipOwner(response, self.user_1)
+            response.assertHasRelationshipOwner(self.user_1)
 
     @parameterized.expand([
         [GEOKRET_TYPE_TRADITIONAL],
@@ -122,7 +120,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.admin)
-            response.assertHasRelationshipGeokretyType(response, geokret_type)
+            response.assertHasRelationshipGeokretyType(geokret_type)
 
     @parameterized.expand([
         [666],
@@ -145,7 +143,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=422)
-            response.assertRaiseJsonApiError(response, '/data/attributes/name')
+            response.assertRaiseJsonApiError('/data/attributes/name')
 
     @parameterized.expand(EMPTY_TEST_CASES)
     def test_field_name_cannot_be_blank(self, name):
@@ -154,7 +152,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=422)
-            response.assertRaiseJsonApiError(response, '/data/attributes/name')
+            response.assertRaiseJsonApiError('/data/attributes/name')
 
     @parameterized.expand(UTF8_TEST_CASES)
     def test_field_name_accept_unicode(self, name, result=None):
@@ -165,7 +163,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasAttribute(response, 'name', result)
+            response.assertHasAttribute('name', result)
 
     @parameterized.expand(NO_HTML_TEST_CASES)
     def test_field_name_doesnt_accept_html(self, name, result=None):
@@ -176,7 +174,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasAttribute(response, 'name', result)
+            response.assertHasAttribute('name', result)
 
     def test_field_description_may_be_absent(self):
         payload = GeokretyPayload()
@@ -194,7 +192,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasAttribute(response, 'description', result)
+            response.assertHasAttribute('description', result)
 
     @parameterized.expand(HTML_SUBSET_TEST_CASES)
     def test_field_description_accept_html_subset(self, description, result=None):
@@ -205,21 +203,21 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=201)
-            response.assertHasAttribute(response, 'description', result)
+            response.assertHasAttribute('description', result)
 
     def test_holder_is_owner_for_himself(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.user_1, code=201, include=['holder'])
-            response.assertHasIncludeHolder(response, self.user_1)
+            response.assertHasIncludeHolder(self.user_1)
 
     def test_holder_is_owner_for_himself_as_admin(self):
         payload = GeokretyPayload()
         with app.test_request_context():
             self.blend_users()
             response = self._send_post(payload, user=self.admin, code=201, include=['holder'])
-            response.assertHasIncludeHolder(response, self.admin)
+            response.assertHasIncludeHolder(self.admin)
 
     def test_holder_is_owner_for_someone_else_by_admin(self):
         payload = GeokretyPayload()
@@ -227,7 +225,7 @@ class TestGeokretCreate(BaseTestCase):
             self.blend_users()
             payload.set_owner(self.user_1)
             response = self._send_post(payload, user=self.admin, code=201, include=['holder'])
-            response.assertHasIncludeHolder(response, self.user_1)
+            response.assertHasIncludeHolder(self.user_1)
 
     def test_geokret_may_be_born_at_home_no_home_coordinates(self):
         payload = GeokretyPayload()
@@ -243,7 +241,7 @@ class TestGeokretCreate(BaseTestCase):
         with app.test_request_context():
             user = self.blend_user(latitude=48.8566, longitude=2.3522)
             response = self._send_post(payload, user=user, code=201)
-            response.assertHasRelationshipMoves(response)
+            response.assertHasRelationshipMoves()
             move = safe_query(self, Move, 'geokret_id', response.id, 'geokret_id')
             self.assertEqual(move.move_type_id, MOVE_TYPE_DIPPED)
             self.assertEqual(move.latitude, user.latitude)

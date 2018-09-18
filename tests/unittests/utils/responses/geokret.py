@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from base import BaseResponse
 
 
@@ -7,19 +9,33 @@ class GeokretResponse(BaseResponse):
 
     @property
     def holder(self):
-        self._get_attribute('holder')
+        return self._get_attribute('holder')
 
-    def assertHasRelationshipOwner(self, response, user):
-        self.assertHasRelationship(response, 'owner', '/v1/users/%s' % (user.id))
+    @property
+    def created_on_datetime(self):
+        import pprint
+        pprint.pprint(self)
+        return datetime.strptime(self._get_attribute('created-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
-    def assertHasRelationshipGeokretyType(self, response, geokrety_type):
-        self.assertHasRelationship(response, 'type', '/v1/geokrety-types/%s' % (geokrety_type))
+    @property
+    def updated_on_datetime(self):
+        return datetime.strptime(self._get_attribute('updated-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
-    def assertHasRelationshipMoves(self, response):
-        self.assertHasRelationship(response, 'moves', '/v1/geokrety/%s/moves' % (response.id))
+    def assertHasRelationshipOwner(self, user):
+        self.assertHasRelationship('owner', '/v1/users/%s' % (user.id))
 
-    def assertHasIncludeHolder(self, response, user):
-        self.assertHasIncludeId(response, 'holder', user.id)
+    def assertHasRelationshipGeokretyType(self, geokrety_type):
+        self.assertHasRelationship('type', '/v1/geokrety-types/%s' % (geokrety_type))
 
-    def assertHasPublicAttributes(self, response, obj):
-        self.assertHasAttribute(response, 'name', obj.name)
+    def assertHasRelationshipMoves(self):
+        self.assertHasRelationship('moves', '/v1/geokrety/%s/moves' % (self.id))
+
+    def assertHasIncludeHolder(self, user):
+        self.assertHasIncludeId('holder', user.id)
+
+    def assertHasPublicAttributes(self, obj):
+        self.assertHasAttribute('name', obj.name)
+        self.assertHasAttribute('description', obj.description)
+        self.assertHasAttribute('name', obj.name)
+        self.assertHasAttribute('name', obj.name)
+        self.pprint()

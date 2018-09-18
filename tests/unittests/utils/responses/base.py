@@ -17,7 +17,7 @@ class BaseResponse(dict):
             assert 'id' in self['data']
             return self['data']['id']
         except AssertionError:
-            pprint.pprint(self)
+            self.pprint(self)
             raise AttributeError("Object id not found in response.")
 
     def _get_attribute(self, attribute):
@@ -27,95 +27,77 @@ class BaseResponse(dict):
             assert attribute in self['data']['attributes']
             return self['data']['attributes'][attribute]
         except AssertionError:
-            pprint.pprint(self)
+            self.pprint(self)
             raise AttributeError("Attribute '%s' not found in response." % attribute)
 
-    def assertHasRelationship(self, response, relation_type, link):
+    def assertHasRelationship(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
         try:
-            assert 'data' in response
-            assert 'relationships' in response['data']
-            assert relation_type in response['data']['relationships']
-            assert 'links' in response['data']['relationships'][relation_type]
-            assert 'related' in response['data']['relationships'][relation_type]['links']
-            assert link in response['data']['relationships'][relation_type]['links']['related']
+            assert 'data' in self
+            assert 'relationships' in self['data']
+            assert relation_type in self['data']['relationships']
+            assert 'links' in self['data']['relationships'][relation_type]
+            assert 'related' in self['data']['relationships'][relation_type]['links']
+            assert link in self['data']['relationships'][relation_type]['links']['related']
         except AssertionError:
-            pprint.pprint(response)
+            self.pprint()
             raise AttributeError("Link '%s' not found in relationship '%s'" % (link, relation_type))
 
-    def assertHasAttribute(self, response, attribute, value):
+    def assertHasAttribute(self, attribute, value):
         """Assert a response attribute has a specific value
         """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
         try:
-            assert 'data' in response
-            assert 'attributes' in response['data']
-            assert attribute in response['data']['attributes']
-            assert response['data']['attributes'][attribute] == value
+            assert self._get_attribute(attribute) == value
         except AssertionError:
-            pprint.pprint(response)
-            raise
+            self.pprint()
+            raise AttributeError("Attribute '%s' not found in response." % attribute)
 
-    def assertHasIncludeId(self, response, relationships, value):
+    def assertHasIncludeId(self, relationships, value):
         """Assert a response relation has a specific value
         """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
         try:
-            assert 'data' in response
-            assert 'relationships' in response['data']
-            assert relationships in response['data']['relationships']
-            assert 'data' in response['data']['relationships'][relationships]
-            assert response['data']['relationships'][relationships]['data'] is not None
-            assert 'id' in response['data']['relationships'][relationships]['data']
-            assert response['data']['relationships'][relationships]['data']['id'] == str(value)
+            assert 'data' in self
+            assert 'relationships' in self['data']
+            assert relationships in self['data']['relationships']
+            assert 'data' in self['data']['relationships'][relationships]
+            assert self['data']['relationships'][relationships]['data'] is not None
+            assert 'id' in self['data']['relationships'][relationships]['data']
+            assert self['data']['relationships'][relationships]['data']['id'] == str(value)
         except AssertionError:
-            pprint.pprint(response)
-            raise
+            self.pprint()
+            raise AttributeError("Included relationships '%s' not found in response." % relationships)
 
-    def assertHasIncludes(self, response, relationships, value):
+    def assertHasIncludes(self, relationships, value):
         raise Unimplemented("Function assertHasIncludes is not yet implemented")
 
-    def assertCreationDateTime(self, response):
-        self.assertDateTimePresent(response, 'created-on-datetime')
+    def assertCreationDateTime(self):
+        self.assertDateTimePresent('created-on-datetime')
 
-    def assertUpdatedDateTime(self, response):
-        self.assertDateTimePresent(response, 'updated-on-datetime')
+    def assertUpdatedDateTime(self):
+        self.assertDateTimePresent('updated-on-datetime')
 
-    def assertDateTimePresent(self, response, attribute):
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
+    def assertDateTimePresent(self, attribute):
         try:
-            assert 'data' in response
-            assert 'attributes' in response['data']
-            assert attribute in response['data']['attributes']
-            date_time = response['data']['attributes'][attribute]
+            date_time = self._get_attribute(attribute)
             assertIsDateTime(date_time)
         except AssertionError:
-            pprint.pprint(response)
-            raise
+            self.pprint()
+            raise AttributeError("Attribute '%s' was not parsed as a datetime." % attribute)
 
-    def assertRaiseJsonApiError(self, response, pointer):
+    def assertRaiseJsonApiError(self, pointer):
         """Assert an error response has a specific pointer
         """
-        if not isinstance(response, dict):
-            raise TypeError("'response' parameter must be of type dict (%s)" % type(response))
-
         try:
-            assert 'errors' in response
-            for error in response['errors']:
+            assert 'errors' in self
+            for error in self['errors']:
                 assert 'source' in error
                 assert 'pointer' in error['source']
                 if pointer in error['source']['pointer']:
                     return True
         except AssertionError:
-            pprint.pprint(response)
+            self.pprint()
             raise
+
+    def pprint(self):
+        pprint.pprint(self)
