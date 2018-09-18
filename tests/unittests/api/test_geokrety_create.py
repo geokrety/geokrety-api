@@ -13,7 +13,8 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
 from app.api.helpers.db import safe_query
 from app.models.move import Move
 from tests.unittests.utils import assertIsDateTime
-from tests.unittests.utils.base_test_case import BaseTestCase, custom_name_geokrety_type
+from tests.unittests.utils.base_test_case import (BaseTestCase,
+                                                  custom_name_geokrety_type)
 from tests.unittests.utils.payload.geokret import GeokretyPayload
 from tests.unittests.utils.responses.geokret import GeokretResponse
 from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
