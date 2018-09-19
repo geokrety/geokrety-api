@@ -90,6 +90,8 @@ class BaseTestCase(unittest.TestCase):
 
     def blend_move(self, *args, **kwargs):
         with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(Move, **kwargs)
             return mixer.blend(Move, **kwargs)
 
     def blend_users(self, *args, **kwargs):

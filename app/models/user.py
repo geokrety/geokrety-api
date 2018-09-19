@@ -178,15 +178,6 @@ class User(db.Model):
             password.encode('utf-8') + app.config['PASSWORD_HASH_SALT']
         )
 
-    @property
-    def is_super_admin(self):
-        return self.is_admin
-        # return self.id in [1, 26422]x
-
-    # @property
-    # def is_admin(self):
-    #     return self.id in [1, 26422]
-
 
 @event.listens_for(User, 'init')
 def receive_init(target, args, kwargs):

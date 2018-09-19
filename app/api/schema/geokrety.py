@@ -82,7 +82,7 @@ class GeokretSchemaPublic(Schema):
         related_view_kwargs={'geokret_id': '<id>'},
         many=True,
         schema='MoveSchema',
-        type_='moves',
+        type_='move',
         #   include_resource_linkage=True
     )
 
@@ -108,10 +108,7 @@ class GeokretSchemaPublic(Schema):
             .filter(Move.author_id == self.context['current_identity'].id) \
             .filter(Move.move_type_id != MOVE_TYPE_COMMENT)
 
-        print "COUNT: %s" % count.count()
         if count.count():
-            print "LIST: %s" % count
-            print "LIST: %s" % count.one()
             return geokret.tracking_code
 
 

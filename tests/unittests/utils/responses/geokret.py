@@ -47,6 +47,9 @@ class GeokretResponse(BaseResponse):
     def assertHasRelationshipGeokretyTypeData(self, user_id):
         self.assertHasRelationshipData('type', user_id, 'type')
 
+    def assertHasRelationshipMovesData(self, moves_ids):
+        self.assertHasRelationshipDatas('moves', moves_ids, 'move')
+
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
         self.assertHasAttribute('description', obj.description)

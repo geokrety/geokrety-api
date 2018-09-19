@@ -79,7 +79,6 @@ class BaseResponse(dict):
         """
         rel = self._get_relationships(relationships)
         if value is None:
-            print "DEBUG: %s" % rel['data']
             assert rel['data'] is None
         assert rel['data'] is not None
         try:
@@ -87,6 +86,31 @@ class BaseResponse(dict):
             assert rel['data']['id'] == str(value)
             assert 'type' in rel['data']
             assert rel['data']['type'] == type
+        except AssertionError:
+            self.pprint()
+            raise AttributeError("Included relationships '%s' not found in response." % relationships)
+
+    def assertHasRelationshipDatas(self, relationships, values, type):
+        """Assert a response relation has specific values
+        """
+        rel = self._get_relationships(relationships)
+        if values is None:
+            assert rel['data'] is None
+        assert rel['data'] is not None
+
+        str_values = [str(value) for value in values]
+        found_ids = []
+        try:
+            # returned data in expected list
+            for data in rel['data']:
+                assert 'id' in data
+                assert data['id'] in str_values
+                assert 'type' in data
+                assert data['type'] == type
+                found_ids.append(data['id'])
+            # expect to find all expected values in response
+            for value in str_values:
+                assert value in found_ids
         except AssertionError:
             self.pprint()
             raise AttributeError("Included relationships '%s' not found in response." % relationships)

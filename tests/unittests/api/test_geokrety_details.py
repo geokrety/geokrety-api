@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import urllib
+
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 from parameterized import parameterized
 
@@ -27,8 +29,10 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 class TestGeokretDetails(BaseTestCase):
     """Test Geokrety details"""
 
-    def send_get(self, id, include=None, **kwargs):
-        return GeokretResponse(self._send_get("/v1/geokrety/%s?include=moves" % id, **kwargs))
+    def send_get(self, id, args=None, **kwargs):
+        args_ = '' if args is None else urllib.urlencode(args)
+        url = "/v1/geokrety/%s?%s" % (id, args_)
+        return GeokretResponse(self._send_get(url, **kwargs))
 
     # has_normal_attributes
 
@@ -120,13 +124,13 @@ class TestGeokretDetails(BaseTestCase):
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
     def test_has_tracking_code_when_user_has_touched(self, input, expected):
-        # TODO
         with app.test_request_context():
             user_1 = self.blend_user()
             user_2 = self.blend_user()
             geokret = self.blend_geokret(created_on_datetime="2018-09-18T23:37:01")
             self.blend_move(geokret=geokret, author=user_1, move_type_id=input, moved_on_datetime="2018-09-18T23:37:02")
-            self.blend_move(geokret=geokret, author=user_2, move_type_id=MOVE_TYPE_GRABBED, moved_on_datetime="2018-09-18T23:37:03")
+            self.blend_move(geokret=geokret, author=user_2, move_type_id=MOVE_TYPE_GRABBED,
+                            moved_on_datetime="2018-09-18T23:37:03")
             response = self.send_get(geokret.id, user=user_1)
             if expected:
                 response.assertHasTrackingCode(geokret.tracking_code)
@@ -157,14 +161,19 @@ class TestGeokretDetails(BaseTestCase):
     #     # TODO
     #     pass
 
-    def test_has_relationships_last_position_data(self):
-        # TODO
-        pass
+    # def test_has_relationships_last_position_data(self):
+    #     # TODO
+    #     pass
 
-    def test_has_relationships_last_log_data(self):
-        # TODO
-        pass
+    # def test_has_relationships_last_log_data(self):
+    #     # TODO
+    #     pass
 
     def test_has_relationships_moves_data(self):
-        # TODO
-        pass
+        with app.test_request_context():
+            user_1 = self.blend_user()
+            geokret = self.blend_geokret()
+            moves = self.blend_move(count=5, geokret=geokret, author=user_1, move_type_id=MOVE_TYPE_GRABBED)
+            moves_ids = [move.id for move in moves]
+            response = self.send_get(geokret.id, user=user_1, args={'include': 'moves'})
+            response.assertHasRelationshipMovesData(moves_ids)
