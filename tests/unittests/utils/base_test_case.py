@@ -101,6 +101,8 @@ class BaseTestCase(unittest.TestCase):
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(Geokret, **kwargs)
             return mixer.blend(Geokret, **kwargs)
 
     def _login(self, username="kumy", password="password"):
@@ -148,9 +150,9 @@ class BaseTestCase(unittest.TestCase):
 
         with app.test_request_context():
             response = getattr(self.app, method)(endpoint,
-                                                 json=payload,
-                                                 headers=headers,
-                                                 content_type=content_type)
+                                               json=payload,
+                                               headers=headers,
+                                               content_type=content_type)
 
             data = response.get_data(as_text=False)
             if response.content_type in ['application/vnd.api+json', 'application/json'] and data:

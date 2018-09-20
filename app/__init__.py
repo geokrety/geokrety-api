@@ -27,8 +27,6 @@ app = Flask(__name__, static_folder=static_dir, template_folder=template_dir)
 
 env.read_envfile()
 
-app_created = False
-
 
 def create_app():
     app.config.from_object(env('APP_CONFIG', default='config.ProductionConfig'))
@@ -71,7 +69,7 @@ def create_app():
     return app, _manager, db, _jwt
 
 
-current_app, manager, database, jwt = create_app()
+current_app, manager, db, jwt = create_app()
 
 # @app.before_request
 # def track_user():

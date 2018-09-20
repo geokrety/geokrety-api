@@ -8,62 +8,60 @@ from tests.unittests.utils import assertIsDateTime
 class BaseResponse(dict):
 
     def __init__(self, data):
-        self.update(data.get_json())
+        if 'data' in data:
+            self.update(data['data'])
+        else:
+            self.update(data)
 
     @property
     def id(self):
-        assert 'data' in self
-        assert 'id' in self['data']
+        assert 'id' in self
         try:
-            return self['data']['id']
+            return self['id']
         except AssertionError:
             self.pprint()
             raise AttributeError("Object id not found in response.")
 
     def get_attribute(self, attribute):
-        assert 'data' in self
-        assert 'attributes' in self['data']
-        assert attribute in self['data']['attributes']
+        assert 'attributes' in self
+        assert attribute in self['attributes']
         try:
-            return self['data']['attributes'][attribute]
+            return self['attributes'][attribute]
         except AssertionError:
             self.pprint()
             raise AttributeError("Attribute '%s' not found in response." % attribute)
 
     def _get_relationships(self, relationships):
-        assert 'data' in self
-        assert 'relationships' in self['data']
-        assert relationships in self['data']['relationships']
-        return self['data']['relationships'][relationships]
+        assert 'relationships' in self
+        assert relationships in self['relationships']
+        return self['relationships'][relationships]
 
     def assertHasRelationshipRelated(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
-        assert 'data' in self
-        assert 'relationships' in self['data']
-        assert relation_type in self['data']['relationships']
-        assert 'links' in self['data']['relationships'][relation_type]
-        assert 'related' in self['data']['relationships'][relation_type]['links']
+        assert 'relationships' in self
+        assert relation_type in self['relationships']
+        assert 'links' in self['relationships'][relation_type]
+        assert 'related' in self['relationships'][relation_type]['links']
         try:
-            assert link in self['data']['relationships'][relation_type]['links']['related']
+            assert link in self['relationships'][relation_type]['links']['related']
         except AssertionError:
             self.pprint()
-            raise AttributeError("assert '%s' in self['data']['relationships']['%s']['links']['related']" % (link, relation_type))
+            raise AttributeError("assert '%s' in self['relationships']['%s']['links']['related']" % (link, relation_type))
 
     def assertHasRelationshipSelf(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
-        assert 'data' in self
-        assert 'relationships' in self['data']
-        assert relation_type in self['data']['relationships']
-        assert 'links' in self['data']['relationships'][relation_type]
-        assert 'self' in self['data']['relationships'][relation_type]['links']
+        assert 'relationships' in self
+        assert relation_type in self['relationships']
+        assert 'links' in self['relationships'][relation_type]
+        assert 'self' in self['relationships'][relation_type]['links']
         try:
-            assert link in self['data']['relationships'][relation_type]['links']['self']
+            assert link in self['relationships'][relation_type]['links']['self']
         except AssertionError:
             print link
             self.pprint()
-            raise AttributeError("assert %s in self['data']['relationships']['%s']['links']['self']" % (link, relation_type))
+            raise AttributeError("assert %s in self['relationships']['%s']['links']['self']" % (link, relation_type))
 
     def assertHasAttribute(self, attribute, value):
         """Assert a response attribute has a specific value
@@ -88,7 +86,7 @@ class BaseResponse(dict):
             assert rel['data']['type'] == type
         except AssertionError:
             self.pprint()
-            raise AttributeError("Included relationships '%s' not found in response." % relationships)
+            raise AttributeError("Relationships '%s' should be '%s' but was '%s'." % (rel, value, rel['data']))
 
     def assertHasRelationshipDatas(self, relationships, values, type):
         """Assert a response relation has specific values

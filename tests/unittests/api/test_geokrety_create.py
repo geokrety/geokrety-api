@@ -34,7 +34,7 @@ class TestGeokretCreate(BaseTestCase):
             code=code,
             payload=payload,
             user=user,
-            content_type=content_type))
+            content_type=content_type).get_json())
 
     # ## TEST CASES ##
 

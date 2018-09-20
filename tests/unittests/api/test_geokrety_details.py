@@ -32,7 +32,7 @@ class TestGeokretDetails(BaseTestCase):
     def send_get(self, id, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)
         url = "/v1/geokrety/%s?%s" % (id, args_)
-        return GeokretResponse(self._send_get(url, **kwargs))
+        return GeokretResponse(self._send_get(url, **kwargs).get_json())
 
     # has_normal_attributes
 
