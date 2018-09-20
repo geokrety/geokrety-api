@@ -106,15 +106,6 @@ class TestGeokretDetails(BaseTestCase):
             response = self.send_get(geokret.id, user=self.user_1)
             response.assertHasTrackingCode(geokret.tracking_code)
 
-    def test_has_tracking_code_when_user_never_touched(self):
-        # TODO
-        with app.test_request_context():
-            self.blend_users()
-            user_2 = self.blend_user()
-            geokret = self.blend_geokret(owner=self.user_1)
-            response = self.send_get(geokret.id, user=user_2)
-            response.assertHasTrackingCode(None)
-
     @parameterized.expand([
         [MOVE_TYPE_DROPPED, True],
         [MOVE_TYPE_GRABBED, True],
@@ -125,13 +116,12 @@ class TestGeokretDetails(BaseTestCase):
     ], doc_func=custom_name_geokrety_move_type)
     def test_has_tracking_code_when_user_has_touched(self, input, expected):
         with app.test_request_context():
-            user_1 = self.blend_user()
-            user_2 = self.blend_user()
+            self.blend_users()
             geokret = self.blend_geokret(created_on_datetime="2018-09-18T23:37:01")
-            self.blend_move(geokret=geokret, author=user_1, move_type_id=input, moved_on_datetime="2018-09-18T23:37:02")
-            self.blend_move(geokret=geokret, author=user_2, move_type_id=MOVE_TYPE_GRABBED,
+            self.blend_move(geokret=geokret, author=self.user_1, move_type_id=input, moved_on_datetime="2018-09-18T23:37:02")
+            self.blend_move(geokret=geokret, author=self.user_2, move_type_id=MOVE_TYPE_GRABBED,
                             moved_on_datetime="2018-09-18T23:37:03")
-            response = self.send_get(geokret.id, user=user_1)
+            response = self.send_get(geokret.id, user=self.user_1)
             if expected:
                 response.assertHasTrackingCode(geokret.tracking_code)
             else:

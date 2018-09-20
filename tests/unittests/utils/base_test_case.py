@@ -94,10 +94,10 @@ class BaseTestCase(unittest.TestCase):
                 return mixer.cycle(kwargs.get('count')).blend(Move, **kwargs)
             return mixer.blend(Move, **kwargs)
 
-    def blend_users(self, *args, **kwargs):
+    def blend_users(self, count=3, *args, **kwargs):
         self.admin = self.blend_admin(**kwargs)
-        self.user_1 = self.blend_user(**kwargs)
-        self.user_2 = self.blend_user(**kwargs)
+        for i in range(1, count):
+            setattr(self, 'user_{}'.format(i), self.blend_user(**kwargs))
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
