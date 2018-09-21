@@ -127,6 +127,57 @@ class TestGeokretDetails(BaseTestCase):
             else:
                 response.assertHasTrackingCode(None)
 
+    # sparse_fieldset
+
+    def test_sparse_fieldset(self):
+        with app.test_request_context():
+            self.blend_users()
+            geokret = self.blend_geokret(owner=self.user_1)
+            response = self.send_get(geokret.id, args={'fields[geokret]': 'name,description'})
+            response.assertHasAttribute('name', geokret.name)
+            response.assertHasAttribute('description', geokret.description)
+            with self.assertRaises(AssertionError):
+                assert response.get_attribute('missing')
+
+    @parameterized.expand([
+        [None, False],
+        ['admin', True],
+        ['user_1', True],  # Owner
+        ['user_2', False],
+    ])
+    def test_sparse_fieldset_has_tracking_code(self, input, expected):
+        with app.test_request_context():
+            self.blend_users()
+            geokret = self.blend_geokret(owner=self.user_1)
+            response = self.send_get(geokret.id, user=getattr(self, input) if input else None, args={'fields[geokret]': 'tracking_code'})
+            response.pprint()
+            if expected:
+                response.assertHasTrackingCode(geokret.tracking_code)
+            else:
+                response.assertHasTrackingCode(None)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED, True],
+        [MOVE_TYPE_GRABBED, True],
+        [MOVE_TYPE_COMMENT, False],
+        [MOVE_TYPE_SEEN, True],
+        [MOVE_TYPE_ARCHIVED, True],
+        [MOVE_TYPE_DIPPED, True],
+    ], doc_func=custom_name_geokrety_move_type)
+    def test_sparse_fieldset_has_tracking_code_when_user_has_touched(self, input, expected):
+        with app.test_request_context():
+            self.blend_users()
+            geokret = self.blend_geokret(created_on_datetime="2018-09-20T23:15:30")
+            self.blend_move(geokret=geokret, author=self.user_1, move_type_id=input,
+                            moved_on_datetime="2018-09-20T23:15:31")
+            self.blend_move(geokret=geokret, author=self.user_2, move_type_id=MOVE_TYPE_GRABBED,
+                            moved_on_datetime="2018-09-20T23:15:32")
+            response = self.send_get(geokret.id, user=self.user_1, args={'fields[geokret]': 'tracking_code'})
+            if expected:
+                response.assertHasTrackingCode(geokret.tracking_code)
+            else:
+                response.assertHasTrackingCode(None)
+
     # has_relationships
 
     def test_has_relationships_owner_data(self):

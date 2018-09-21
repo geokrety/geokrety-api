@@ -94,28 +94,20 @@ class TestGeokretyCollection(BaseTestCase):
             else:
                 response.data[0].assertHasTrackingCode(None)
 
-    def test_sparse_fieldset(self):
-        with app.test_request_context():
-            self.blend_users()
-            geokret = self.blend_geokret(owner=self.user_1)
-            response = self.send_get(args={'fields[geokret]': 'name,description'})
-            response.data[0].assertHasAttribute('name', geokret.name)
-            response.data[0].assertHasAttribute('description', geokret.description)
-            with self.assertRaises(AssertionError):
-                assert response.data[0].get_attribute('missing')
-
     @parameterized.expand([
         [None, False],
         ['admin', True],
         ['user_1', True],  # Owner
         ['user_2', False],
     ])
-    def test_sparse_fieldset_has_tracking_code(self, user, expected):
+    def test_filter_by_tracking_code_as(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
-            response = self.send_get(user=getattr(self, user) if user else None, args={'fields[geokret]': 'tracking_code'})
-            response.pprint()
+            response = self.send_get(
+                user=getattr(self, input) if input else None,
+                args={'filter': '[{"name":"tracking_code","op":"eq","val":"%s"}]' % (geokret.tracking_code)}
+                )
             if expected:
                 response.data[0].assertHasTrackingCode(geokret.tracking_code)
             else:
@@ -129,32 +121,16 @@ class TestGeokretyCollection(BaseTestCase):
         [MOVE_TYPE_ARCHIVED, True],
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
-    def test_sparse_fieldset_has_tracking_code_when_user_has_touched(self, input, expected):
+    def test_filter_by_tracking_code_user_has_touched(self, input, expected):
         with app.test_request_context():
             self.blend_users()
-            geokret = self.blend_geokret(created_on_datetime="2018-09-20T23:15:30")
+            geokret = self.blend_geokret(author=self.user_2, created_on_datetime="2018-09-21T23:55:20")
             self.blend_move(geokret=geokret, author=self.user_1, move_type_id=input,
-                            moved_on_datetime="2018-09-20T23:15:31")
+                            moved_on_datetime="2018-09-21T23:55:21")
             self.blend_move(geokret=geokret, author=self.user_2, move_type_id=MOVE_TYPE_GRABBED,
-                            moved_on_datetime="2018-09-20T23:15:32")
-            response = self.send_get(user=self.user_1, args={'fields[geokret]': 'tracking_code'})
-            if expected:
-                response.data[0].assertHasTrackingCode(geokret.tracking_code)
-            else:
-                response.data[0].assertHasTrackingCode(None)
-
-    @parameterized.expand([
-        [None, False],
-        ['admin', True],
-        ['user_1', True],  # Owner
-        ['user_2', False],
-    ])
-    def test_filter_by_tracking_code_as(self, user, expected):
-        with app.test_request_context():
-            self.blend_users()
-            geokret = self.blend_geokret(owner=self.user_1)
+                            moved_on_datetime="2018-09-21T23:55:22")
             response = self.send_get(
-                user=getattr(self, user) if user else None,
+                user=self.user_1,
                 args={'filter': '[{"name":"tracking_code","op":"eq","val":"%s"}]' % (geokret.tracking_code)}
                 )
             if expected:
