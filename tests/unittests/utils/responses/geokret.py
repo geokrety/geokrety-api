@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 
 from base import BaseResponse
 
@@ -46,14 +45,6 @@ class GeokretResponse(BaseResponse):
     @property
     def owner(self):
         return self['relationships']['owner']['data']['id']
-
-    @property
-    def created_on_datetime(self):
-        return datetime.strptime(self.get_attribute('created-on-datetime'), '%Y-%m-%dT%H:%M:%S')
-
-    @property
-    def updated_on_datetime(self):
-        return datetime.strptime(self.get_attribute('updated-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
     def assertHasTrackingCode(self, tracking_code):
         self.assertHasAttribute('tracking-code', tracking_code)

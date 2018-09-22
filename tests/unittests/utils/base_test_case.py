@@ -4,6 +4,7 @@ import json
 import pprint
 import unittest
 from datetime import date, datetime
+from functools import wraps
 
 import phpass
 from mixer.backend.flask import mixer
@@ -18,6 +19,7 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
                                          MOVE_TYPES_TEXT)
 from app.models.geokret import Geokret
 from app.models.move import Move
+from app.models.news import News
 from app.models.user import User
 from tests.unittests.setup_database import Setup
 
@@ -67,6 +69,15 @@ def custom_name_geokrety_move_type(testcase_func, param_num, param):
     )
 
 
+def request_context(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with app.test_request_context():
+            args[0].blend_users()
+            return func(*args, **kwargs)
+    return wrapper
+
+
 class BaseTestCase(unittest.TestCase):
 
     @classmethod
@@ -102,6 +113,12 @@ class BaseTestCase(unittest.TestCase):
         self.admin = self.blend_admin(**kwargs)
         for i in range(1, count):
             setattr(self, 'user_{}'.format(i), self.blend_user(**kwargs))
+
+    def blend_news(self, *args, **kwargs):
+        with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(News, **kwargs)
+            return mixer.blend(News, **kwargs)
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
@@ -156,9 +173,9 @@ class BaseTestCase(unittest.TestCase):
             print("URL: {}".format(endpoint))
             pprint.pprint(payload)
             response = getattr(self.app, method)(endpoint,
-                                               json=payload,
-                                               headers=headers,
-                                               content_type=content_type)
+                                                 json=payload,
+                                                 headers=headers,
+                                                 content_type=content_type)
 
             data = response.get_data(as_text=False)
             if response.content_type in ['application/vnd.api+json', 'application/json'] and data:

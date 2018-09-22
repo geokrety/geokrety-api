@@ -34,7 +34,8 @@ class News(db.Model):
         'userid',
         db.Integer,
         db.ForeignKey('gk-users.id'),
-        key='author_id'
+        key='author_id',
+        nullable=False,
     )
     comments_count = db.Column(
         'komentarze',

@@ -1,5 +1,5 @@
 from marshmallow_jsonapi import fields
-from marshmallow_jsonapi.flask import Schema, Relationship
+from marshmallow_jsonapi.flask import Relationship, Schema
 
 from app.api.helpers.utilities import dasherize
 
@@ -28,18 +28,18 @@ class NewsSchema(Schema):
                           self_view='v1.news_author',
                           self_view_kwargs={'id': '<id>'},
                           related_view='v1.user_details',
-                          related_view_kwargs={'id': '<author_id>'},
-                          schema='UserSchema',
+                          related_view_kwargs={'news_author_id': '<id>'},
+                          schema='UserSchemaPublic',
                           type_='user',
-                        #   include_resource_linkage=True
+                          include_resource_linkage=True
                           )
 
     news_comments = Relationship(self_view='v1.news_comments',
-                          self_view_kwargs={'id': '<id>'},
-                          related_view='v1.news_comments_list',
-                          related_view_kwargs={'news_id': '<id>'},
-                          many=True,
-                          schema='NewsCommentSchema',
-                          type_='news-comment',
-                        #   include_resource_linkage=True
-                          )
+                                 self_view_kwargs={'id': '<id>'},
+                                 related_view='v1.news_comments_list',
+                                 related_view_kwargs={'news_id': '<id>'},
+                                 many=True,
+                                 schema='NewsCommentSchema',
+                                 type_='news-comment',
+                                 #   include_resource_linkage=True
+                                 )

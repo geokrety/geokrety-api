@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pprint
+from datetime import datetime
 
 from tests.unittests.utils import assertIsDateTime
 
@@ -21,6 +22,14 @@ class BaseResponse(dict):
         except AssertionError:
             self.pprint()
             raise AttributeError("Object id not found in response.")
+
+    @property
+    def created_on_datetime(self):
+        return datetime.strptime(self.get_attribute('created-on-datetime'), '%Y-%m-%dT%H:%M:%S')
+
+    @property
+    def updated_on_datetime(self):
+        return datetime.strptime(self.get_attribute('updated-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
     def get_attribute(self, attribute):
         assert 'attributes' in self
@@ -47,7 +56,8 @@ class BaseResponse(dict):
             assert link in self['relationships'][relation_type]['links']['related']
         except AssertionError:
             self.pprint()
-            raise AttributeError("assert '%s' in self['relationships']['%s']['links']['related']" % (link, relation_type))
+            raise AttributeError(
+                "assert '%s' in self['relationships']['%s']['links']['related']" % (link, relation_type))
 
     def assertHasRelationshipSelf(self, relation_type, link):
         """Assert an error response has a specific pointer
@@ -70,7 +80,8 @@ class BaseResponse(dict):
             assert self.get_attribute(attribute) == value
         except AssertionError:
             self.pprint()
-            raise AttributeError("Attribute value '%s' not the expected one (%s)." % (self.get_attribute(attribute), value))
+            raise AttributeError("Attribute value '%s' not the expected one (%s)." %
+                                 (self.get_attribute(attribute), value))
 
     def assertHasRelationshipData(self, relationships, value, type):
         """Assert a response relation has a specific value
@@ -86,7 +97,8 @@ class BaseResponse(dict):
             assert rel['data']['type'] == type
         except AssertionError:
             self.pprint()
-            raise AttributeError("Relationships '%s' should be '%s' but was '%s'." % (relationships, value, rel['data']['id']))
+            raise AttributeError("Relationships '%s' should be '%s' but was '%s'." %
+                                 (relationships, value, rel['data']['id']))
 
     def assertHasRelationshipDatas(self, relationships, values, type):
         """Assert a response relation has specific values
@@ -112,7 +124,8 @@ class BaseResponse(dict):
                 assert value in found_ids
         except AssertionError:
             self.pprint()
-            raise AttributeError("Included relationships '%s' not found in response, expected %s, found %s." % (relationships, str_values, rel['data']))
+            raise AttributeError("Included relationships '%s' not found in response, expected %s, found %s." % (
+                relationships, str_values, rel['data']))
 
     def assertHasIncludes(self, relationships, value):
         raise Unimplemented("Function assertHasIncludes is not yet implemented")

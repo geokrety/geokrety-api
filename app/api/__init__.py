@@ -15,7 +15,7 @@ from app.api.users import UserDetail, UserList, UserRelationship
 api.route(UserList, 'users_list', '/users')
 api.route(UserDetail, 'user_details',
           '/users/<int:id>',
-          '/news/<int:news_id>/author',
+          '/news/<int:news_author_id>/author',
           '/news-comments/<int:newscomment_id>/author',
           '/geokrety/<int:geokret_owned_id>/owner',
           '/geokrety/<int:geokret_held_id>/holder',
