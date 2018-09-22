@@ -21,12 +21,11 @@ class TestGeokretyCollection(BaseTestCase):
     def send_get(self, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)
         url = "/v1/geokrety?%s" % (args_)
-        print "URL: {}".format(url)
         return GeokretCollectionResponse(self._send_get(url, **kwargs).get_json())
 
     # has_normal_attributes
 
-    def test_get_collection_as_anonymous(self):
+    def test_geokret_collection_get_as_anonymous(self):
         with app.test_request_context():
             self.blend_users()
             geokrety = self.blend_geokret(owner=self.user_1, count=5)
@@ -37,7 +36,7 @@ class TestGeokretyCollection(BaseTestCase):
                 geokret_response.assertHasTrackingCode(None)
                 i = i + 1
 
-    def test_get_collection_as_administrator(self):
+    def test_geokret_collection_as_administrator(self):
         with app.test_request_context():
             self.blend_users()
             geokrety = self.blend_geokret(owner=self.user_1, count=5)
@@ -48,7 +47,7 @@ class TestGeokretyCollection(BaseTestCase):
                 geokret_response.assertHasTrackingCode(geokrety[i].tracking_code)
                 i = i + 1
 
-    def test_get_collection_as_authenticated(self):
+    def test_geokret_collection_as_authenticated(self):
         with app.test_request_context():
             self.blend_users()
             geokrety = self.blend_geokret(owner=self.user_1, count=5)
@@ -59,7 +58,7 @@ class TestGeokretyCollection(BaseTestCase):
                 geokret_response.assertHasTrackingCode(None)
                 i = i + 1
 
-    def test_get_collection_as_owner(self):
+    def test_geokret_collection_as_owner(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_2)
@@ -79,7 +78,7 @@ class TestGeokretyCollection(BaseTestCase):
         [MOVE_TYPE_ARCHIVED, True],
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
-    def test_has_tracking_code_when_user_has_touched(self, input, expected):
+    def test_geokret_collection_has_tracking_code_when_user_has_touched(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(created_on_datetime="2018-09-20T23:15:30")
@@ -99,7 +98,7 @@ class TestGeokretyCollection(BaseTestCase):
         ['user_1', True],  # Owner
         ['user_2', False],
     ])
-    def test_filter_by_tracking_code_as(self, input, expected):
+    def test_geokret_collection_filter_by_tracking_code_as(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
@@ -120,7 +119,7 @@ class TestGeokretyCollection(BaseTestCase):
         [MOVE_TYPE_ARCHIVED, True],
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
-    def test_filter_by_tracking_code_user_has_touched(self, input, expected):
+    def test_geokret_collection_filter_by_tracking_code_user_has_touched(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(author=self.user_2, created_on_datetime="2018-09-21T23:55:20")

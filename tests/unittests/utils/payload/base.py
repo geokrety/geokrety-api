@@ -22,6 +22,10 @@ class BasePayload(dict):
         })
         self.blend()
 
+    def set_id(self, value):
+        self['data']['id'] = str(value)
+        return self
+
     def _set_attribute(self, name, value):
         if 'attributes' not in self['data']:
             self['data']['attributes'] = {}
@@ -31,18 +35,33 @@ class BasePayload(dict):
         self['data']['attributes'][name] = value
         return self
 
-    def _set_relationship(self, relationship, name, id):
+    def _set_relationships(self, relationships, name, id):
         if 'relationships' not in self['data']:
             self['data']['relationships'] = {}
-        if relationship not in self['data']['relationships']:
-            self['data']['relationships'][relationship] = {}
+        if relationships not in self['data']['relationships']:
+            self['data']['relationships'][relationships] = {}
 
-        self['data']['relationships'][relationship].update({
+        self['data']['relationships'][relationships].update({
             'data': {
                 'type': name,
                 'id': id,
             }
         })
+        return self
+
+    def _set_relationships_many(self, relationships, name, ids):
+        if 'relationships' not in self['data']:
+            self['data']['relationships'] = {}
+        if relationships not in self['data']['relationships']:
+            self['data']['relationships'][relationships] = {}
+
+        datas = []
+        for id in ids:
+            datas.append({
+                'type': name,
+                'id': id,
+            })
+        self['data']['relationships'][relationships]['data'] = datas
         return self
 
     def blend(self):

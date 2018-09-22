@@ -12,8 +12,40 @@ class GeokretResponse(BaseResponse):
         return self.get_attribute('name')
 
     @property
+    def description(self):
+        return self.get_attribute('description')
+
+    @property
     def holder(self):
         return self.get_attribute('holder')
+
+    @property
+    def missing(self):
+        return self.get_attribute('missing')
+
+    @property
+    def distance(self):
+        return self.get_attribute('distance')
+
+    @property
+    def caches_count(self):
+        return self.get_attribute('caches-count')
+
+    @property
+    def pictures_count(self):
+        return self.get_attribute('pictures-count')
+
+    @property
+    def average_rating(self):
+        return self.get_attribute('average-rating')
+
+    @property
+    def type(self):
+        return self['relationships']['type']['data']['id']
+
+    @property
+    def owner(self):
+        return self['relationships']['owner']['data']['id']
 
     @property
     def created_on_datetime(self):

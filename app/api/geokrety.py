@@ -9,6 +9,7 @@ from flask_rest_jsonapi.exceptions import ObjectNotFound
 from app.api.bootstrap import api
 from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
 from app.api.helpers.db import safe_query
+from app.api.helpers.permission_manager import has_access
 from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
@@ -95,6 +96,13 @@ class GeokretList(ResourceList):
 
 
 class GeokretDetail(ResourceDetail):
+    def before_patch(self, args, kwargs, data=None):
+        data.pop('holder', None)
+        data.pop('moves', None)
+
+        if not has_access('is_admin'):
+            data.pop('owner', None)
+
     decorators = (
         api.has_permission('is_geokret_owner', methods="PATCH,DELETE",
                            fetch="id", fetch_as="geokret_id",

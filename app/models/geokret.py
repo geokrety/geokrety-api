@@ -83,8 +83,8 @@ class Geokret(db.Model):
         'timestamp',
         db.TIMESTAMP(timezone=True),
         key='updated_on_datetime',
-        default=datetime.datetime.now,
-        onupdate=datetime.datetime.now,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
     )
     owner_id = db.Column(
         'owner',
@@ -165,4 +165,3 @@ class Geokret(db.Model):
 @event.listens_for(Geokret, 'init')
 def receive_init(target, args, kwargs):
     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
-    target.created_on_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

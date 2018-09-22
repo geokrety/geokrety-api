@@ -36,7 +36,7 @@ class TestGeokretDetails(BaseTestCase):
 
     # has_normal_attributes
 
-    def test_has_normal_attributes_as_anonymous_user(self):
+    def test_geokret_details_has_normal_attributes_as_anonymous_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
@@ -47,7 +47,7 @@ class TestGeokretDetails(BaseTestCase):
             with self.assertRaises(AssertionError):
                 response.assertHasRelationshipHolderData(geokret.holder_id)
 
-    def test_has_normal_attributes_as_authenticated_user(self):
+    def test_geokret_details_has_normal_attributes_as_authenticated_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
@@ -58,7 +58,7 @@ class TestGeokretDetails(BaseTestCase):
             with self.assertRaises(AssertionError):
                 response.assertHasRelationshipHolderData(geokret.holder_id)
 
-    def test_has_normal_attributes_as_admin_user(self):
+    def test_geokret_details_has_normal_attributes_as_admin_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
@@ -71,35 +71,35 @@ class TestGeokretDetails(BaseTestCase):
 
     # has_tracking_code
 
-    def test_has_tracking_code_as_anonymous_user(self):
+    def test_geokret_details_has_tracking_code_as_anonymous_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret()
             response = self.send_get(geokret.id, user=None)
             response.assertHasTrackingCode(None)
 
-    def test_has_tracking_code_as_authenticated_user(self):
+    def test_geokret_details_has_tracking_code_as_authenticated_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.admin)
             response = self.send_get(geokret.id, user=self.user_1)
             response.assertHasTrackingCode(None)
 
-    def test_has_tracking_code_as_admin_user(self):
+    def test_geokret_details_has_tracking_code_as_admin_user(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
             response = self.send_get(geokret.id, user=self.admin)
             response.assertHasTrackingCode(geokret.tracking_code)
 
-    def test_has_tracking_code_as_owner(self):
+    def test_geokret_details_has_tracking_code_as_owner(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
             response = self.send_get(geokret.id, user=self.user_1)
             response.assertHasTrackingCode(geokret.tracking_code)
 
-    def test_has_tracking_code_as_holder(self):
+    def test_geokret_details_has_tracking_code_as_holder(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(holder=self.user_1)
@@ -114,7 +114,7 @@ class TestGeokretDetails(BaseTestCase):
         [MOVE_TYPE_ARCHIVED, True],
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
-    def test_has_tracking_code_when_user_has_touched(self, input, expected):
+    def test_geokret_details_has_tracking_code_when_user_has_touched(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(created_on_datetime="2018-09-18T23:37:01")
@@ -129,7 +129,7 @@ class TestGeokretDetails(BaseTestCase):
 
     # sparse_fieldset
 
-    def test_sparse_fieldset(self):
+    def test_geokret_details_sparse_fieldset(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
@@ -145,7 +145,7 @@ class TestGeokretDetails(BaseTestCase):
         ['user_1', True],  # Owner
         ['user_2', False],
     ])
-    def test_sparse_fieldset_has_tracking_code(self, input, expected):
+    def test_geokret_details_sparse_fieldset_has_tracking_code(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
@@ -164,7 +164,7 @@ class TestGeokretDetails(BaseTestCase):
         [MOVE_TYPE_ARCHIVED, True],
         [MOVE_TYPE_DIPPED, True],
     ], doc_func=custom_name_geokrety_move_type)
-    def test_sparse_fieldset_has_tracking_code_when_user_has_touched(self, input, expected):
+    def test_geokret_details_sparse_fieldset_has_tracking_code_when_user_has_touched(self, input, expected):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(created_on_datetime="2018-09-20T23:15:30")
@@ -180,37 +180,37 @@ class TestGeokretDetails(BaseTestCase):
 
     # has_relationships
 
-    def test_has_relationships_owner_data(self):
+    def test_geokret_details_has_relationships_owner_data(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(owner=self.user_1)
             response = self.send_get(geokret.id, user=None)
             response.assertHasRelationshipOwnerData(geokret.owner_id)
 
-    def test_has_relationships_holder_data(self):
+    def test_geokret_details_has_relationships_holder_data(self):
         with app.test_request_context():
             self.blend_users()
             geokret = self.blend_geokret(holder=self.user_2)
             response = self.send_get(geokret.id, user=None)
             response.assertHasRelationshipHolderData(geokret.holder_id)
 
-    # def test_has_relationships_avatar_data(self):
+    # def test_geokret_details_has_relationships_avatar_data(self):
     #     # TODO
     #     pass
 
-    # def test_has_relationships_all_pictures_data(self):
+    # def test_geokret_details_has_relationships_all_pictures_data(self):
     #     # TODO
     #     pass
 
-    # def test_has_relationships_last_position_data(self):
+    # def test_geokret_details_has_relationships_last_position_data(self):
     #     # TODO
     #     pass
 
-    # def test_has_relationships_last_log_data(self):
+    # def test_geokret_details_has_relationships_last_log_data(self):
     #     # TODO
     #     pass
 
-    def test_has_relationships_moves_data(self):
+    def test_geokret_details_has_relationships_moves_data(self):
         with app.test_request_context():
             user_1 = self.blend_user()
             geokret = self.blend_geokret()

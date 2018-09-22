@@ -45,10 +45,14 @@ def json_serial(obj):  # pragma: no cover
 
 def custom_name_geokrety_type(testcase_func, param_num, param):
     id = unicode(param.args[0])
+    id2 = ''
+    if 1 in param.args:
+        id2 = '_%s' % unicode(param.args[1])
     name = GEOKRET_TYPES_TEXT[id] if id in GEOKRET_TYPES_TEXT else id
-    return u"%s_%s (%s)" % (
+    return u"%s_%s%s (%s)" % (
         testcase_func.__name__,
         parameterized.to_safe_name(name),
+        parameterized.to_safe_name(id2),
         testcase_func.__name__,
     )
 

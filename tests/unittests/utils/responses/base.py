@@ -86,7 +86,7 @@ class BaseResponse(dict):
             assert rel['data']['type'] == type
         except AssertionError:
             self.pprint()
-            raise AttributeError("Relationships '%s' should be '%s' but was '%s'." % (rel, value, rel['data']))
+            raise AttributeError("Relationships '%s' should be '%s' but was '%s'." % (relationships, value, rel['data']['id']))
 
     def assertHasRelationshipDatas(self, relationships, values, type):
         """Assert a response relation has specific values
@@ -94,6 +94,7 @@ class BaseResponse(dict):
         rel = self._get_relationships(relationships)
         if values is None:
             assert rel['data'] is None
+        print rel
         assert rel['data'] is not None
 
         str_values = [str(value) for value in values]
@@ -111,7 +112,7 @@ class BaseResponse(dict):
                 assert value in found_ids
         except AssertionError:
             self.pprint()
-            raise AttributeError("Included relationships '%s' not found in response." % relationships)
+            raise AttributeError("Included relationships '%s' not found in response, expected %s, found %s." % (relationships, str_values, rel['data']))
 
     def assertHasIncludes(self, relationships, value):
         raise Unimplemented("Function assertHasIncludes is not yet implemented")

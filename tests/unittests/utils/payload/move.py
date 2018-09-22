@@ -55,7 +55,7 @@ class MovePayload(BasePayload):
         if type(user) is not User:
             raise TypeError("'user' parameter must be of type User (%s)" % type(user))
 
-        self._set_relationship('author', 'user', user.id)
+        self._set_relationships('author', 'user', user.id)
         return self
 
     def set_moved_date_time(self, date_time=None):
