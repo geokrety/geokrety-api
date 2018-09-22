@@ -6,6 +6,7 @@ import htmlentities
 # import bleach
 from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_COMMENT
 from app.api.helpers.exceptions import UnprocessableEntity
+from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
 from app.models.move import Move
 
@@ -91,24 +92,14 @@ class GeokretSchemaPublic(Schema):
     def tracking_code_or_none(self, geokret):
         """Add the tracking_code only if user has already touched the GK
         """
-        if not self.context['current_identity']:
+
+        # Is authenticated?
+        if not has_access('auth_required'):
             return None
 
-        # Is holder?
-        if geokret.holder_id == self.context['current_identity'].id:
-            return geokret.tracking_code
-
-        # Is owner?
-        if geokret.owner_id == self.context['current_identity'].id:
-            return geokret.tracking_code
-
-        # Is GeoKret already seen?
-        count = Move.query \
-            .filter(Move.geokret_id == geokret.id) \
-            .filter(Move.author_id == self.context['current_identity'].id) \
-            .filter(Move.move_type_id != MOVE_TYPE_COMMENT)
-
-        if count.count():
+        if has_access('is_geokret_holder', geokret_id=geokret.id) or \
+                has_access('is_geokret_owner', geokret_id=geokret.id) or \
+                has_access('has_touched_geokret', geokret_id=geokret.id):
             return geokret.tracking_code
 
 

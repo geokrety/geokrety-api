@@ -1,10 +1,13 @@
-from app.api.helpers.errors import ForbiddenError, NotFoundError
+from flask import request
+from flask_jwt import current_identity
+from flask_rest_jsonapi.exceptions import ObjectNotFound
+from sqlalchemy.orm.exc import NoResultFound
+
+from app.api.helpers.data_layers import MOVE_TYPE_COMMENT
+from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permissions import jwt_required
 from app.models.geokret import Geokret
 from app.models.move import Move
-from flask import request
-from flask_jwt import current_identity
-from sqlalchemy.orm.exc import NoResultFound
 
 
 @jwt_required
@@ -16,7 +19,7 @@ def auth_required(view, view_args, view_kwargs, *args, **kwargs):
 def is_admin(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
     if not user.is_admin:
-        return ForbiddenError({'source': ''}, 'Admin access is required').respond()
+        raise ForbiddenException({'source': ''}, 'Admin access is required')
 
     return view(*view_args, **view_kwargs)
 
@@ -29,7 +32,7 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
     """
     user = current_identity
     if not user.is_admin and user.id != kwargs['user_id']:
-        return ForbiddenError({'source': ''}, 'Access Forbidden').respond()
+        raise ForbiddenException({'source': ''}, 'Access Forbidden')
     return view(*view_args, **view_kwargs)
 
 
@@ -45,16 +48,16 @@ def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
     try:
         move = Move.query.filter(Move.id == kwargs['move_id']).one()
     except NoResultFound:
-        return NotFoundError({'parameter': 'id'}, 'Move not found.').respond()
+        raise ObjectNotFound({'parameter': 'id'}, 'Move not found.')
 
     if move.author_id == user.id:
         return view(*view_args, **view_kwargs)
 
-    return ForbiddenError({'source': ''}, 'Access denied.').respond()
+    raise ForbiddenException({'source': ''}, 'Access denied.')
 
 
 @jwt_required
-def is_owner(view, view_args, view_kwargs, *args, **kwargs):
+def is_geokret_owner(view, view_args, view_kwargs, *args, **kwargs):
     """
     Allows GeoKret owner access to private resources of owned GeoKrety.
     Otherwise the user can only access public resource.
@@ -66,20 +69,59 @@ def is_owner(view, view_args, view_kwargs, *args, **kwargs):
     try:
         geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
     except NoResultFound:
-        return NotFoundError({'parameter': 'geokret_id'}, 'Geokret not found.').respond()
+        raise ObjectNotFound({'parameter': 'geokret_id'}, 'Geokret not found.')
 
     if geokret.owner_id == user.id:
         return view(*view_args, **view_kwargs)
 
-    return ForbiddenError({'source': ''}, 'Access denied.').respond()
+    raise ForbiddenException({'source': ''}, 'Access denied.')
+
+
+@jwt_required
+def is_geokret_holder(view, view_args, view_kwargs, *args, **kwargs):
+    user = current_identity
+    if user.is_admin:
+        return view(*view_args, **view_kwargs)
+
+    try:
+        geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
+    except NoResultFound:
+        raise ObjectNotFound({'parameter': 'geokret_id'}, 'Geokret not found.')
+
+    if geokret.holder_id == current_identity.id:
+        return True
+
+    raise ForbiddenException({'source': ''}, 'Not the GeoKret holder.')
+
+
+@jwt_required
+def has_touched_geokret(view, view_args, view_kwargs, *args, **kwargs):
+    user = current_identity
+    if user.is_admin:
+        return view(*view_args, **view_kwargs)
+
+    try:
+        geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
+    except NoResultFound:
+        raise ObjectNotFound({'parameter': 'geokret_id'}, 'Geokret not found.')
+
+    if Move.query \
+            .filter(Move.geokret_id == geokret.id) \
+            .filter(Move.author_id == user.id) \
+            .filter(Move.move_type_id != MOVE_TYPE_COMMENT).count() > 0:
+        return True
+
+    raise ForbiddenException({'source': ''}, 'Has never touched the GeoKret.')
 
 
 permissions = {
     'is_admin': is_admin,
     'is_user_itself': is_user_itself,
     'auth_required': auth_required,
-    'is_owner': is_owner,
+    'is_geokret_owner': is_geokret_owner,
+    'is_geokret_holder': is_geokret_holder,
     'is_move_author': is_move_author,
+    'has_touched_geokret': has_touched_geokret,
 }
 
 
@@ -109,19 +151,19 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):  # pragma
         methods = kwargs['methods']
 
     if request.method not in methods:
-        return view(*view_args, **view_kwargs)
+        return
 
     # leave_if checks if we have to bypass this request on the basis of lambda function
     if 'leave_if' in kwargs:
         check = kwargs['leave_if']
         if check(view_kwargs):
-            return view(*view_args, **view_kwargs)
+            return
 
     # A check to ensure it is good to go ahead and check permissions
     if 'check' in kwargs:
         check = kwargs['check']
         if not check(view_kwargs):
-            return ForbiddenError({'source': ''}, 'Access forbidden').respond()
+            raise ForbiddenException({'source': ''}, 'Access forbidden')
 
     if 'fetch' in kwargs:
         fetched = None
@@ -169,7 +211,7 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):  # pragma
                     break
 
             if not found:
-                return NotFoundError({'source': ''}, 'Object not found.').respond()
+                raise ObjectNotFound({'source': ''}, 'Object not found.')
 
             fetched = None
             if is_multiple(fetch):
@@ -184,12 +226,12 @@ def permission_manager(view, view_args, view_kwargs, *args, **kwargs):  # pragma
         if fetched:
             kwargs[kwargs['fetch_as']] = fetched
         else:
-            return NotFoundError({'source': ''}, 'Object not found.').respond()
+            raise ObjectNotFound({'source': ''}, 'Object not found.')
 
     if args[0] in permissions:
-        return permissions[args[0]](view, view_args, view_kwargs, *args, **kwargs)
+        permissions[args[0]](view, view_args, view_kwargs, *args, **kwargs)
     else:
-        return ForbiddenError({'source': ''}, 'Access forbidden').respond()
+        raise ForbiddenException({'source': ''}, 'Access forbidden')
 
 
 def has_access(access_level, **kwargs):
@@ -200,9 +242,9 @@ def has_access(access_level, **kwargs):
     :param dict kwargs: This is directly passed to permission manager
     :return: bool: True if passes the access else False
     """
-    if access_level in permissions:
-        auth = permissions[access_level](
-            lambda *a, **b: True, (), {}, (), **kwargs)
-        if isinstance(auth, bool) and auth is True:
-            return True
-    return False
+    try:
+        if access_level in permissions:
+            permissions[access_level](lambda *a, **b: True, (), {}, (), **kwargs)
+    except Exception:
+        return False
+    return True

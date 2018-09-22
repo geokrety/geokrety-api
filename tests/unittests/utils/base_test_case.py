@@ -149,6 +149,8 @@ class BaseTestCase(unittest.TestCase):
                 'JWT %s' % self._login(user.name, user.password)
 
         with app.test_request_context():
+            print("URL: {}".format(endpoint))
+            pprint.pprint(payload)
             response = getattr(self.app, method)(endpoint,
                                                json=payload,
                                                headers=headers,

@@ -11,7 +11,6 @@ from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPES_TEXT)
 from tests.unittests.utils.base_test_case import (BaseTestCase,
                                                   custom_name_geokrety_move_type)
-from tests.unittests.utils.payload.geokret import GeokretyPayload
 from tests.unittests.utils.responses.collections import \
     GeokretCollectionResponse
 

@@ -9,9 +9,7 @@ from flask_rest_jsonapi.exceptions import ObjectNotFound
 from app.api.bootstrap import api
 from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
 from app.api.helpers.db import safe_query
-from app.api.helpers.permission_manager import has_access
-from app.api.schema.geokrety import (GeokretSchema, GeokretSchemaCreate,
-                                     GeokretSchemaPublic)
+from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
@@ -43,26 +41,11 @@ class GeokretList(ResourceList):
 
         return query_
 
-    def before_marshmallow(self, args, kwargs):
-        if current_identity:
-            # Is admin?
-            if has_access('is_admin', user_id=current_identity.id):
-                self.schema = GeokretSchema
-
-            # List owned GeoKret
-            if kwargs.get('owner_id') is not None and kwargs.get('owner_id') == current_identity.id:
-                self.schema = GeokretSchema
-
-            # List held GeoKret
-            if kwargs.get('holder_id') is not None and kwargs.get('holder_id') == current_identity.id:
-                self.schema = GeokretSchema
-
     def post(self, *args, **kwargs):
         self.schema = GeokretSchemaCreate
         return super(GeokretList, self).post(args, kwargs)
 
     def before_post(self, args, kwargs, data=None):
-
         # Enforce owner to current user
         if not current_identity.is_admin or 'owner' not in data:
             data['owner'] = current_identity.id
@@ -97,7 +80,6 @@ class GeokretList(ResourceList):
                 db.session.commit()
         return geokret
 
-    current_identity = current_identity
     schema = GeokretSchemaPublic
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
     decorators = (
@@ -113,23 +95,8 @@ class GeokretList(ResourceList):
 
 
 class GeokretDetail(ResourceDetail):
-
-    def before_marshmallow(self, args, kwargs):
-        if current_identity:
-            # Is admin?
-            if has_access('is_admin', user_id=current_identity.id):
-                self.schema = GeokretSchema
-
-            if kwargs.get('id') is not None:
-                geokret = safe_query(self, Geokret, 'id', kwargs['id'], 'id')
-
-                # Is GeoKret owner?
-                if geokret.owner_id == current_identity.id:
-                    self.schema = GeokretSchema
-
-    current_identity = current_identity
     decorators = (
-        api.has_permission('is_owner', methods="PATCH,DELETE",
+        api.has_permission('is_geokret_owner', methods="PATCH,DELETE",
                            fetch="id", fetch_as="geokret_id",
                            model=Geokret, fetch_key_url="id"),
     )

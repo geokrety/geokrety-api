@@ -85,7 +85,7 @@ class MovesList(ResourceList):
             if not current_identity:
                 _jwt_required(app.config['JWT_DEFAULT_REALM'])
 
-            if has_access('is_admin', user_id=current_identity.id):
+            if has_access('is_admin'):
                 return
 
             if geokret.owner_id != current_identity.id:

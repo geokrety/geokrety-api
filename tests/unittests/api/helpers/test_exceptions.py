@@ -1,5 +1,7 @@
+from app.api.helpers.exceptions import (AuthenticationRequired,
+                                        ConflictException, ForbiddenException,
+                                        MethodNotAllowed, UnprocessableEntity)
 from tests.unittests.utils.base_test_case import BaseTestCase
-from app.api.helpers.exceptions import UnprocessableEntity, ConflictException, ForbiddenException, MethodNotAllowed
 
 
 class TestExceptionsHelperValidation(BaseTestCase):
@@ -14,6 +16,10 @@ class TestExceptionsHelperValidation(BaseTestCase):
         # Conflict Exception
         with self.assertRaises(ConflictException):
             raise ConflictException({'pointer': '/data/attributes/email'}, "Email already exists")
+
+        # Authentication Required Exception
+        with self.assertRaises(AuthenticationRequired):
+            raise AuthenticationRequired({'source': ''}, "Authentication Required")
 
         # Forbidden Exception
         with self.assertRaises(ForbiddenException):

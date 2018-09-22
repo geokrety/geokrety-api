@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import pprint
+
 
 class BasePayload(dict):
 
@@ -48,3 +50,6 @@ class BasePayload(dict):
 
     def set_obj(self, obj):
         raise NotImplementedError("`set_obj` is not implemented")
+
+    def pprint(self):
+        pprint.pprint(self)

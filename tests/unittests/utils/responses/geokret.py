@@ -8,6 +8,10 @@ from base import BaseResponse
 class GeokretResponse(BaseResponse):
 
     @property
+    def name(self):
+        return self.get_attribute('name')
+
+    @property
     def holder(self):
         return self.get_attribute('holder')
 
