@@ -1,3 +1,7 @@
+from flask_jwt import current_identity
+from flask_rest_jsonapi import (ResourceDetail, ResourceList,
+                                ResourceRelationship)
+
 from app.api.bootstrap import api
 from app.api.helpers.db import safe_query
 from app.api.schema.news import NewsSchema
@@ -5,8 +9,6 @@ from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.user import User
-from flask_rest_jsonapi import (ResourceDetail, ResourceList,
-                                ResourceRelationship)
 
 
 class NewsList(ResourceList):
@@ -21,7 +23,17 @@ class NewsList(ResourceList):
 
         return query_
 
+    def before_post(self, args, kwargs, data=None):
+        # Enforce author to current user
+        if 'author' not in data or not data['author']:
+            data['author'] = current_identity.id
+
+        # Enforce username to current user if undefined
+        if 'username' not in data or not data['username']:
+            data['username'] = current_identity.name
+
     schema = NewsSchema
+    get_schema_kwargs = {'context': {'current_identity': current_identity}}
     decorators = (
         api.has_permission('is_admin', methods="POST"),
     )
@@ -45,6 +57,15 @@ class NewsDetail(ResourceDetail):
         if view_kwargs.get('newscomment_id') is not None:
             newscomment = safe_query(self, NewsComment, 'id', view_kwargs['newscomment_id'], 'newscomment_id')
             view_kwargs['id'] = newscomment.news_id
+
+    def before_patch(self, args, kwargs, data=None):
+        # Enforce author to current user
+        if 'author' not in data or not data['author']:
+            data['author'] = current_identity.id
+
+        # Enforce username to current user if undefined
+        if 'username' not in data or not data['username']:
+            data['username'] = current_identity.name
 
     decorators = (
         api.has_permission('is_admin', methods="PATCH,DELETE",

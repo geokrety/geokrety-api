@@ -1,11 +1,27 @@
+from marshmallow import validates
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
+import htmlentities
+from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.utilities import dasherize
 
 
 # Create logical data abstraction
 class NewsSchema(Schema):
+
+    @validates('title')
+    def validate_title_blank(self, data):
+        data = htmlentities.decode(data).replace('\x00', '').strip()
+        if not data:
+            raise UnprocessableEntity("News title cannot be blank", {'pointer': '/data/attributes/title'})
+
+    @validates('content')
+    def validate_content_blank(self, data):
+        data = htmlentities.decode(data).replace('\x00', '').strip()
+        if not data:
+            raise UnprocessableEntity("News content cannot be blank", {'pointer': '/data/attributes/content'})
+
     class Meta:
         type_ = 'news'
         self_view = 'v1.news_details'

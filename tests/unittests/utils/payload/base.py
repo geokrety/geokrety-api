@@ -9,6 +9,7 @@ class BasePayload(dict):
         'geokret',
         'move',
         'user',
+        'news',
     ]
 
     def __init__(self, type):

@@ -45,6 +45,23 @@ HTML_SUBSET_TEST_CASES = [
     [u' some&nbsp;word ', u'some word'],
 ]
 
+HTML_SUBSET_TEST_CASES_NO_BLANK = [
+    ['<a></a>', '<a></a>'],
+    ['<a>', '<a></a>'],
+    ['<a href="">link</a>'],
+    ['<a something="">link</a>', '<a>link</a>'],
+    ['<div>sad</a>', 'sad'],
+    ['<div><!--sad--></a>', ''],
+    ['<div></div>', ''],
+    ['<b>bold</b>'],
+    ['&lt;', '<'],
+    ['some&nbsp;word', u'some word'],
+    # strip spaces
+    [' <a></a> ', '<a></a>'],
+    [' <a>something</a> ', '<a>something</a>'],
+    [u' some&nbsp;word ', u'some word'],
+]
+
 NO_HTML_TEST_CASES = [
     ['<a>link</a>', 'link'],
     ['<a>link', 'link'],

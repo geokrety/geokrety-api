@@ -46,10 +46,10 @@ def json_serial(obj):  # pragma: no cover
 
 
 def custom_name_geokrety_type(testcase_func, param_num, param):
-    id = unicode(param.args[0])
-    id2 = ''
+    id = id2 = ''
     if 1 in param.args:
-        id2 = '_%s' % unicode(param.args[1])
+        id = unicode(param.args[1])
+        id2 = '_%s' % unicode(param.args[0])
     name = GEOKRET_TYPES_TEXT[id] if id in GEOKRET_TYPES_TEXT else id
     return u"%s_%s%s (%s)" % (
         testcase_func.__name__,
@@ -171,7 +171,7 @@ class BaseTestCase(unittest.TestCase):
 
         with app.test_request_context():
             print("URL: {}".format(endpoint))
-            pprint.pprint(payload)
+            print("PAYLOAD: {}".format(pprint.pformat(payload)))
             response = getattr(self.app, method)(endpoint,
                                                  json=payload,
                                                  headers=headers,
@@ -182,7 +182,7 @@ class BaseTestCase(unittest.TestCase):
                 data = json.loads(data)
 
             if response.status_code != code:  # pragma: no cover
-                pprint.pprint(data)
+                print("RESPONSE: {}".format(pprint.pformat(data)))
 
             self.assertEqual(response.status_code, code)
             return response

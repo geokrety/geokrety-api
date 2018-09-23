@@ -25,7 +25,7 @@ class NewsResponse(BaseResponse):
 
     @property
     def last_comment_date_time(self):
-        return self.get_attribute('last-comment-date-time')
+        return datetime.strptime(self.get_attribute('last-comment-date-time'), '%Y-%m-%dT%H:%M:%S')
 
     @property
     def author(self):
@@ -39,8 +39,8 @@ class NewsResponse(BaseResponse):
         self.assertHasRelationshipSelf('news-comments', '/v1/news/%s/relationships/news-comments' % self.id)
         self.assertHasRelationshipRelated('news-comments', '/v1/news/%s/news-comments' % self.id)
 
-    def assertHasRelationshipAuthorData(self, news_id):
-        self.assertHasRelationshipData('author', news_id, 'user')
+    def assertHasRelationshipAuthorData(self, user_id):
+        self.assertHasRelationshipData('author', user_id, 'user')
 
     def assertHasRelationshipNewsCommentsData(self, news_id):
         self.assertHasRelationshipData('news-comments', news_id, 'news-comment')

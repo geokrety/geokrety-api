@@ -4,11 +4,10 @@ from marshmallow_jsonapi.flask import Relationship, Schema
 
 import htmlentities
 # import bleach
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_COMMENT
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
-from app.models.move import Move
 
 
 class GeokretSchemaPublic(Schema):

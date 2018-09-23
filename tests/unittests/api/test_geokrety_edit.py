@@ -52,12 +52,12 @@ class TestGeokretyEdit(BaseTestCase):
         new_name = 'some other name'
         payload._set_attribute('name', new_name)
         geokret = self.blend_geokret(owner=self.user_1)
-        user = getattr(self, input) if input else None
+        user = getattr(self, input)
         if expected:
             response = self.send_patch(geokret.id, payload, user=self.admin, code=200)
             self.assertEqual(response.name, new_name)
         else:
-            response = self.send_patch(geokret.id, payload, user=user, code=403)
+            assert self.send_patch(geokret.id, payload, user=user, code=403)
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
@@ -104,8 +104,7 @@ class TestGeokretyEdit(BaseTestCase):
     def test_geokret_patch_field_name_doesnt_accept_html(self, name, result=None):
         payload = GeokretyPayload()
         payload.set_name(name)
-        if result is None:
-            result = name
+        result = name if result is None else result
         geokret = self.blend_geokret()
         response = self.send_patch(geokret.id, payload, user=self.admin, code=200)
         self.assertEqual(response.name, result)
@@ -124,8 +123,7 @@ class TestGeokretyEdit(BaseTestCase):
     def test_geokret_patch_field_description_accept_html_subset(self, description, result=None):
         payload = GeokretyPayload()
         payload.set_description(description)
-        if result is None:
-            result = description
+        result = description if result is None else result
         geokret = self.blend_geokret()
         response = self.send_patch(geokret.id, payload, user=self.admin, code=200)
         self.assertEqual(response.description, result)
