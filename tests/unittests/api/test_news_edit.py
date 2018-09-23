@@ -15,7 +15,7 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 
 
 class TestNewsEdit(BaseTestCase):
-    """Test News create"""
+    """Test News edit"""
 
     def send_patch(self, id, payload, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)

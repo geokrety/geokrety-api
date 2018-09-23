@@ -68,10 +68,7 @@ class NewsDetail(ResourceDetail):
             data['username'] = current_identity.name
 
     decorators = (
-        api.has_permission('is_admin', methods="PATCH,DELETE",
-                           fetch="author_id", fetch_as="user_id", model=News),
-        # api.has_permission('is_admin', methods="PATCH,DELETE",
-        #                    fetch="author_id", fetch_as="user_id", model=News),
+        api.has_permission('is_admin', methods="PATCH,DELETE"),
     )
     schema = NewsSchema
     data_layer = {
@@ -86,5 +83,7 @@ class NewsDetail(ResourceDetail):
 class NewsRelationship(ResourceRelationship):
     methods = ['GET']
     schema = NewsSchema
-    data_layer = {'session': db.session,
-                  'model': News}
+    data_layer = {
+        'session': db.session,
+        'model': News
+    }
