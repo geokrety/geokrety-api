@@ -12,7 +12,7 @@ from app.models.move import Move
 
 @jwt_required
 def auth_required(view, view_args, view_kwargs, *args, **kwargs):
-    return view(*view_args, **view_kwargs)
+    return True
 
 
 @jwt_required
@@ -21,7 +21,7 @@ def is_admin(view, view_args, view_kwargs, *args, **kwargs):
     if not user.is_admin:
         raise ForbiddenException({'source': ''}, 'Admin access is required')
 
-    return view(*view_args, **view_kwargs)
+    return True
 
 
 @jwt_required
@@ -33,7 +33,7 @@ def is_user_itself(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
     if not user.is_admin and user.id != kwargs['user_id']:
         raise ForbiddenException({'source': ''}, 'Access Forbidden')
-    return view(*view_args, **view_kwargs)
+    return True
 
 
 @jwt_required
@@ -43,7 +43,7 @@ def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
     """
     user = current_identity
     if user.is_admin:
-        return view(*view_args, **view_kwargs)
+        return True
 
     try:
         move = Move.query.filter(Move.id == kwargs['move_id']).one()
@@ -51,7 +51,7 @@ def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
         raise ObjectNotFound({'parameter': 'id'}, 'Move not found.')
 
     if move.author_id == user.id:
-        return view(*view_args, **view_kwargs)
+        return True
 
     raise ForbiddenException({'source': ''}, 'Access denied.')
 
@@ -64,7 +64,7 @@ def is_geokret_owner(view, view_args, view_kwargs, *args, **kwargs):
     """
     user = current_identity
     if user.is_admin:
-        return view(*view_args, **view_kwargs)
+        return True
 
     try:
         geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
@@ -72,7 +72,7 @@ def is_geokret_owner(view, view_args, view_kwargs, *args, **kwargs):
         raise ObjectNotFound({'parameter': 'geokret_id'}, 'Geokret not found.')
 
     if geokret.owner_id == user.id:
-        return view(*view_args, **view_kwargs)
+        return True
 
     raise ForbiddenException({'source': ''}, 'Access denied.')
 
@@ -81,7 +81,7 @@ def is_geokret_owner(view, view_args, view_kwargs, *args, **kwargs):
 def is_geokret_holder(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
     if user.is_admin:
-        return view(*view_args, **view_kwargs)
+        return True
 
     try:
         geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
@@ -98,7 +98,7 @@ def is_geokret_holder(view, view_args, view_kwargs, *args, **kwargs):
 def has_touched_geokret(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
     if user.is_admin:
-        return view(*view_args, **view_kwargs)
+        return True
 
     try:
         geokret = Geokret.query.filter(Geokret.id == kwargs['geokret_id']).one()
