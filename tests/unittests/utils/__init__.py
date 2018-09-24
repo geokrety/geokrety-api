@@ -1,12 +1,12 @@
-from datetime import datetime
+from datetime import datetime as dt
 
 
-def assertIsDateTime(date_time):
-    if isinstance(date_time, datetime):
+def assertIsDateTime(datetime):
+    if isinstance(datetime, dt):
         return
 
     try:
-        datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
+        dt.strptime(datetime, "%Y-%m-%dT%H:%M:%S")
     except ValueError:
         assert False, 'Date is not parsable'
         raise

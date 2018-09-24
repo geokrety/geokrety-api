@@ -10,6 +10,7 @@ class BasePayload(dict):
         'move',
         'user',
         'news',
+        'news-subscription',
     ]
 
     def __init__(self, type):

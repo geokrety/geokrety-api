@@ -15,7 +15,7 @@ class MovePayload(BasePayload):
     def __init__(self, move_type):
         super(MovePayload, self).__init__('move')
         self.set_move_type(move_type)
-        self.move_date_time()
+        self.move_datetime()
         self.application_name()
         self.application_version()
 
@@ -58,7 +58,7 @@ class MovePayload(BasePayload):
         self._set_relationships('author', 'user', user.id)
         return self
 
-    def set_moved_date_time(self, date_time=None):
+    def set_moved_datetime(self, datetime=None):
         def random_date(start):
             """Generate a random datetime between `start` and `end`"""
             start = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S")
@@ -68,8 +68,8 @@ class MovePayload(BasePayload):
                 seconds=random.randint(0, int((end - start).total_seconds())),
             )).strftime("%Y-%m-%dT%H:%M:%S")
 
-        if date_time:
-            self._set_attribute('moved_on_datetime', date_time)
+        if datetime:
+            self._set_attribute('moved_on_datetime', datetime)
         else:
             self._set_attribute('moved_on_datetime', random_date("2017-12-01T14:18:22"))
         return self
@@ -82,7 +82,7 @@ class MovePayload(BasePayload):
         self.set_application_version(obj.application_version)
         self.set_comment(obj.comment)
         self.set_username(obj.username)
-        self.set_moved_date_time(obj.moved_date_time)
+        self.set_moved_datetime(obj.moved_datetime)
         if obj.author:
             self.set_author(obj.author)
         return self

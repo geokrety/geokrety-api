@@ -25,6 +25,7 @@ class NewsSubscription(db.Model):
         'read',
         db.DateTime,
         key='subscribed_on_datetime',
+        nullable=False,
         default=datetime.datetime.utcnow,
     )
     post = db.Column(

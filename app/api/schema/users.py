@@ -20,7 +20,7 @@ class UserSchemaPublic(Schema):
     name = fields.Str(required=True)
     language = fields.Str()
     country = fields.Str(dump_only=True)
-    join_date_time = fields.Date(dump_only=True)
+    join_datetime = fields.Date(dump_only=True)
 
     # statpic = Relationship()
     news = Relationship(
@@ -96,6 +96,6 @@ class UserSchema(UserSchemaPublic):
     hour = fields.Integer(dump_only=True)
     secid = fields.Str()
     statpic_id = fields.Integer()
-    last_update_date_time = fields.Date(dump_only=True)
-    last_mail_date_time = fields.Date(dump_only=True)
-    last_login_date_time = fields.Date(dump_only=True)
+    last_update_datetime = fields.Date(dump_only=True)
+    last_mail_datetime = fields.Date(dump_only=True)
+    last_login_datetime = fields.Date(dump_only=True)

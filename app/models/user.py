@@ -96,28 +96,28 @@ class User(db.Model):
         key='statpic_id',
         default=1
     )
-    join_date_time = db.Column(
+    join_datetime = db.Column(
         'joined',
-        db.DateTime, key='join_date_time'
+        db.DateTime, key='join_datetime'
     )
-    last_mail_date_time = db.Column(
+    last_mail_datetime = db.Column(
         'ostatni_mail',
         db.DateTime,
         nullable=True,
-        key='last_mail_date_time',
+        key='last_mail_datetime',
         default=None
     )
-    last_login_date_time = db.Column(
+    last_login_datetime = db.Column(
         'ostatni_login',
         db.DateTime,
         nullable=False,
-        key='last_login_date_time',
+        key='last_login_datetime',
         default=datetime.datetime.utcnow
     )
-    last_update_date_time = db.Column(
+    last_update_datetime = db.Column(
         'timestamp',
         db.DateTime,
-        key='last_update_date_time',
+        key='last_update_datetime',
         default=datetime.datetime.utcnow
     )
     secid = db.Column(
@@ -183,6 +183,6 @@ class User(db.Model):
 def receive_init(target, args, kwargs):
     target.hour = random.randrange(0, 23)
     target.secid = "todo"  # TODO
-    target.join_date_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    target.join_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     target.ip = request.remote_addr
     target.country = 'fr'  # TODO

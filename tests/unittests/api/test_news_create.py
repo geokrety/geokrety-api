@@ -97,7 +97,7 @@ class TestNewsCreate(BaseTestCase):
         response.assertRaiseJsonApiError('/data/attributes/content')
 
     @request_context
-    def test_news_create_field_creation_date_time_set_automatically(self):
+    def test_news_create_field_creation_datetime_set_automatically(self):
         payload = NewsPayload()
         response = self.send_post(payload, user=self.admin, code=201)
         response.assertCreationDateTime()

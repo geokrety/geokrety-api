@@ -98,16 +98,16 @@ class TestNewsEdit(BaseTestCase):
     def test_geokret_patch_field_dump_only(self):
         payload = NewsPayload()
         payload._set_attribute('comments_count', 1000)
-        payload._set_attribute('last_comment_date_time', "2018-09-23T23:13:36")
+        payload._set_attribute('last_comment_datetime', "2018-09-23T23:13:36")
         payload._set_attribute('created_on_datetime', "2018-09-23T23:13:37")
         news = self.blend_news(
             comments_count=12,
-            last_comment_date_time="2018-09-23T23:15:13",
+            last_comment_datetime="2018-09-23T23:15:13",
             created_on_datetime="2018-09-23T23:15:14",
         )
         response = self.send_patch(news.id, payload, user=self.admin, code=200)
         self.assertEqual(response.comments_count, news.comments_count)
-        self.assertEqual(response.last_comment_date_time, news.last_comment_date_time)
+        self.assertEqual(response.last_comment_datetime, news.last_comment_datetime)
         self.assertEqual(response.created_on_datetime, news.created_on_datetime)
 
     @parameterized.expand(UTF8_TEST_CASES)

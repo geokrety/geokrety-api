@@ -46,10 +46,10 @@ class News(db.Model):
         key='comments_count',
         default=0
     )
-    last_comment_date_time = db.Column(
+    last_comment_datetime = db.Column(
         'ostatni_komentarz',
         db.DateTime,
-        key='last_comment_date_time',
+        key='last_comment_datetime',
         nullable=False,
         default="0000-00-00T00:00:00"
     )

@@ -24,8 +24,8 @@ class NewsResponse(BaseResponse):
         return self.get_attribute('comments-count')
 
     @property
-    def last_comment_date_time(self):
-        return datetime.strptime(self.get_attribute('last-comment-date-time'), '%Y-%m-%dT%H:%M:%S')
+    def last_comment_datetime(self):
+        return datetime.strptime(self.get_attribute('last-comment-datetime'), '%Y-%m-%dT%H:%M:%S')
 
     @property
     def author(self):
@@ -50,6 +50,6 @@ class NewsResponse(BaseResponse):
         self.assertHasAttribute('content', obj.content)
         self.assertHasAttribute('username', obj.username)
         self.assertHasAttribute('comments-count', obj.comments_count)
-        self.assertHasAttribute('last-comment-date-time', obj.last_comment_date_time)
+        self.assertHasAttribute('last-comment-datetime', obj.last_comment_datetime)
         self.assertHasRelationshipAuthor()
         self.assertHasRelationshipNewsComments()

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pprint
-from datetime import datetime
-
-from tests.unittests.utils import assertIsDateTime
+from datetime import datetime, timedelta
 
 
 class BaseResponse(dict):
@@ -20,16 +18,19 @@ class BaseResponse(dict):
         try:
             return self['id']
         except AssertionError:
-            self.pprint()
             raise AttributeError("Object id not found in response.")
 
     @property
     def created_on_datetime(self):
-        return datetime.strptime(self.get_attribute('created-on-datetime'), '%Y-%m-%dT%H:%M:%S')
+        return self._format_datetime(self.get_attribute('created-on-datetime'))
 
     @property
     def updated_on_datetime(self):
-        return datetime.strptime(self.get_attribute('updated-on-datetime'), '%Y-%m-%dT%H:%M:%S')
+        return self._format_datetime(self.get_attribute('updated-on-datetime'))
+
+    def _format_datetime(self, date_time):
+        print date_time
+        return datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
 
     def get_attribute(self, attribute):
         assert 'attributes' in self
@@ -37,7 +38,6 @@ class BaseResponse(dict):
         try:
             return self['attributes'][attribute]
         except AssertionError:
-            self.pprint()
             raise AttributeError("Attribute '%s' not found in response." % attribute)
 
     def _get_relationships(self, relationships):
@@ -55,7 +55,6 @@ class BaseResponse(dict):
         try:
             assert link in self['relationships'][relation_type]['links']['related']
         except AssertionError:
-            self.pprint()
             raise AttributeError(
                 "assert '%s' in self['relationships']['%s']['links']['related']" % (link, relation_type))
 
@@ -63,15 +62,10 @@ class BaseResponse(dict):
         """Assert an error response has a specific pointer
         """
         assert 'relationships' in self
-        assert relation_type in self['relationships']
-        assert 'links' in self['relationships'][relation_type]
-        assert 'self' in self['relationships'][relation_type]['links']
-        try:
-            assert link in self['relationships'][relation_type]['links']['self']
-        except AssertionError:
-            print link
-            self.pprint()
-            raise AttributeError("assert %s in self['relationships']['%s']['links']['self']" % (link, relation_type))
+        assert relation_type in self['relationships'], relation_type
+        assert 'links' in self['relationships'][relation_type], relation_type
+        assert 'self' in self['relationships'][relation_type]['links'], relation_type
+        assert link in self['relationships'][relation_type]['links']['self'], relation_type
 
     def assertHasAttribute(self, attribute, value):
         """Assert a response attribute has a specific value
@@ -79,7 +73,6 @@ class BaseResponse(dict):
         try:
             assert self.get_attribute(attribute) == value
         except AssertionError:
-            self.pprint()
             raise AttributeError("Attribute value '%s' not the expected one (%s)." %
                                  (self.get_attribute(attribute), value))
 
@@ -96,7 +89,6 @@ class BaseResponse(dict):
             assert 'type' in rel['data']
             assert rel['data']['type'] == type
         except AssertionError:
-            self.pprint()
             raise AttributeError("Relationships '%s' should be '%s' but was '%s'." %
                                  (relationships, value, rel['data']['id']))
 
@@ -123,7 +115,6 @@ class BaseResponse(dict):
             for value in str_values:
                 assert value in found_ids
         except AssertionError:
-            self.pprint()
             raise AttributeError("Included relationships '%s' not found in response, expected %s, found %s." % (
                 relationships, str_values, rel['data']))
 
@@ -136,27 +127,36 @@ class BaseResponse(dict):
     def assertUpdatedDateTime(self):
         self.assertDateTimePresent('updated-on-datetime')
 
+    def assertHasAttributeDateTime(self, attribute, date_time):
+        self.assertDateTimePresent(attribute)
+        assert self.get_attribute(attribute)[-1] == date_time.strftime("%Y-%m-%dT%H:%M:%S")[-1]
+
     def assertDateTimePresent(self, attribute):
         try:
-            date_time = self.get_attribute(attribute)
-            assertIsDateTime(date_time)
+            datetime = self.get_attribute(attribute)
+            self.assertIsDateTime(datetime)
         except AssertionError:
-            self.pprint()
             raise AttributeError("Attribute '%s' was not parsed as a datetime." % attribute)
+
+    def assertIsDateTime(self, date_time):
+        if isinstance(date_time, datetime):
+            return
+
+        try:
+            datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            assert False, 'Date is not parsable'
+            raise
 
     def assertRaiseJsonApiError(self, pointer):
         """Assert an error response has a specific pointer
         """
-        try:
-            assert 'errors' in self
-            for error in self['errors']:
-                assert 'source' in error
-                assert 'pointer' in error['source']
-                if pointer in error['source']['pointer']:
-                    return True
-        except AssertionError:
-            self.pprint()
-            raise
+        assert 'errors' in self
+        for error in self['errors']:
+            assert 'source' in error
+            assert 'pointer' in error['source']
+            if pointer in error['source']['pointer']:
+                return True
 
     def pprint(self):
         pprint.pprint(self)

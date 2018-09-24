@@ -14,7 +14,6 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
                                          MOVE_TYPE_DIPPED)
 from app.api.helpers.db import safe_query
 from app.models.move import Move
-from tests.unittests.utils import assertIsDateTime
 from tests.unittests.utils.base_test_case import (BaseTestCase,
                                                   custom_name_geokrety_type,
                                                   custom_name_geokrety_move_type,
@@ -51,19 +50,19 @@ class TestGeokretCreate(BaseTestCase):
         assert self.send_post(payload, user=self.user_1)
 
     @request_context
-    def test_geokret_create_field_creation_date_time_is_auto_managed(self):
+    def test_geokret_create_field_creation_datetime_is_auto_managed(self):
         payload = GeokretyPayload()
         response = self.send_post(payload, user=self.user_1)
         response.assertCreationDateTime()
 
     @request_context
-    def test_geokret_create_field_update_date_time_is_auto_managed(self):
+    def test_geokret_create_field_update_datetime_is_auto_managed(self):
         payload = GeokretyPayload()
         response = self.send_post(payload, user=self.user_1)
         response.assertUpdatedDateTime()
 
     @request_context
-    def test_geokret_create_field_creation_date_time_is_equal_to_update_date_time(self):
+    def test_geokret_create_field_creation_datetime_is_equal_to_update_datetime(self):
         payload = GeokretyPayload()
         response = self.send_post(payload, user=self.user_1)
         self.assertAlmostEqual(
@@ -227,6 +226,6 @@ class TestGeokretCreate(BaseTestCase):
         self.assertEqual(move.move_type_id, MOVE_TYPE_DIPPED)
         self.assertEqual(move.latitude, user.latitude)
         self.assertEqual(move.longitude, user.longitude)
-        assertIsDateTime(move.moved_on_datetime)
+        response.assertIsDateTime(move.moved_on_datetime)
         self.assertEqual(move.author_id, user.id)
         self.assertEqual(move.comment, "Born here")

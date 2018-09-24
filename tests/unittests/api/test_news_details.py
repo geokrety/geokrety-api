@@ -24,7 +24,8 @@ class TestNewsDetails(BaseTestCase):
         ['user_2'],
     ])
     @request_context
-    def test_news_details_has_normal_attributes_as_anonymous_user(self, input):
+    def test_news_details_has_normal_attributes_as(self, input):
         news = self.blend_news(author=self.user_1)
-        response = self.send_get(news.id)
+        user = getattr(self, input) if input else None
+        response = self.send_get(news.id, user=user)
         response.assertHasPublicAttributes(news)

@@ -20,6 +20,7 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
 from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.news import News
+from app.models.news_subscription import NewsSubscription
 from app.models.user import User
 from tests.unittests.setup_database import Setup
 
@@ -120,6 +121,12 @@ class BaseTestCase(unittest.TestCase):
                 return mixer.cycle(kwargs.get('count')).blend(News, **kwargs)
             return mixer.blend(News, **kwargs)
 
+    def blend_news_subscription(self, *args, **kwargs):
+        with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(NewsSubscription, **kwargs)
+            return mixer.blend(NewsSubscription, **kwargs)
+
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
             if kwargs.get('count'):
@@ -181,8 +188,7 @@ class BaseTestCase(unittest.TestCase):
             if response.content_type in ['application/vnd.api+json', 'application/json'] and data:
                 data = json.loads(data)
 
-            if response.status_code != code:  # pragma: no cover
-                print("RESPONSE: {}".format(pprint.pformat(data)))
+            print("RESPONSE: {}".format(pprint.pformat(data)))
 
             self.assertEqual(response.status_code, code)
             return response
