@@ -9,6 +9,10 @@ class NewsSubscriptionPayload(BasePayload):
     def __init__(self):
         super(NewsSubscriptionPayload, self).__init__('news-subscription')
 
+    def set_subscribed(self, subscribed):
+        self._set_attribute('subscribed', subscribed)
+        return self
+
     def set_user(self, user_id):
         self._set_relationships('user', 'user', user_id)
         return self
@@ -18,7 +22,7 @@ class NewsSubscriptionPayload(BasePayload):
         return self
 
     def set_obj(self, obj):
-        self.set_subscribed_on_datetime(obj.subscribed_on_datetime)
+        self._set_attribute('subscribed_on_datetime', obj.subscribed_on_datetime)
         self.set_subscribed(obj.subscribed)
         if obj.user.id:
             self.set_user(obj.user.id)

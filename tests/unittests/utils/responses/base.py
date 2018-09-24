@@ -42,7 +42,7 @@ class BaseResponse(dict):
 
     def _get_relationships(self, relationships):
         assert 'relationships' in self
-        assert relationships in self['relationships']
+        assert relationships in self['relationships'], relationships
         return self['relationships'][relationships]
 
     def assertHasId(self, id):
@@ -132,7 +132,9 @@ class BaseResponse(dict):
 
     def assertHasAttributeDateTime(self, attribute, date_time):
         self.assertDateTimePresent(attribute)
-        assert self.get_attribute(attribute)[-1] == date_time.strftime("%Y-%m-%dT%H:%M:%S")[-1]
+        if isinstance(date_time, datetime):
+            date_time = date_time.strftime("%Y-%m-%dT%H:%M:%S")
+        assert self.get_attribute(attribute)[:-1] == date_time[:-1]
 
     def assertDateTimePresent(self, attribute):
         try:
