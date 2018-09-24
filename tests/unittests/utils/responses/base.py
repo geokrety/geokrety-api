@@ -45,6 +45,9 @@ class BaseResponse(dict):
         assert relationships in self['relationships']
         return self['relationships'][relationships]
 
+    def assertHasId(self, id):
+        assert self.id == str(id)
+
     def assertHasRelationshipRelated(self, relation_type, link):
         """Assert an error response has a specific pointer
         """

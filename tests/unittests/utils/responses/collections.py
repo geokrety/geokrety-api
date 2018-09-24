@@ -4,6 +4,7 @@ import pprint
 
 from tests.unittests.utils.responses.geokret import GeokretResponse
 from tests.unittests.utils.responses.news import NewsResponse
+from tests.unittests.utils.responses.news_subscription import NewsSubscriptionResponse
 
 
 class BaseCollectionResponse(dict):
@@ -13,8 +14,14 @@ class BaseCollectionResponse(dict):
 
     @property
     def data(self):
-        assert 'data' in self
-        return self['data']
+        return self.get('data', [])
+
+    @property
+    def count(self):
+        return self['meta']['count']
+
+    def assertCount(self, count):
+        assert self.count == count
 
     def pprint(self):
         pprint.pprint(self)
@@ -37,4 +44,14 @@ class NewsCollectionResponse(BaseCollectionResponse):
         datas = []
         for data_ in self.data:
             datas.append(NewsResponse(data_))
+        self['data'] = datas
+
+
+class NewsSubscriptionCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(NewsSubscriptionCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(NewsSubscriptionResponse(data_))
         self['data'] = datas

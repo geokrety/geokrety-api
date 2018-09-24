@@ -16,22 +16,12 @@ class NewsSubscriptionList(ResourceList):
     def query(self, view_kwargs):
         """Filter news-subscriptions"""
         query_ = self.session.query(NewsSubscription)
-
         user = current_identity
-        if not user.is_admin:
-            if view_kwargs.get('user_id') is not None and user.id != view_kwargs['user_id']:
-                raise ForbiddenException({'parameter': 'user_id'}, 'User {} must be yourself ({})'.format(
-                    view_kwargs['user_id'], user.id))
 
-            query_ = query_.filter(User.id == user.id)
+        if user.is_admin:
+            return query_
 
-        if view_kwargs.get('news_id') is not None:
-            safe_query(self, News, 'id', view_kwargs['news_id'], 'news_id')
-            query_ = query_.join(News).filter(News.id == view_kwargs['news_id'])
-
-        if view_kwargs.get('user_id') is not None:
-            safe_query(self, User, 'id', view_kwargs['user_id'], 'user_id')
-            query_ = query_.join(User).filter(User.id == view_kwargs['user_id'])
+        query_ = query_.filter(NewsSubscription.user_id == user.id)
 
         return query_
 

@@ -24,9 +24,18 @@ class TestNewsSubscriptionDetails(BaseTestCase):
         ['user_2', 403],
     ])
     @request_context
-    def test_news_subscription_details_has_normal_attributes_as(self, input, expected):
+    def test_news_subscription_details_can_be_accessed_as(self, input, expected):
         news_subscription = self.blend_news_subscription(user=self.user_1)
         user = getattr(self, input) if input else None
         response = self.send_get(news_subscription.id, user=user, code=expected)
-        if expected is 200:
-            response.assertHasPublicAttributes(news_subscription)
+
+    @parameterized.expand([
+        ['admin'],
+        ['user_1'],  # Owner
+    ])
+    @request_context
+    def test_news_subscription_details_has_normal_attributes_as(self, input):
+        news_subscription = self.blend_news_subscription(user=self.user_1)
+        user = getattr(self, input)
+        response = self.send_get(news_subscription.id, user=user)
+        response.assertHasPublicAttributes(news_subscription)
