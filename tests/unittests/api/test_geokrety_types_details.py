@@ -2,29 +2,17 @@
 
 import urllib
 
-from flask_rest_jsonapi.exceptions import ObjectNotFound
 from parameterized import parameterized
 
-from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
                                          GEOKRET_TYPE_HUMAN,
                                          GEOKRET_TYPE_KRETYPOST,
-                                         GEOKRET_TYPE_TRADITIONAL,
-                                         MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
-                                         MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
-                                         MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN,
-                                         MOVE_TYPES_TEXT)
-from app.api.helpers.db import safe_query
-from app.models.move import Move
+                                         GEOKRET_TYPE_TRADITIONAL)
 from tests.unittests.utils.base_test_case import (BaseTestCase,
                                                   custom_name_geokrety_type,
                                                   request_context)
 from tests.unittests.utils.responses.geokrety_types import \
     GeokretyTypesResponse
-from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
-                                                     HTML_SUBSET_TEST_CASES,
-                                                     NO_HTML_TEST_CASES,
-                                                     UTF8_TEST_CASES)
 
 
 class fakeGeokretyType(object):
@@ -33,7 +21,7 @@ class fakeGeokretyType(object):
 
 
 class TestGeokretyTypeDetails(BaseTestCase):
-    """Test GeoKrety details"""
+    """Test GeoKrety Types details"""
 
     def send_get(self, id, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)

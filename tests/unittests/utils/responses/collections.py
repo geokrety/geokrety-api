@@ -3,6 +3,7 @@
 import pprint
 
 from tests.unittests.utils.responses.geokret import GeokretResponse
+from tests.unittests.utils.responses.geokrety_types import GeokretyTypesResponse
 from tests.unittests.utils.responses.news import NewsResponse
 from tests.unittests.utils.responses.news_subscription import NewsSubscriptionResponse
 
@@ -54,4 +55,15 @@ class NewsSubscriptionCollectionResponse(BaseCollectionResponse):
         datas = []
         for data_ in self.data:
             datas.append(NewsSubscriptionResponse(data_))
+        self['data'] = datas
+
+
+
+class GeokretyTypesCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(GeokretyTypesCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(GeokretyTypesResponse(data_))
         self['data'] = datas

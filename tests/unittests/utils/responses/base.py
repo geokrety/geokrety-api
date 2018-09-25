@@ -7,7 +7,9 @@ from datetime import datetime, timedelta
 class BaseResponse(dict):
 
     def __init__(self, data):
-        if 'data' in data:
+        if data is None:
+            self.update({})
+        elif data.get('data'):
             self.update(data['data'])
         else:
             self.update(data)
