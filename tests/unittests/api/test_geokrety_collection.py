@@ -17,7 +17,7 @@ from tests.unittests.utils.responses.collections import \
 
 
 class TestGeokretyCollection(BaseTestCase):
-    """Test Geokrety collection"""
+    """Test GeoKrety collection"""
 
     def send_get(self, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)

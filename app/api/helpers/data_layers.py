@@ -71,7 +71,7 @@ MOVE_TYPES_LIST = [
 
 class GeoKretyTypeDataLayer(BaseDataLayer):
 
-    def get_object(self, view_kwargs):
+    def get_object(self, view_kwargs, qs=None):
         """Retrieve an object
         :params dict view_kwargs: kwargs from the resource view
         :return DeclarativeMeta: an object

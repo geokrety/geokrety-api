@@ -27,7 +27,7 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 
 
 class TestGeokretDetails(BaseTestCase):
-    """Test Geokrety details"""
+    """Test GeoKrety details"""
 
     def send_get(self, id, args=None, **kwargs):
         args_ = '' if args is None else urllib.urlencode(args)

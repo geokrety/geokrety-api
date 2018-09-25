@@ -27,7 +27,7 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 
 
 class TestGeokretCreate(BaseTestCase):
-    """Test Geokrety creation"""
+    """Test GeoKrety creation"""
 
     def send_post(self, payload=None, code=201, user=None, content_type='application/vnd.api+json'):
         return GeokretResponse(super(TestGeokretCreate, self)._send_post(
