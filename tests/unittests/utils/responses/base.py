@@ -33,6 +33,7 @@ class BaseResponse(dict):
         return datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
 
     def get_attribute(self, attribute):
+        attribute = attribute.replace('_', '-')
         assert 'attributes' in self
         assert attribute in self['attributes']
         try:

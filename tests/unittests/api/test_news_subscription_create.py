@@ -12,7 +12,7 @@ from tests.unittests.utils.responses.collections import \
     NewsSubscriptionResponse
 
 
-class TestNewsSubscription(BaseTestCase):
+class TestNewsSubscriptionCreate(BaseTestCase):
     """Test NewsSubscription create"""
 
     def send_post(self, payload, args=None, **kwargs):
@@ -33,7 +33,7 @@ class TestNewsSubscription(BaseTestCase):
     def test_news_subscription_create_field_news_is_mandatory(self):
         payload = NewsSubscriptionPayload()
         response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/relationships/news/data')
+        response.assertRaiseJsonApiError('/data/relationships/news')
 
     @request_context
     def test_news_subscription_create_field_user_is_current_user_by_default(self):
@@ -42,6 +42,14 @@ class TestNewsSubscription(BaseTestCase):
         payload.set_news(news.id)
         response = self.send_post(payload, user=self.user_1)
         response.assertHasRelationshipUserData(self.user_1.id)
+
+    @request_context
+    def test_news_subscription_create_field_user_is_current_user_by_default_also_for_admin(self):
+        news = self.blend_news()
+        payload = NewsSubscriptionPayload()
+        payload.set_news(news.id)
+        response = self.send_post(payload, user=self.admin)
+        response.assertHasRelationshipUserData(self.admin.id)
 
     @request_context
     def test_news_subscription_create_field_subscribed_on_datetime_cannot_be_overrided(self):
@@ -71,6 +79,7 @@ class TestNewsSubscription(BaseTestCase):
         payload.set_news(news.id)
         payload.set_user(self.user_2.id)
         response = self.send_post(payload, user=self.user_1, code=403)
+        response.assertRaiseJsonApiError('/data/relationships/user')
 
     @request_context
     def test_news_subscription_create_admin_can_subscribe_someone_else(self):

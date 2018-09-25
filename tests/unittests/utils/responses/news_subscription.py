@@ -13,7 +13,6 @@ class NewsSubscriptionResponse(BaseResponse):
 
     @property
     def subscribed_on_datetime(self):
-        return "Sadasd"
         return datetime.strptime(self.get_attribute('subscribed-on-datetime'), '%Y-%m-%dT%H:%M:%S')
 
     @property
@@ -23,6 +22,9 @@ class NewsSubscriptionResponse(BaseResponse):
     @property
     def news(self):
         return self['relationships']['news']['data']['id']
+
+    def assertHasSubscribed(self, value):
+        self.assertHasAttribute('subscribed', value)
 
     def assertHasRelationshipUser(self):
         self.assertHasRelationshipSelf('user', '/v1/news-subscriptions/%s/relationships/user' % self.id)

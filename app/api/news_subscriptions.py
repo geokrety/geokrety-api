@@ -28,20 +28,21 @@ class NewsSubscriptionList(ResourceList):
 
         # Check author_id
         if not data.get('subscribed'):
-            raise UnprocessableEntity('Setting subscribed to False has no sense', {'pointer': '/data/attributes/subscribed'})
-
-        if has_access('is_admin'):
-            return
+            raise UnprocessableEntity('Setting subscribed to False has no sense',
+                                      {'pointer': '/data/attributes/subscribed'})
 
         # Set author to current user by default
         user = current_identity
         if 'user' not in data:
             data['user'] = user.id
 
+        if has_access('is_admin'):
+            return
+
         # Check author_id
         if data['user'] != user.id:
-            raise ForbiddenException({'parameter': 'user'}, 'User {} must be yourself ({})'.format(
-                data['user'], user.id))
+            raise ForbiddenException('User {} must be yourself ({})'.format(
+                data['user'], user.id), {'pointer': '/data/relationships/user'})
 
     decorators = (
         api.has_permission('auth_required', methods="GET,POST"),
@@ -61,10 +62,10 @@ class NewsSubscriptionList(ResourceList):
 class NewsSubscriptionDetail(ResourceDetail):
 
     decorators = (
-        api.has_permission('is_user_itself', methods="GET,DELETE",
+        api.has_permission('is_user_itself', methods="GET,PATCH,DELETE",
                            fetch="user_id", fetch_as="user_id", model=NewsSubscription),
     )
-    methods = ['GET', 'DELETE']
+    methods = ['GET', 'PATCH', 'DELETE']
     schema = NewsSubscriptionSchema
     data_layer = {
         'session': db.session,

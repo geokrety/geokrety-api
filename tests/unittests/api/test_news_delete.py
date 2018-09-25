@@ -8,10 +8,6 @@ from app import current_app as app
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.news import NewsPayload
 from tests.unittests.utils.responses.news import NewsResponse
-from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
-                                                     HTML_SUBSET_TEST_CASES_NO_BLANK,
-                                                     NO_HTML_TEST_CASES,
-                                                     UTF8_TEST_CASES)
 
 
 class TestNewsDelete(BaseTestCase):
