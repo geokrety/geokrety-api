@@ -12,8 +12,8 @@ class GeokretyTypesResponse(BaseResponse):
         return self.get_attribute('name')
 
     def assertHasRelationshipGeokrety(self):
-        self.assertHasRelationshipSelf('geokrety', '/v1/geokrety-types/%s/relationships/geokret' % self.id)
-        self.assertHasRelationshipRelated('geokrety', '/v1/geokrety-types/%s/geokret' % self.id)
+        self.assertHasRelationshipSelf('geokrety', '/v1/geokrety-types/%s/relationships/geokrety' % self.id)
+        self.assertHasRelationshipRelated('geokrety', '/v1/geokrety-types/%s/geokrety' % self.id)
 
     def assertHasRelationshipGeokretyData(self, geokrety_type_id):
         self.assertHasRelationshipData('geokrety', geokrety_type_id, 'geokret')
