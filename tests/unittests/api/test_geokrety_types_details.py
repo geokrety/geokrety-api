@@ -39,4 +39,5 @@ class TestGeokretyTypeDetails(BaseTestCase):
     def test_geokrety_types_details_has_normal_attributes_as_anonymous_user(self, input, expected):
         fake_type = fakeGeokretyType(expected)
         response = self.send_get(input)
+        response.assertHasAttribute('name', fake_type.name)
         response.assertHasPublicAttributes(fake_type)

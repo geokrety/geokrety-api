@@ -9,7 +9,7 @@ class GeokretyTypesResponse(BaseResponse):
 
     @property
     def name(self):
-        return self.get_attribute('subscribed')
+        return self.get_attribute('name')
 
     def assertHasRelationshipGeokrety(self):
         self.assertHasRelationshipSelf('geokrety', '/v1/geokrety-types/%s/relationships/geokret' % self.id)
