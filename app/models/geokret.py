@@ -4,9 +4,9 @@ import random
 from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from app.models import db
 import bleach
 import htmlentities
+from app.models import db
 
 
 class Geokret(db.Model):

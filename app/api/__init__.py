@@ -21,6 +21,7 @@ api.route(UserDetail,
           '/news/<int:news_author_id>/author',
           '/news-comments/<int:newscomment_id>/author',
           '/news-subscriptions/<int:news_subscription_id>/user',
+          '/news-comments/<int:news_comment_id>/author',
           '/geokrety/<int:geokret_owned_id>/owner',
           '/geokrety/<int:geokret_held_id>/holder',
           '/move/<int:move_author_id>/author',
@@ -38,6 +39,7 @@ api.route(NewsDetail, 'news_details',
           '/news/<int:id>',
           '/news-comments/<int:news_comment_id>/news',
           '/news-subscriptions/<int:news_subscription_id>/news',
+          '/news-comments/<int:news_comment_id>/news',
           )
 api.route(NewsRelationship, 'news_comments', '/news/<int:id>/relationships/news-comments')
 api.route(NewsRelationship, 'news_author', '/news/<int:id>/relationships/author')

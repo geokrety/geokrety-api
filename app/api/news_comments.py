@@ -1,14 +1,17 @@
+from flask_jwt import current_identity
+from flask_rest_jsonapi import (ResourceDetail, ResourceList,
+                                ResourceRelationship)
+
 from app.api.bootstrap import api
 from app.api.helpers.db import safe_query, save_to_db
 from app.api.helpers.exceptions import ForbiddenException
+from app.api.helpers.permission_manager import has_access
 from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.user import User
-from flask_jwt import current_identity
-from flask_rest_jsonapi import (ResourceDetail, ResourceList,
-                                ResourceRelationship)
+from app.models.news_subscription import NewsSubscription
 
 
 class NewsCommentList(ResourceList):
@@ -27,13 +30,35 @@ class NewsCommentList(ResourceList):
 
         return query_
 
-    def before_create_object(self, data, view_kwargs):
+    def before_post(self, args, kwargs, data=None):
         user = current_identity
 
+        if data.get('subscribe'):
+            self.subscribe = True
+            del data['subscribe']
+        else:
+            self.subscribe = False
+
+        if has_access('is_admin'):
+            return
+
         # Check author_id
-        if not user.is_admin and not user.is_super_admin and data['author'] != user.id:
-            raise ForbiddenException({'parameter': 'author'}, 'Author {} must be yourself ({})'.format(
-                data['author'], user.id))
+        if data.get('author') != user.id:
+            raise ForbiddenException('Author must be yourself', {'pointer': '/data/relationships/author/data'})
+
+    def create_object(self, data, kwargs):
+        geokret = super(NewsCommentList, self).create_object(data, kwargs)
+
+        # Create first move if requested
+        if self.subscribe:
+            news_subscription = NewsSubscription(
+                news_id=geokret.news_id,
+                user_id=geokret.author_id,
+                subscribed=True,
+            )
+            db.session.add(news_subscription)
+            db.session.commit()
+        return geokret
 
     def after_create_object(self, obj, data, view_kwargs):
         # Increment comment count on news
@@ -50,7 +75,6 @@ class NewsCommentList(ResourceList):
         'model': NewsComment,
         'methods': {
             'query': query,
-            'before_create_object': before_create_object,
             'after_create_object': after_create_object
         }
     }

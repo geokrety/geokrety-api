@@ -9,6 +9,8 @@ from tests.unittests.utils.responses.moves_types import MovesTypesResponse
 from tests.unittests.utils.responses.news import NewsResponse
 from tests.unittests.utils.responses.news_subscription import \
     NewsSubscriptionResponse
+from tests.unittests.utils.responses.news_comment import \
+    NewsCommentResponse
 
 
 class BaseCollectionResponse(dict):
@@ -58,6 +60,16 @@ class NewsSubscriptionCollectionResponse(BaseCollectionResponse):
         datas = []
         for data_ in self.data:
             datas.append(NewsSubscriptionResponse(data_))
+        self['data'] = datas
+
+
+class NewsCommentCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(NewsCommentCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(NewsCommentResponse(data_))
         self['data'] = datas
 
 

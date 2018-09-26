@@ -21,6 +21,7 @@ from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.news import News
 from app.models.news_subscription import NewsSubscription
+from app.models.news_comment import NewsComment
 from app.models.user import User
 from tests.unittests.setup_database import Setup
 
@@ -126,6 +127,12 @@ class BaseTestCase(unittest.TestCase):
             if kwargs.get('count'):
                 return mixer.cycle(kwargs.get('count')).blend(NewsSubscription, **kwargs)
             return mixer.blend(NewsSubscription, **kwargs)
+
+    def blend_news_comment(self, *args, **kwargs):
+        with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(NewsComment, **kwargs)
+            return mixer.blend(NewsComment, **kwargs)
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():

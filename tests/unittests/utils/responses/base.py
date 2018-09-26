@@ -31,13 +31,12 @@ class BaseResponse(dict):
         return self._format_datetime(self.get_attribute('updated-on-datetime'))
 
     def _format_datetime(self, date_time):
-        print date_time
         return datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
 
     def get_attribute(self, attribute):
         attribute = attribute.replace('_', '-')
         assert 'attributes' in self
-        assert attribute in self['attributes']
+        assert attribute in self['attributes'], attribute
         try:
             return self['attributes'][attribute]
         except AssertionError:
@@ -71,7 +70,7 @@ class BaseResponse(dict):
         assert relation_type in self['relationships'], relation_type
         assert 'links' in self['relationships'][relation_type], relation_type
         assert 'self' in self['relationships'][relation_type]['links'], relation_type
-        assert link in self['relationships'][relation_type]['links']['self'], relation_type
+        assert link in self['relationships'][relation_type]['links']['self'], link
 
     def assertHasAttribute(self, attribute, value):
         """Assert a response attribute has a specific value
@@ -140,11 +139,8 @@ class BaseResponse(dict):
         assert self.get_attribute(attribute)[:-1] == date_time[:-1]
 
     def assertDateTimePresent(self, attribute):
-        try:
-            datetime = self.get_attribute(attribute)
-            self.assertIsDateTime(datetime)
-        except AssertionError:
-            raise AttributeError("Attribute '%s' was not parsed as a datetime." % attribute)
+        datetime = self.get_attribute(attribute)
+        self.assertIsDateTime(datetime)
 
     def assertIsDateTime(self, date_time):
         if isinstance(date_time, datetime):

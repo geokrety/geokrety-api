@@ -11,6 +11,7 @@ class BasePayload(dict):
         'user',
         'news',
         'news-subscription',
+        'news-comment',
     ]
 
     def __init__(self, type):
