@@ -45,7 +45,7 @@ class NewsCommentResponse(BaseResponse):
 
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('comment', obj.comment)
-        # self.assertHasAttribute('icon', obj.icon)
+        self.assertHasAttribute('icon', obj.icon)
         self.assertCreationDateTime()
         self.assertHasRelationshipAuthor()
         self.assertHasRelationshipAuthorData(obj.author.id)

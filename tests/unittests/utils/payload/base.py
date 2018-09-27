@@ -30,6 +30,7 @@ class BasePayload(dict):
         return self
 
     def _set_attribute(self, name, value):
+        name = name.replace('_', '-')
         if 'attributes' not in self['data']:
             self['data']['attributes'] = {}
         if name not in self['data']['attributes']:

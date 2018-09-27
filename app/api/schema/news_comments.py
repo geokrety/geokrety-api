@@ -25,7 +25,7 @@ class NewsCommentSchema(Schema):
 
     id = fields.Str(dump_only=True)
     comment = fields.Str(required=True)
-    # icon = fields.Integer(dump_only=True)
+    icon = fields.Integer(dump_only=True)
     created_on_datetime = fields.Date(dump_only=True)
     subscribe = fields.Boolean()
 

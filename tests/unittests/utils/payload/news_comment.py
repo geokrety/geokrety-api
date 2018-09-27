@@ -25,6 +25,10 @@ class NewsCommentPayload(BasePayload):
         self._set_relationships('news', 'news', news_id)
         return self
 
+    def set_subscribe(self, subscribe):
+        self._set_attribute('subscribe', subscribe)
+        return self
+
     def set_obj(self, obj):
         self._set_attribute('created_on_datetime', obj.created_on_datetime)
         self.set_comment(obj.comment)

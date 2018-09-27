@@ -5,6 +5,9 @@ import urllib
 from parameterized import parameterized
 
 from app import current_app as app
+from app.api.helpers.db import safe_query
+from app.models import db
+from app.models.news_subscription import NewsSubscription
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.news_comment import NewsCommentPayload
 from tests.unittests.utils.responses.news_comment import NewsCommentResponse
@@ -41,6 +44,22 @@ class TestNewsCommentCreate(BaseTestCase):
         response = self.send_post(payload, user=user, code=expected)
 
     @request_context
+    def test_news_comment_create_field_author_defaults_to_current_user(self):
+        news = self.blend_news()
+        payload = NewsCommentPayload()
+        payload.set_news(news.id)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasRelationshipAuthorData(self.user_1.id)
+
+    @request_context
+    def test_news_comment_create_field_author_defaults_to_current_user_even_for_admin(self):
+        news = self.blend_news()
+        payload = NewsCommentPayload()
+        payload.set_news(news.id)
+        response = self.send_post(payload, user=self.admin, code=201)
+        response.assertHasRelationshipAuthorData(self.admin.id)
+
+    @request_context
     def test_news_comment_create_field_author_must_be_current_user(self):
         news = self.blend_news()
         payload = NewsCommentPayload()
@@ -74,16 +93,6 @@ class TestNewsCommentCreate(BaseTestCase):
         payload.set_author(self.user_1.id)
         payload.set_news(news.id)
         payload['data']['attributes'].pop('comment', None)
-        response = self.send_post(payload, user=self.admin, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/comment')
-
-    @request_context
-    def test_news_comment_create_field_comment_cannot_be_blank(self):
-        news = self.blend_news()
-        payload = NewsCommentPayload()
-        payload.set_author(self.user_1.id)
-        payload.set_news(news.id)
-        payload.set_comment('')
         response = self.send_post(payload, user=self.admin, code=422)
         response.assertRaiseJsonApiError('/data/attributes/comment')
 
@@ -123,13 +132,45 @@ class TestNewsCommentCreate(BaseTestCase):
 
     @request_context
     def test_news_comment_create_field_author_must_be_current_user(self):
-        news = self.blend_news()
         payload = NewsCommentPayload()
         payload.set_author(self.user_1.id)
         payload.set_news(666)
         self.send_post(payload, user=self.user_1, code=404)
 
+    @request_context
+    def test_news_comment_create_user_opted_in_to_subscribe_to_the_news(self):
+        news = self.blend_news()
+        payload = NewsCommentPayload()
+        payload.set_author(self.user_1.id)
+        payload.set_news(news.id)
+        payload.set_subscribe(True)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        assert 'subscribe' not in response['attributes']
+        news_subscription = db.session \
+            .query(NewsSubscription) \
+            .filter(NewsSubscription.user_id == self.user_1.id, NewsSubscription.news_id == news.id)
+        self.assertEqual(news_subscription.count(), 1)
+        self.assertTrue(news_subscription.first().subscribed)
 
-    # @request_context
-    # def test_news_comment_create_user_may_opt_in_to_subscribe_to_the_news(self):
-    #     assert False
+    @request_context
+    def test_news_comment_create_user_did_not_opted_in_to_subscribe_to_the_news(self):
+        news = self.blend_news()
+        payload = NewsCommentPayload()
+        payload.set_author(self.user_1.id)
+        payload.set_news(news.id)
+        payload.set_subscribe(False)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        assert 'subscribe' not in response['attributes']
+        news_subscription = db.session \
+            .query(NewsSubscription) \
+            .filter(NewsSubscription.user_id == self.user_1.id, NewsSubscription.news_id == news.id)
+        self.assertEqual(news_subscription.count(), 0)
+
+    @request_context
+    def test_news_comment_create_news_comments_counter_must_be_incremented(self):
+        news = self.blend_news()
+        self.assertEqual(news.comments_count, 0)
+        payload = NewsCommentPayload()
+        payload.set_news(news.id)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(news.comments_count, 1)

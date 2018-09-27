@@ -33,11 +33,11 @@ class NewsCommentList(ResourceList):
     def before_post(self, args, kwargs, data=None):
         user = current_identity
 
-        if data.get('subscribe'):
-            self.subscribe = True
-            del data['subscribe']
-        else:
-            self.subscribe = False
+        self.subscribe = data.pop('subscribe', False)
+
+        # Defaults to current user
+        if 'author' not in data:
+            data['author'] = user.id
 
         if has_access('is_admin'):
             return
@@ -47,18 +47,18 @@ class NewsCommentList(ResourceList):
             raise ForbiddenException('Author must be yourself', {'pointer': '/data/relationships/author/data'})
 
     def create_object(self, data, kwargs):
-        geokret = super(NewsCommentList, self).create_object(data, kwargs)
+        news_comment = super(NewsCommentList, self).create_object(data, kwargs)
 
         # Create first move if requested
         if self.subscribe:
             news_subscription = NewsSubscription(
-                news_id=geokret.news_id,
-                user_id=geokret.author_id,
+                news_id=news_comment.news_id,
+                user_id=news_comment.author_id,
                 subscribed=True,
             )
             db.session.add(news_subscription)
             db.session.commit()
-        return geokret
+        return news_comment
 
     def after_create_object(self, obj, data, view_kwargs):
         # Increment comment count on news
@@ -81,6 +81,39 @@ class NewsCommentList(ResourceList):
 
 
 class NewsCommentDetail(ResourceDetail):
+
+    def before_patch(self, args, kwargs, data=None):
+        user = current_identity
+
+        self.subscribe = data.pop('subscribe', None)
+
+        if has_access('is_admin'):
+            return
+
+        # Check author_id
+        if data.get('author', user.id) != user.id:
+            raise ForbiddenException('Author must be yourself', {'pointer': '/data/relationships/author/data'})
+
+    def update_object(self, data, qs, kwargs):
+        news_comment = super(NewsCommentDetail, self).update_object(data, qs, kwargs)
+
+        # Create first move if requested
+        if self.subscribe:
+            news_subscription = NewsSubscription(
+                news_id=news_comment.news_id,
+                user_id=news_comment.author_id,
+                subscribed=True,
+            )
+            db.session.add(news_subscription)
+            db.session.commit()
+        elif self.subscribe is False:
+            news_subscription = db.session \
+                .query(NewsSubscription) \
+                .filter(NewsSubscription.user_id == news_comment.author_id, NewsSubscription.news_id == news_comment.news_id)
+            if news_subscription.count():
+                db.session.delete(news_subscription.one())
+                db.session.commit()
+        return news_comment
 
     def after_delete_object(self, obj, view_kwargs):
         # Decrement comment count on news
