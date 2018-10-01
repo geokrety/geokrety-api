@@ -114,12 +114,3 @@ class TestNewsCommentEdit(BaseTestCase):
         # delete again
         response = self.send_patch(news_comment.id, payload, user=self.user_1)
         self.assertEqual(news_subscription.count(), 0)
-
-    # @request_context
-    # def test_news_comment_create_news_comments_counter_must_be_incremented(self):
-    #     news = self.blend_news()
-    #     self.assertEqual(news.comments_count, 0)
-    #     payload = NewsCommentPayload()
-    #     payload.set_news(news.id)
-    #     response = self.send_post(payload, user=self.user_1, code=201)
-    #     self.assertEqual(news.comments_count, 1)

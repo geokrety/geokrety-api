@@ -6,7 +6,6 @@ from parameterized import parameterized
 
 from app import current_app as app
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
-from tests.unittests.utils.payload.news import NewsPayload
 from tests.unittests.utils.responses.news import NewsResponse
 
 

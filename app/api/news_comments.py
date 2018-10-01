@@ -10,8 +10,8 @@ from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
-from app.models.user import User
 from app.models.news_subscription import NewsSubscription
+from app.models.user import User
 
 
 class NewsCommentList(ResourceList):
@@ -97,7 +97,7 @@ class NewsCommentDetail(ResourceDetail):
     def update_object(self, data, qs, kwargs):
         news_comment = super(NewsCommentDetail, self).update_object(data, qs, kwargs)
 
-        # Create first move if requested
+        # Create subscription if requested
         if self.subscribe:
             news_subscription = NewsSubscription(
                 news_id=news_comment.news_id,
@@ -109,7 +109,10 @@ class NewsCommentDetail(ResourceDetail):
         elif self.subscribe is False:
             news_subscription = db.session \
                 .query(NewsSubscription) \
-                .filter(NewsSubscription.user_id == news_comment.author_id, NewsSubscription.news_id == news_comment.news_id)
+                .filter(
+                    NewsSubscription.user_id == news_comment.author_id,
+                    NewsSubscription.news_id == news_comment.news_id
+                )
             if news_subscription.count():
                 db.session.delete(news_subscription.one())
                 db.session.commit()
@@ -120,6 +123,18 @@ class NewsCommentDetail(ResourceDetail):
         news = safe_query(self, News, 'id', obj.news_id, 'id')
         news.comments_count -= 1
         save_to_db(news)
+
+        # Drop subscriptions
+        news_subscription = db.session \
+            .query(NewsSubscription) \
+            .filter(
+                NewsSubscription.user_id == obj.author_id,
+                NewsSubscription.news_id == obj.news_id
+            )
+        if news_subscription.count():
+            print news_subscription.one()
+            db.session.delete(news_subscription.one())
+            db.session.commit()
 
     decorators = (
         api.has_permission('is_user_itself', methods="PATCH,DELETE",
