@@ -86,13 +86,15 @@ class BaseTestCase(unittest.TestCase):
     def setUpClass(self):
         Setup.drop_db()
         self.app = Setup.create_app()
+        if getattr(self, "hash_password_original", None) is None:
+            self.hash_password_original = phpass.PasswordHash.hash_password
         phpass.PasswordHash.hash_password = mock_hash_password
         phpass.PasswordHash.check_password = mock_check_password
         mixer.init_app(app)
 
     @classmethod
     def tearDownClass(self):
-        Setup.drop_db()
+        phpass.PasswordHash.hash_password = self.hash_password_original
 
     def tearDown(self):
         Setup.truncate_db()

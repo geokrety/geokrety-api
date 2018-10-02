@@ -7,7 +7,7 @@ from .base import BasePayload
 
 class UserPayload(BasePayload):
     def __init__(self):
-        super(UserPayload, self).__init__('news')
+        super(UserPayload, self).__init__('user')
 
     def set_name(self, name):
         self._set_attribute('name', name)
@@ -106,39 +106,44 @@ class UserPayload(BasePayload):
         return self
 
     def set_obj(self, obj):
-        self.set_name(obj.title)
-        self.set_is_admin(obj.title)
-        self.set_password(obj.title)
-        self.set_email(obj.title)
-        self.set_daily_mails(obj.title)
-        self.set_ip(obj.title)
-        self.set_language(obj.title)
-        self.set_latitude(obj.title)
-        self.set_longitude(obj.title)
-        self.set_observation_radius(obj.title)
-        self.set_country(obj.title)
-        self.set_hour(obj.title)
-        self.set_statpic_id(obj.title)
-        self.set_join_datetime(obj.title)
-        self.set_last_mail_datetime(obj.title)
-        self.set_last_login_datetime(obj.title)
-        self.set_last_update_datetime(obj.title)
-        self.set_secid(obj.title)
-        if obj.news.id:
-            self.set_news(obj.news.id)
-        if obj.news_comments.id:
-            self.set_news_comments(obj.news_comments.id)
-        if obj.news_subscriptions.id:
-            self.set_news_subscriptions(obj.news_subscriptions.id)
-        if obj.geokrety_owned.id:
-            self.set_geokrety_owned(obj.geokrety_owned.id)
-        if obj.geokrety_held.id:
-            self.set_geokrety_held(obj.geokrety_held.id)
-        if obj.moves.id:
-            self.set_moves(obj.moves.id)
+        self.set_name(obj.name)
+        self.set_is_admin(obj.is_admin)
+        self.set_password(obj.password)
+        self.set_email(obj.email)
+        self.set_daily_mails(obj.daily_mails)
+        self.set_ip(obj.ip)
+        self.set_language(obj.language)
+        self.set_latitude(obj.latitude)
+        self.set_longitude(obj.longitude)
+        self.set_observation_radius(obj.observation_radius)
+        self.set_country(obj.country)
+        self.set_hour(obj.hour)
+        self.set_statpic_id(obj.statpic_id)
+        self.set_join_datetime(obj.join_datetime)
+        self.set_last_mail_datetime(obj.last_mail_datetime)
+        self.set_last_login_datetime(obj.last_login_datetime)
+        self.set_last_update_datetime(obj.last_update_datetime)
+        self.set_secid(obj.secid)
+        if obj.news:
+            self.set_news(obj.news)
+        if obj.news_comments:
+            self.set_news_comments(obj.news_comments)
+        if obj.news_subscriptions:
+            self.set_news_subscriptions(obj.news_subscriptions)
+        if obj.geokrety_owned:
+            self.set_geokrety_owned(obj.geokrety_owned)
+        if obj.geokrety_held:
+            self.set_geokrety_held(obj.geokrety_held)
+        if obj.moves:
+            self.set_moves(obj.moves)
         return self
+
+    @property
+    def blended(self):
+        return self._blend
 
     def blend(self):
         with mixer.ctx(commit=False):
-            self.set_obj(mixer.blend('app.models.user.User'))
+            self._blend = mixer.blend('app.models.user.User')
+            self.set_obj(self._blend)
             return self

@@ -10,6 +10,12 @@ from app.models.geokret import Geokret
 from app.models.move import Move
 
 
+# @jwt_required
+def is_anonymous(view, view_args, view_kwargs, *args, **kwargs):
+    if current_identity._get_current_object() is not None:
+        raise ForbiddenException({'source': ''}, 'Anonymous access is required')
+
+
 @jwt_required
 def auth_required(view, view_args, view_kwargs, *args, **kwargs):
     return True
@@ -20,7 +26,6 @@ def is_admin(view, view_args, view_kwargs, *args, **kwargs):
     user = current_identity
     if not user.is_admin:
         raise ForbiddenException({'source': ''}, 'Admin access is required')
-
     return True
 
 
@@ -115,6 +120,7 @@ def has_touched_geokret(view, view_args, view_kwargs, *args, **kwargs):
 
 
 permissions = {
+    'is_anonymous': is_anonymous,
     'is_admin': is_admin,
     'is_user_itself': is_user_itself,
     'auth_required': auth_required,

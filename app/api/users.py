@@ -19,6 +19,9 @@ class UserList(ResourceList):
             if 'id' in kwargs and (has_access('is_user_itself', user_id=kwargs.get('id'))):
                 self.schema = UserSchema
 
+    decorators = (
+        api.has_permission('is_anonymous', methods="POST"),
+    )
     schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {'session': db.session,

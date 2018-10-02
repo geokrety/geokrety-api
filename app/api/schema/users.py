@@ -34,23 +34,19 @@ class UserSchema(Schema):
                 if not has_access('is_user_itself', user_id=item['id']):
                     item = drop_private_attributes(item)
             return data
-
         if not has_access('is_user_itself', user_id=data['data']['id']):
             data['data'] = drop_private_attributes(data['data'])
-
         return data
 
     @validates('name')
     def validate_username_uniqueness(self, data):
         if User.query.filter_by(name=data).count():
-            raise UnprocessableEntity({'pointer': '/data/attributes/name'},
-                                      "Username already taken")
+            raise UnprocessableEntity("Username already taken", {'pointer': '/data/attributes/name'})
 
     @validates('email')
     def validate_email_uniqueness(self, data):
         if User.query.filter_by(email=data).count():
-            raise UnprocessableEntity({'pointer': '/data/attributes/email'},
-                                      "Email already taken")
+            raise UnprocessableEntity("Email already taken", {'pointer': '/data/attributes/email'})
 
     class Meta:
         type_ = 'user'
@@ -68,12 +64,13 @@ class UserSchema(Schema):
 
     email = fields.Email(required=True)
     password = fields.Str(load_only=True, required=True)
-    latitude = fields.Float()
-    longitude = fields.Float()
+    latitude = fields.Float(allow_none=True)
+    longitude = fields.Float(allow_none=True)
     daily_mails = fields.Boolean()
     observation_radius = fields.Integer()
     hour = fields.Integer(dump_only=True)
-    secid = fields.Str()
+    secid = fields.Str(dump_only=True)
+    # ip = fields.Str(dump_only=True)  # Do not use this field a all GDPR?
     statpic_id = fields.Integer()
     last_update_datetime = fields.Date(dump_only=True)
     last_mail_datetime = fields.Date(dump_only=True)
