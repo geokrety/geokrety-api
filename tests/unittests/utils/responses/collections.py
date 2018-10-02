@@ -7,10 +7,10 @@ from tests.unittests.utils.responses.geokrety_types import \
     GeokretyTypesResponse
 from tests.unittests.utils.responses.moves_types import MovesTypesResponse
 from tests.unittests.utils.responses.news import NewsResponse
+from tests.unittests.utils.responses.news_comment import NewsCommentResponse
 from tests.unittests.utils.responses.news_subscription import \
     NewsSubscriptionResponse
-from tests.unittests.utils.responses.news_comment import \
-    NewsCommentResponse
+from tests.unittests.utils.responses.user import UserResponse
 
 
 class BaseCollectionResponse(dict):
@@ -90,4 +90,14 @@ class MovesTypesCollectionResponse(BaseCollectionResponse):
         datas = []
         for data_ in self.data:
             datas.append(MovesTypesResponse(data_))
+        self['data'] = datas
+
+
+class UsersCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(UsersCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(UserResponse(data_))
         self['data'] = datas

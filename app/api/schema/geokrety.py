@@ -48,7 +48,7 @@ class GeokretSchemaPublic(Schema):
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
         related_view_kwargs={'geokret_owned_id': '<id>'},
-        schema='UserSchemaPublic',
+        schema='UserSchema',
         type_='user',
         include_resource_linkage=True,
     )
@@ -59,7 +59,7 @@ class GeokretSchemaPublic(Schema):
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
         related_view_kwargs={'geokret_held_id': '<id>'},
-        schema='UserSchemaPublic',
+        schema='UserSchema',
         type_='user',
         include_resource_linkage=True,
     )

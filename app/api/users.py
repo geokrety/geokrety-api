@@ -2,7 +2,7 @@ from app.api.bootstrap import api
 from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
-from app.api.schema.users import UserSchema, UserSchemaPublic
+from app.api.schema.users import UserSchema
 from app.models import db
 from app.models.news import News
 from app.models.news_comment import NewsComment
@@ -14,11 +14,13 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 
 class UserList(ResourceList):
 
+    def before_marshmallow(self, args, kwargs):
+        if current_identity:
+            if 'id' in kwargs and (has_access('is_user_itself', user_id=kwargs.get('id'))):
+                self.schema = UserSchema
+
     schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
-    decorators = (
-        api.has_permission('auth_required', methods="GET"),
-    )
     data_layer = {'session': db.session,
                   'model': User}
 
@@ -59,7 +61,7 @@ class UserDetail(ResourceDetail):
                            model=User, fetch_key_url="id"),
     )
     methods = ('GET', 'PATCH', 'DELETE')
-    schema = UserSchemaPublic
+    schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {'session': db.session,
                   'model': User,

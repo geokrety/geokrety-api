@@ -45,7 +45,7 @@ class NewsSchema(Schema):
                           self_view_kwargs={'id': '<id>'},
                           related_view='v1.user_details',
                           related_view_kwargs={'news_author_id': '<id>'},
-                          schema='UserSchemaPublic',
+                          schema='UserSchema',
                           type_='user',
                           include_resource_linkage=True
                           )

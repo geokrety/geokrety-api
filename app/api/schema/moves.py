@@ -58,7 +58,7 @@ class MoveSchema(Schema):
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
         related_view_kwargs={'id': '<author_id>'},
-        schema='UserSchemaPublic',
+        schema='UserSchema',
         type_='user'
     )
 

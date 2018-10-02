@@ -6,6 +6,37 @@ from datetime import datetime, timedelta
 
 class BaseResponse(dict):
 
+    class assertRaises:
+
+        def __init__(self, expected, expected_regexp=None):
+            self.expected = expected
+            self.failureException = AssertionError
+            self.expected_regexp = expected_regexp
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, tb):
+            if exc_type is None:
+                try:
+                    exc_name = self.expected.__name__
+                except AttributeError:
+                    exc_name = str(self.expected)
+                raise self.failureException(
+                    "{0} not raised".format(exc_name))
+            if not issubclass(exc_type, self.expected):
+                # let unexpected exceptions pass through
+                return False
+            self.exception = exc_value  # store for later retrieval
+            if self.expected_regexp is None:
+                return True
+
+            expected_regexp = self.expected_regexp
+            if not expected_regexp.search(str(exc_value)):
+                raise self.failureException('"%s" does not match "%s"' %
+                                            (expected_regexp.pattern, str(exc_value)))
+            return True
+
     def __init__(self, data):
         if data is None:
             self.update({})
@@ -43,6 +74,7 @@ class BaseResponse(dict):
             raise AttributeError("Attribute '%s' not found in response." % attribute)
 
     def _get_relationships(self, relationships):
+        relationships = relationships.replace('_', '-')
         assert 'relationships' in self
         assert relationships in self['relationships'], relationships
         return self['relationships'][relationships]
@@ -53,6 +85,7 @@ class BaseResponse(dict):
     def assertHasRelationshipRelated(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
+        relation_type = relation_type.replace('_', '-')
         assert 'relationships' in self
         assert relation_type in self['relationships']
         assert 'links' in self['relationships'][relation_type]
@@ -66,6 +99,7 @@ class BaseResponse(dict):
     def assertHasRelationshipSelf(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
+        relation_type = relation_type.replace('_', '-')
         assert 'relationships' in self
         assert relation_type in self['relationships'], relation_type
         assert 'links' in self['relationships'][relation_type], relation_type
@@ -132,6 +166,11 @@ class BaseResponse(dict):
     def assertUpdatedDateTime(self):
         self.assertDateTimePresent('updated-on-datetime')
 
+    def assertHasAttributeDateTimeOrNone(self, attribute, date_time):
+        if date_time is None:
+            return
+        self.assertHasAttributeDateTime(attribute, date_time)
+
     def assertHasAttributeDateTime(self, attribute, date_time):
         self.assertDateTimePresent(attribute)
         if isinstance(date_time, datetime):
@@ -150,7 +189,6 @@ class BaseResponse(dict):
             datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
         except ValueError:
             assert False, 'Date is not parsable'
-            raise
 
     def assertRaiseJsonApiError(self, pointer):
         """Assert an error response has a specific pointer

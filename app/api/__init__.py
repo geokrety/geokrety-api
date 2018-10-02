@@ -26,8 +26,10 @@ api.route(UserDetail,
           '/geokrety/<int:geokret_held_id>/holder',
           '/move/<int:move_author_id>/author',
           )
+api.route(UserRelationship, 'user_moves', '/users/<int:id>/relationships/moves')
 api.route(UserRelationship, 'user_news', '/users/<int:id>/relationships/news')
 api.route(UserRelationship, 'user_news_comments', '/users/<int:id>/relationships/news-comments')
+api.route(UserRelationship, 'user_news_subscriptions', '/users/<int:id>/relationships/news-subscriptions')
 api.route(UserRelationship, 'user_geokrety_owned', '/users/<int:id>/relationships/geokrety-owned')
 api.route(UserRelationship, 'user_geokrety_held', '/users/<int:id>/relationships/geokrety-held')
 
@@ -98,6 +100,7 @@ api.route(
     'moves_list',
     '/moves',
     '/geokrety/<int:geokret_id>/moves',
+    '/users/<int:user_id>/moves',
 )
 api.route(
     MoveDetail,
