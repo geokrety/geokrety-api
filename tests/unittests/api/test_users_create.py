@@ -149,3 +149,67 @@ class TestUserCreate(BaseTestCase):
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertNotEqual(user.password, payload['data']['attributes']['password'])
         self.assertEqual(user.password[:7], "$2a$11$")
+
+    @request_context
+    def test_user_create_languages_defaults_to_english_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['language']
+        response = self.send_post(payload)
+        response.assertHasAttribute('language', 'en')
+
+    @request_context
+    def test_user_create_languages_defaults_to_english_if_empty(self):
+        payload = UserPayload()
+        payload.set_language('')
+        response = self.send_post(payload)
+        response.assertHasAttribute('language', 'en')
+
+    @parameterized.expand([
+        ['en', 201],
+        ['fr', 201],
+        ['francais', 422],
+        ['tt', 422],
+        ['t', 422],
+    ])
+    @request_context
+    def test_user_create_languages_are_checked_against_static_list(self, input, expected):
+        payload = UserPayload()
+        payload.set_language(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/language')
+        else:
+            response.assertHasAttribute('language', input)
+
+    @parameterized.expand([
+        ['fr', 201],
+        ['pl', 201],
+        ['de', 201],
+        ['uk', 201],
+        ['ru', 201],
+        ['ro', 201],
+        ['zz', 422],
+    ])
+    @request_context
+    def test_user_create_countries_are_checked_against_static_list(self, input, expected):
+        payload = UserPayload()
+        payload.set_country(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/country')
+        else:
+            response.assertHasAttribute('country', input)
+
+    @request_context
+    def test_user_create_countries_defaults_to_none_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['country']
+        response = self.send_post(payload)
+        response.assertHasAttribute('country', None)
+
+    @request_context
+    def test_user_create_countries_defaults_to_none_if_empty(self):
+        payload = UserPayload()
+        payload.set_country('')
+        response = self.send_post(payload)
+        response.assertHasAttribute('country', None)

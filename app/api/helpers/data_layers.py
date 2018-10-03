@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from flask_rest_jsonapi.data_layers.base import BaseDataLayer
 
 from app.api.helpers.db import safe_query
@@ -67,6 +69,24 @@ MOVE_TYPES_LIST = [
     MOVE_TYPE_DIPPED,
 ]
 # MOVE_TYPES_COUNT = 6
+
+LANGUAGES = {
+    'fr': u'France',
+    'pl': u'Polska',
+    'de': u'Deutschland',
+    'en': u'English',
+    'ru': u'Россия',
+    'ro': u'România',
+}
+
+COUNTRIES = {
+    'fr': u'France',
+    'pl': u'Polska',
+    'de': u'Deutschland',
+    'uk': u'England',
+    'ru': u'Россия',
+    'ro': u'România',
+}
 
 
 class GeoKretyTypeDataLayer(BaseDataLayer):

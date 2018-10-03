@@ -1,8 +1,9 @@
 
-from marshmallow import post_dump, validates
+from marshmallow import post_dump, pre_load, validate, validates
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
+from app.api.helpers.data_layers import COUNTRIES, LANGUAGES
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
@@ -38,6 +39,16 @@ class UserSchema(Schema):
             data['data'] = drop_private_attributes(data['data'])
         return data
 
+    @pre_load()
+    def set_default_language(self, data):
+        if 'language' not in data or not data['language']:
+            data['language'] = 'en'
+
+    @pre_load()
+    def set_default_country(self, data):
+        if 'country' not in data or not data['country']:
+            data['country'] = None
+
     @validates('name')
     def validate_username_uniqueness(self, data):
         if User.query.filter_by(name=data).count():
@@ -47,6 +58,16 @@ class UserSchema(Schema):
     def validate_email_uniqueness(self, data):
         if User.query.filter_by(email=data).count():
             raise UnprocessableEntity("Email already taken", {'pointer': '/data/attributes/email'})
+
+    @validates('language')
+    def validate_language_value(self, data):
+        if data not in LANGUAGES.keys():
+            raise UnprocessableEntity("Invalid language", {'pointer': '/data/attributes/language'})
+
+    @validates('country')
+    def validate_country_value(self, data):
+        if data is not None and data not in COUNTRIES.keys():
+            raise UnprocessableEntity("Invalid country", {'pointer': '/data/attributes/country'})
 
     class Meta:
         type_ = 'user'
@@ -58,8 +79,8 @@ class UserSchema(Schema):
 
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
-    language = fields.Str()
-    country = fields.Str(dump_only=True)
+    language = fields.Str(validate=validate.Length(max=2), allow_none=True)
+    country = fields.Str(allow_none=True)
     join_datetime = fields.Date(dump_only=True)
 
     email = fields.Email(required=True)

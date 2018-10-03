@@ -86,6 +86,8 @@ class User(db.Model):
     )
     country = db.Column(
         db.String(3),
+        nullable=True,
+        default=None,
     )
     hour = db.Column(
         'godzina',
@@ -193,4 +195,3 @@ def receive_init(target, args, kwargs):
     target.secid = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(84))  # TODO
     # target.join_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     target.ip = request.remote_addr
-    target.country = 'fr'  # TODO
