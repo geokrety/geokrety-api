@@ -343,7 +343,7 @@ class TestUserCreate(BaseTestCase):
     @request_context
     def test_user_create_field_observation_radius_is_integer(self, input, expected):
         payload = UserPayload()
-        payload.set_observation_radius(input)
+        payload.set_hour(input)
         response = self.send_post(payload, code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/observation-radius')
@@ -388,3 +388,70 @@ class TestUserCreate(BaseTestCase):
         else:
             user = safe_query(self, User, 'id', response.id, 'id')
             self.assertEqual(user.observation_radius, int(input))
+
+    @parameterized.expand([
+        ['', 422],
+        [' ', 422],
+        ['a', 422],
+        ['0', 201],
+        ['0.0', 422],
+        [0, 201],
+        [0.0, 201],
+        [1, 201],
+        [1.0, 201],
+        [1.1, 201],
+    ])
+    @request_context
+    def test_user_create_field_hour_is_integer(self, input, expected):
+        payload = UserPayload()
+        payload.set_hour(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/hour')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.hour, int(input))
+
+    @parameterized.expand([
+        [-1, 422],
+        [0, 201],
+        [1, 201],
+        [2, 201],
+        [8, 201],
+        [9, 201],
+        [10, 201],
+        [11, 201],
+        [21, 201],
+        [22, 201],
+        [23, 201],
+        [24, 422],
+        [666, 422],
+    ])
+    @request_context
+    def test_user_create_field_hour_is_betwwen_zero_ten(self, input, expected):
+        payload = UserPayload()
+        payload.set_hour(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/hour')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.hour, int(input))
+
+    @request_context
+    def test_user_create_field_hour_default_to_zero_if_random(self):
+        payload = UserPayload()
+        payload.set_hour(None)
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertGreaterEqual(user.hour, 0)
+        self.assertLessEqual(user.hour, 23)
+
+    @request_context
+    def test_user_create_field_hour_default_to_zero_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['observation-radius']
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertGreaterEqual(user.hour, 0)
+        self.assertLessEqual(user.hour, 23)

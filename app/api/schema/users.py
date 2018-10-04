@@ -74,8 +74,16 @@ class UserSchema(Schema):
         if data is None:
             return
         if data < 0 or data > 10:
-            raise UnprocessableEntity("Observation radius must be between 0 and ten",
+            raise UnprocessableEntity("Observation radius must be between 0 and 10",
                                       {'pointer': '/data/attributes/observation-radius'})
+
+    @validates('hour')
+    def validate_hour_value(self, data):
+        if data is None:
+            return
+        if data < 0 or data > 23:
+            raise UnprocessableEntity("Hour must be between 0 and 23",
+                                      {'pointer': '/data/attributes/hour'})
 
     class Meta:
         type_ = 'user'
@@ -97,7 +105,7 @@ class UserSchema(Schema):
     longitude = fields.Float(allow_none=True)
     daily_mails = fields.Boolean(allow_none=True)
     observation_radius = fields.Integer(allow_none=True)
-    hour = fields.Integer(dump_only=True)
+    hour = fields.Integer(allow_none=True)
     secid = fields.Str(dump_only=True)
     # ip = fields.Str(dump_only=True)  # Do not use this field a all GDPR?
     statpic_id = fields.Integer()

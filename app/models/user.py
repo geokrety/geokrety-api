@@ -11,6 +11,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from app.models import db
 
 
+def random_0_23():
+    return random.randrange(0, 23)
+
 class User(db.Model):
     __tablename__ = 'gk-users'
 
@@ -93,6 +96,7 @@ class User(db.Model):
         'godzina',
         db.Integer,
         key='hour',
+        default=random_0_23,
     )
     statpic_id = db.Column(
         'statpic',
@@ -191,7 +195,5 @@ class User(db.Model):
 
 @event.listens_for(User, 'init')
 def receive_init(target, args, kwargs):
-    target.hour = random.randrange(0, 23)
     target.secid = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(84))  # TODO
-    # target.join_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     target.ip = request.remote_addr
