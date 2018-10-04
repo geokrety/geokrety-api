@@ -50,7 +50,7 @@ class User(db.Model):
         db.Boolean,
         key='daily_news',
         nullable=False,
-        default=True,
+        default=False,
     )
     ip = db.Column(
         db.String(39),
