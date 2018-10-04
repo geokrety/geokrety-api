@@ -69,6 +69,14 @@ class UserSchema(Schema):
         if data is not None and data not in COUNTRIES.keys():
             raise UnprocessableEntity("Invalid country", {'pointer': '/data/attributes/country'})
 
+    @validates('observation_radius')
+    def validate_observation_radius_value(self, data):
+        if data is None:
+            return
+        if data < 0 or data > 10:
+            raise UnprocessableEntity("Observation radius must be between 0 and ten",
+                                      {'pointer': '/data/attributes/observation-radius'})
+
     class Meta:
         type_ = 'user'
         self_view = 'v1.user_details'
@@ -87,8 +95,8 @@ class UserSchema(Schema):
     password = fields.Str(load_only=True, required=True)
     latitude = fields.Float(allow_none=True)
     longitude = fields.Float(allow_none=True)
-    daily_mails = fields.Boolean()
-    observation_radius = fields.Integer()
+    daily_mails = fields.Boolean(allow_none=True)
+    observation_radius = fields.Integer(allow_none=True)
     hour = fields.Integer(dump_only=True)
     secid = fields.Str(dump_only=True)
     # ip = fields.Str(dump_only=True)  # Do not use this field a all GDPR?

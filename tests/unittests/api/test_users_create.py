@@ -2,6 +2,7 @@
 
 import urllib
 from datetime import timedelta
+from decimal import Decimal
 
 from parameterized import parameterized
 
@@ -213,3 +214,177 @@ class TestUserCreate(BaseTestCase):
         payload.set_country('')
         response = self.send_post(payload)
         response.assertHasAttribute('country', None)
+
+    @parameterized.expand([
+        ['', 422],
+        ['abc.def', 422],
+        [u'0', 201],
+        ['0', 201],
+        ['0.0', 201],
+        ['1', 201],
+        ['1.0', 201],
+        [0, 201],
+        [0.0, 201],
+        [1, 201],
+        [1.0, 201],
+    ])
+    @request_context
+    def test_user_create_home_latitude_as_decimal_degrees(self, input, expected):
+        payload = UserPayload()
+        payload.set_latitude(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/latitude')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.latitude, Decimal(input))
+
+    @parameterized.expand([
+        ['', 422],
+        [' ', 422],
+        ['abc.def', 422],
+        [u'0', 201],
+        ['0', 201],
+        ['0.0', 201],
+        ['1', 201],
+        ['1.0', 201],
+        [0, 201],
+        [0.0, 201],
+        [1, 201],
+        [1.0, 201],
+    ])
+    @request_context
+    def test_user_create_home_longitude_as_decimal_degrees(self, input, expected):
+        payload = UserPayload()
+        payload.set_longitude(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/longitude')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.longitude, Decimal(input))
+
+    @request_context
+    def test_user_create_home_latitude_default_to_null_if_empty(self):
+        payload = UserPayload()
+        payload.set_latitude(None)
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertIsNone(user.latitude)
+
+    @request_context
+    def test_user_create_home_latitude_default_to_null_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['latitude']
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertIsNone(user.latitude)
+
+    @request_context
+    def test_user_create_home_longitude_default_to_null_if_empty(self):
+        payload = UserPayload()
+        payload.set_longitude(None)
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertIsNone(user.longitude)
+
+    @request_context
+    def test_user_create_home_longitude_default_to_null_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['longitude']
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertIsNone(user.longitude)
+
+    @parameterized.expand([
+        [None, 201],
+        ['', 422],
+        [' ', 422],
+        ['a', 422],
+        ['0', 201],
+        ['0.0', 422],
+        [0, 201],
+        [0.0, 201],
+        [1, 201, True],
+        [1.0, 201, True],
+        [1.1, 422],
+    ])
+    @request_context
+    def test_user_create_field_daily_mails_is_boolean(self, input, expected_code, expected=False):
+        payload = UserPayload()
+        payload.set_daily_mails(input)
+        response = self.send_post(payload, code=expected_code)
+        if expected_code == 422:
+            response.assertRaiseJsonApiError('/data/attributes/daily-mails')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.daily_mails, expected)
+
+    @request_context
+    def test_user_create_field_daily_mails_default_to_false_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['daily-mails']
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertFalse(user.daily_mails)
+
+    @parameterized.expand([
+        ['', 422],
+        [' ', 422],
+        ['a', 422],
+        ['0', 201],
+        ['0.0', 422],
+        [0, 201],
+        [0.0, 201],
+        [1, 201],
+        [1.0, 201],
+        [1.1, 201],
+    ])
+    @request_context
+    def test_user_create_field_observation_radius_is_integer(self, input, expected):
+        payload = UserPayload()
+        payload.set_observation_radius(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/observation-radius')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.observation_radius, int(input))
+
+    @request_context
+    def test_user_create_field_observation_radius_default_to_zero_if_empty(self):
+        payload = UserPayload()
+        payload.set_observation_radius(None)
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertEqual(user.observation_radius, 0)
+
+    @request_context
+    def test_user_create_field_observation_radius_default_to_zero_if_missing(self):
+        payload = UserPayload()
+        del payload['data']['attributes']['observation-radius']
+        response = self.send_post(payload)
+        user = safe_query(self, User, 'id', response.id, 'id')
+        self.assertEqual(user.observation_radius, 0)
+
+    @parameterized.expand([
+        [-1, 422],
+        [0, 201],
+        [1, 201],
+        [2, 201],
+        [8, 201],
+        [9, 201],
+        [10, 201],
+        [11, 422],
+        [666, 422],
+    ])
+    @request_context
+    def test_user_create_field_observation_radius_is_betwwen_zero_ten(self, input, expected):
+        payload = UserPayload()
+        payload.set_observation_radius(input)
+        response = self.send_post(payload, code=expected)
+        if expected == 422:
+            response.assertRaiseJsonApiError('/data/attributes/observation-radius')
+        else:
+            user = safe_query(self, User, 'id', response.id, 'id')
+            self.assertEqual(user.observation_radius, int(input))
