@@ -1,4 +1,3 @@
-#git+https://github.com/kumy/marshmallow-jsonapi.git@missing-relationship#egg=marshmallow-jsonapi&version=0.20.0
 git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety2#egg=flask-rest-jsonapi
 git+https://github.com/geokrety/flask.git@issue-2900#egg=Flask&version=1.0.2
 marshmallow-jsonapi==0.20.3
