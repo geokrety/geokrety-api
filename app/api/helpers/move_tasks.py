@@ -1,14 +1,12 @@
+import geopy.distance
 import requests
 
-import geopy.distance
 from app import current_app, make_celery
 from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
-from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
-from sqlalchemy.sql import func
 
 celery = make_celery(current_app)
 
@@ -18,9 +16,14 @@ def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret
     """
     moves = Move.query.filter(Move.geokret_id == geokret_id).order_by(Move.moved_on_datetime.asc())
+    geokret = Geokret.query.get(geokret_id)
 
     last = None
     for move in moves:
+        # updates the ost_pozycja_id which is the ruch_id for last log of type grabbed, dropped, met or archived
+        if move.type in (MOVE_TYPE_GRABBED, MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
+            geokret.last_position_id = move.id
+        geokret.last_move_id = move.id
         if move.latitude is None:
             continue
         if last is None:
@@ -29,6 +32,7 @@ def update_move_distances(geokret_id):
 
         distance = geopy.distance.distance((last.latitude, last.longitude), (move.latitude, move.longitude)).km
         move.distance = int(round(distance))
+        geokret.distance += move.distance
         last = move
 
 
@@ -49,17 +53,6 @@ def update_move_country_and_altitude(move_id):
         move.altitude = response.text
     else:
         move.altitude = '-2000'
-
-
-@celery.task(name='update.geokret.distance')
-def update_geokret_total_distance(geokret_id):
-    """ Update GeoKret total distance
-    """
-    distance = db.session.query(func.sum(Move.distance)) \
-        .filter(Move.geokret_id == geokret_id).one()
-
-    geokret = Geokret.query.get(geokret_id)
-    geokret.distance = distance
 
 
 @celery.task(name='update.geokret.total.moves.count')
