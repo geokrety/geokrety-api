@@ -20,7 +20,7 @@ def update_move_distances(geokret_id):
 
     last = None
     for move in moves:
-        # updates the ost_pozycja_id which is the ruch_id for last log of type grabbed, dropped, met or archived
+        # updates the last_position_id which is the ruch_id for last log of type grabbed, dropped, met or archived
         if move.type in (MOVE_TYPE_GRABBED, MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
             geokret.last_position_id = move.id
         geokret.last_move_id = move.id

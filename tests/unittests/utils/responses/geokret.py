@@ -57,6 +57,14 @@ class GeokretResponse(BaseResponse):
         self.assertHasRelationshipSelf('moves', '/v1/geokrety/%s/relationships/moves' % (self.id))
         self.assertHasRelationshipRelated('moves', '/v1/geokrety/%s/moves' % (self.id))
 
+    def assertHasRelationshipLastPosition(self):
+        self.assertHasRelationshipSelf('last-position', '/v1/geokrety/%s/relationships/last-position' % (self.id))
+        self.assertHasRelationshipRelated('last-position', '/v1/geokrety/%s/last-position' % (self.id))
+
+    def assertHasRelationshipLastMove(self):
+        self.assertHasRelationshipSelf('last-move', '/v1/geokrety/%s/relationships/last-move' % (self.id))
+        self.assertHasRelationshipRelated('last-move', '/v1/geokrety/%s/last-move' % (self.id))
+
     def assertHasRelationshipOwnerData(self, user_id):
         self.assertHasRelationshipData('owner', user_id, 'user')
 
@@ -68,6 +76,12 @@ class GeokretResponse(BaseResponse):
 
     def assertHasRelationshipMovesDatas(self, moves_ids):
         self.assertHasRelationshipDatas('moves', moves_ids, 'move')
+
+    def assertHasRelationshipLastPositionData(self, move_id):
+        self.assertHasRelationshipData('last-position', move_id, 'move')
+
+    def assertHasRelationshipLastMoveData(self, move_id):
+        self.assertHasRelationshipData('last-move', move_id, 'move')
 
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
@@ -82,5 +96,7 @@ class GeokretResponse(BaseResponse):
         self.assertHasRelationshipOwner()
         self.assertHasRelationshipHolder()
         self.assertHasRelationshipMoves()
+        self.assertHasRelationshipLastPosition()
+        self.assertHasRelationshipLastMove()
         self.assertHasRelationshipGeokretyType()
         self.assertHasRelationshipGeokretyTypeData(obj.type)

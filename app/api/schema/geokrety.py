@@ -88,6 +88,28 @@ class GeokretSchemaPublic(Schema):
         #   include_resource_linkage=True
     )
 
+    last_position = Relationship(
+        attribute='last_position_id',
+        self_view='v1.geokret_last_position',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.move_details',
+        related_view_kwargs={'geokret_last_position_id': '<id>'},
+        schema='MoveSchema',
+        type_='move',
+        include_resource_linkage=True,
+    )
+
+    last_move = Relationship(
+        attribute='last_move_id',
+        self_view='v1.geokret_last_move',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.move_details',
+        related_view_kwargs={'geokret_last_move_id': '<id>'},
+        schema='MoveSchema',
+        type_='move',
+        include_resource_linkage=True,
+    )
+
     tracking_code = fields.Method('tracking_code_or_none')
 
     def tracking_code_or_none(self, geokret):
