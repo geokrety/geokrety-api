@@ -19,7 +19,7 @@ def random_date(start):
 
 
 class MovePayload(BasePayload):
-    def __init__(self, move_type, geokret=None):
+    def __init__(self, move_type, geokret=None, moved_on_datetime=None):
         self.update({
             "data": {
                 "type": 'move'
@@ -29,6 +29,8 @@ class MovePayload(BasePayload):
         if geokret is not None:
             self.set_tracking_code(geokret.tracking_code)
             self.set_moved_on_datetime(random_date(geokret.created_on_datetime))
+        if moved_on_datetime is not None:
+            self.set_moved_on_datetime(moved_on_datetime)
 
     def set_type(self, move_type):
         self._set_relationships('type', 'move-type', move_type)

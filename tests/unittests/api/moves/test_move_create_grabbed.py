@@ -2,7 +2,7 @@
 
 from parameterized import parameterized
 
-from app.api.helpers.data_layers import MOVE_TYPE_GRABBED
+from app.api.helpers.data_layers import MOVE_TYPE_COMMENT, MOVE_TYPE_GRABBED
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.move import MovePayload
 from tests.unittests.utils.responses.move import MoveResponse
