@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import urllib
 
 from parameterized import parameterized
@@ -199,4 +198,4 @@ class TestGeokretDetails(BaseTestCase):
         geokret = self.blend_geokret()
         moves = self.blend_move(count=5, geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED)
         response = self.send_get(geokret.id, user=self.user_1, args={'include': 'moves'})
-        response.assertHasRelationshipMovesData(moves)
+        response.assertHasRelationshipMovesDatas(moves)
