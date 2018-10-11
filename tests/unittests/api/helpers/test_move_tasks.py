@@ -1,4 +1,3 @@
-import responses
 from mixer.backend.flask import mixer
 
 from app import current_app as app
