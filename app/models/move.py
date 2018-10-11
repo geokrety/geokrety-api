@@ -1,5 +1,6 @@
 import datetime
 
+from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -22,11 +23,17 @@ class Move(db.Model):
     geokret_id = db.Column(
         'id',
         db.Integer,
-        db.ForeignKey('gk-geokrety.id'),
+        db.ForeignKey('gk-geokrety.id', name='fk_geokret_moved'),
         key='geokret_id',
         nullable=False,
         default=None
     )
+
+    ForeignKeyConstraint(
+        ['geokret_id'], ['geokret.id'],
+        use_alter=True, name='fk_geokret_moved'
+    )
+
     latitude = db.Column(
         'lat',
         DOUBLE(precision=8, scale=5),

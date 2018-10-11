@@ -1,7 +1,7 @@
 import datetime
 import random
 
-from sqlalchemy import event
+from sqlalchemy import ForeignKeyConstraint, event
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import bleach
@@ -16,27 +16,27 @@ class Geokret(db.Model):
         'id',
         db.Integer,
         primary_key=True,
-        key='id'
+        key='id',
     )
     tracking_code = db.Column(
         'nr',
         db.String(9),
         key='tracking_code',
         nullable=False,
-        unique=True
+        unique=True,
     )
     _name = db.Column(
         'nazwa',
         db.String(75),
         key='name',
-        nullable=False
+        nullable=False,
     )
     _description = db.Column(
         'opis',
         db.Text(),
         key='description',
         nullable=False,
-        default=''
+        default='',
     )
     type = db.Column(
         'typ',
@@ -49,28 +49,28 @@ class Geokret(db.Model):
         db.Boolean,
         key='missing',
         nullable=False,
-        default=False
+        default=False,
     )
     distance = db.Column(
         'droga',
         db.Integer,
         key='distance',
         nullable=False,
-        default=0
+        default=0,
     )
     caches_count = db.Column(
         'skrzynki',
         db.Integer,
         key='caches_count',
         nullable=False,
-        default=0
+        default=0,
     )
     pictures_count = db.Column(
         'zdjecia',
         db.Integer,
         key='pictures_count',
         nullable=False,
-        default=0
+        default=0,
     )
     created_on_datetime = db.Column(
         'data',
@@ -90,33 +90,42 @@ class Geokret(db.Model):
         'owner',
         db.Integer,
         db.ForeignKey('gk-users.id'),
-        key='owner_id'
+        key='owner_id',
     )
     holder_id = db.Column(
         'hands_of',
         db.Integer,
         db.ForeignKey('gk-users.id'),
-        key='holder_id'
+        key='holder_id',
     )
     moves = db.relationship(
         'Move',
         backref="geokret",
         foreign_keys="Move.geokret_id",
-        cascade="all,delete"
+        cascade="all,delete",
     )
 
-    # last_position_id = db.Column(
-    #     'ost_pozycja_id',
-    #     db.Integer,
-    #     db.ForeignKey('gk-ruchy.id'),
-    #     key='last_position_id'
-    # )
-    # last_log_id = db.Column(
-    #     'ost_log_id',
-    #     db.Integer,
-    #     db.ForeignKey('gk-ruchy.id'),
-    #     key='last_log_id'
-    # )
+    last_position_id = db.Column(
+        'ost_pozycja_id',
+        db.Integer,
+        db.ForeignKey('gk-ruchy.id', name='fk_geokret_last_position'),
+        key='last_position_id',
+        nullable=True,
+        default=None,
+    )
+
+    ForeignKeyConstraint(
+        ['last_position_id'], ['move.id'],
+        use_alter=True, name='fk_geokret_last_position'
+    )
+
+    last_move_id = db.Column(
+        'ost_log_id',
+        db.Integer,
+        db.ForeignKey('gk-ruchy.id'),
+        key='last_move_id'
+    )
+
     # avatar_id = db.Column(
     #     'avatarid',
     #     db.Integer,

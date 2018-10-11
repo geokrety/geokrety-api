@@ -5,7 +5,9 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
                                          MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
                                          MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
                                          MOVE_TYPE_SEEN)
-from app.api.helpers.move_tasks import (update_move_country_and_altitude,
+from app.api.helpers.move_tasks import (update_geokret_holder,
+                                        update_geokret_total_moves_count,
+                                        update_move_country_and_altitude,
                                         update_move_distances)
 from app.models import db
 from app.models.geokret import Geokret
@@ -53,6 +55,8 @@ class TestMoveTasksHelper(BaseTestCase):
             self.move8 = mixer.blend(Move, type=MOVE_TYPE_DROPPED, geokret=self.geokret1,
                                      author=self.user1, moved_on_datetime="2017-12-01T14:18:22",
                                      latitude=43.693633, longitude=6.860933)
+            self.move9 = mixer.blend(Move, type=MOVE_TYPE_COMMENT, geokret=self.geokret1,
+                                     author=self.user3, moved_on_datetime="2017-12-01T14:28:22")
 
     def test_update_move_distances(self):
         """Check Move Tasks: compute move distances"""
@@ -75,6 +79,71 @@ class TestMoveTasksHelper(BaseTestCase):
             self.assertEqual(moves[5].distance, int(round(2.69014884056)))
             self.assertEqual(moves[6].distance, 0)
             self.assertEqual(moves[7].distance, int(round(3.09681445874)))
+
+    def test_update_geokret_total_distance(self):
+        """Check Move Tasks: compute GeoKret total distance"""
+
+        with app.test_request_context():
+            self._blend()
+
+            # run the function
+            update_move_distances(self.geokret1.id)
+            db.session.commit()
+
+            # Check in database
+            self.assertEqual(self.geokret1.distance, 7)
+
+    def test_update_geokret_caches_count(self):
+        """Check Move Tasks: compute GeoKret total caches count"""
+
+        with app.test_request_context():
+            self._blend()
+
+            # run the function
+            update_geokret_total_moves_count(self.geokret1.id)
+            db.session.commit()
+
+            # Check in database
+            self.assertEqual(self.geokret1.caches_count, 5)
+
+    def test_update_geokret_holder(self):
+        """Check Move Tasks: compute GeoKret holder"""
+
+        with app.test_request_context():
+            self._blend()
+
+            # run the function
+            update_geokret_holder(self.geokret1.id)
+            db.session.commit()
+
+            # Check in database
+            self.assertEqual(self.geokret1.holder, self.user4)
+
+    def test_update_geokret_last_position(self):
+        """Check Move Tasks: compute GeoKret last position"""
+
+        with app.test_request_context():
+            self._blend()
+
+            # run the function
+            update_move_distances(self.geokret1.id)
+            db.session.commit()
+
+            # Check in database
+            self.assertEqual(self.geokret1.last_position_id, self.move5.id)
+
+    def test_update_geokret_last_move(self):
+        """Check Move Tasks: compute GeoKret last move"""
+
+        with app.test_request_context():
+            self._blend()
+
+            # run the function
+            update_move_distances(self.geokret1.id)
+            db.session.commit()
+
+            # Check in database
+            self.assertEqual(self.geokret1.last_move_id, self.move9.id)
 
     def test_update_country_and_altitude(self):
         """Check Move Tasks: update country and altitude"""
@@ -99,8 +168,8 @@ class TestMoveTasksHelper(BaseTestCase):
         # Check api error responses
         geokret = self.blend_geokret()
         another_move = self.blend_move(type=MOVE_TYPE_DROPPED, geokret=geokret,
-                                   author=self.user_2, moved_on_datetime="2017-12-01T17:17:17",
-                                   latitude=42, longitude=42)
+                                       author=self.user_2, moved_on_datetime="2017-12-01T17:17:17",
+                                       latitude=42, longitude=42)
         # run the function
         update_move_country_and_altitude(another_move.id)
 
