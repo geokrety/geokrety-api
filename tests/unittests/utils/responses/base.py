@@ -129,7 +129,7 @@ class BaseResponse(dict):
             assert rel['data']['type'] == obj_type
         except AssertionError:  # pragma: no cover
             raise AttributeError("Relationships '%s' should be '%s' but was '%s'." %
-                                 (relationships, value, rel['data']['id']))
+                                 (relationships, obj_type, rel['data']['type']))
 
     def assertHasRelationshipDatas(self, relationships, values, obj_type):
         """Assert a response relation has specific values

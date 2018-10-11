@@ -244,4 +244,4 @@ class TestGeokretyEdit(BaseTestCase):
 
         user = getattr(self, username) if username else None
         response = self.send_patch(geokret_1.id, payload, user=user, args={'include': 'moves'})
-        response.assertHasRelationshipMovesData([])
+        response.assertHasRelationshipMovesDatas([])
