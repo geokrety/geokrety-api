@@ -183,15 +183,21 @@ class TestGeokretDetails(BaseTestCase):
     #     # TODO
     #     pass
 
-    # @request_context
-    # def test_geokret_details_has_relationships_last_position_data(self):
-    #     # TODO
-    #     pass
+    @request_context
+    def test_geokret_details_has_relationships_last_position_data(self):
+        geokret = self.blend_geokret()
+        move = self.blend_move(geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED)
+        geokret.last_position_id = move.id
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasRelationshipLastPositionData(move.id)
 
-    # @request_context
-    # def test_geokret_details_has_relationships_last_log_data(self):
-    #     # TODO
-    #     pass
+    @request_context
+    def test_geokret_details_has_relationships_last_move_data(self):
+        geokret = self.blend_geokret()
+        move = self.blend_move(geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED)
+        geokret.last_move_id = move.id
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasRelationshipLastMoveData(move.id)
 
     @request_context
     def test_geokret_details_has_relationships_moves_data(self):

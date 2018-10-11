@@ -95,6 +95,8 @@ api.route(GeokretRelationship, 'geokret_owner', '/geokrety/<int:id>/relationship
 api.route(GeokretRelationship, 'geokret_holder', '/geokrety/<int:id>/relationships/holder')
 api.route(GeokretRelationship, 'geokret_type', '/geokrety/<int:id>/relationships/type')
 api.route(GeokretRelationship, 'geokret_moves', '/geokrety/<int:id>/relationships/moves')
+api.route(GeokretRelationship, 'geokret_last_position', '/geokrety/<int:id>/relationships/last-position')
+api.route(GeokretRelationship, 'geokret_last_move', '/geokrety/<int:id>/relationships/last-move')
 
 api.route(MovesList, 'moves_list',
           '/moves',
@@ -102,7 +104,9 @@ api.route(MovesList, 'moves_list',
           '/users/<int:user_id>/moves',
           )
 api.route(MoveDetail, 'move_details',
-          '/moves/<int:id>'
+          '/moves/<int:id>',
+          '/geokrety/<int:geokret_last_position_id>/last-position',
+          '/geokrety/<int:geokret_last_move_id>/last-move',
           )
 api.route(MoveRelationship, 'move_geokret', '/moves/<int:id>/relationships/geokret')
 api.route(MoveRelationship, 'move_author', '/moves/<int:id>/relationships/author')
