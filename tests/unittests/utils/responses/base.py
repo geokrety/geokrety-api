@@ -157,7 +157,7 @@ class BaseResponse(dict):
                 relationships, str_values, rel['data']))
 
     def assertHasIncludes(self, relationships, value):  # pragma: no cover
-        raise NotImplemented("Function assertHasIncludes is not yet implemented")
+        raise NotImplementedError("Function assertHasIncludes is not yet implemented")
 
     def assertCreationDateTime(self):
         self.assertDateTimePresent('created-on-datetime')
