@@ -32,7 +32,7 @@ env:
 addons:
   - mariadb: '10.0'
 before_script:
-  - mysql -e 'CREATE DATABASE geokrety_unittest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+  - mysql -e 'FLUSH TABLES; DROP DATABASE IF EXISTS geokrety_unittest; CREATE DATABASE geokrety_unittest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 script:
   - nosetests tests/unittests -v --with-coverage
 after_success:
