@@ -13,6 +13,7 @@ class Setup(object):
         app.config.from_object('config.TestingConfig')
         app.secret_key = 'super secret key'
         with app.test_request_context():
+            Setup.drop_db()
             db.create_all()
         return app.test_client()
 
