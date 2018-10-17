@@ -80,7 +80,6 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        Setup.drop_db()
         self.app = Setup.create_app()
         if getattr(self, "hash_password_original", None) is None:
             self.hash_password_original = phpass.PasswordHash.hash_password
@@ -91,6 +90,7 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         phpass.PasswordHash.hash_password = self.hash_password_original
+        Setup.drop_db()
 
     def tearDown(self):
         super(BaseTestCase, self).tearDown()
