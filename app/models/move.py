@@ -20,6 +20,7 @@ class Move(db.Model):
         primary_key=True,
         key='id'
     )
+
     geokret_id = db.Column(
         'id',
         db.Integer,
@@ -31,7 +32,8 @@ class Move(db.Model):
 
     ForeignKeyConstraint(
         ['geokret_id'], ['geokret.id'],
-        use_alter=True, name='fk_geokret_moved'
+        use_alter=True,
+        name='fk_geokret_moved'
     )
 
     latitude = db.Column(
@@ -41,6 +43,7 @@ class Move(db.Model):
         nullable=True,
         default=None
     )
+
     longitude = db.Column(
         'lon',
         DOUBLE(precision=8, scale=5),
@@ -48,6 +51,7 @@ class Move(db.Model):
         nullable=True,
         default=None
     )
+
     altitude = db.Column(
         'alt',
         db.Integer,
@@ -55,6 +59,7 @@ class Move(db.Model):
         nullable=False,
         default=-32768
     )
+
     country = db.Column(
         'country',
         db.String(3),
@@ -62,6 +67,7 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
+
     distance = db.Column(
         'droga',
         db.Integer,
@@ -69,6 +75,7 @@ class Move(db.Model):
         nullable=False,
         default=0
     )
+
     waypoint = db.Column(
         'waypoint',
         db.String(10),
@@ -76,6 +83,7 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
+
     _comment = db.Column(
         'koment',
         db.String(5120),
@@ -83,6 +91,7 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
+
     pictures_count = db.Column(
         'zdjecia',
         db.Integer,
@@ -90,6 +99,7 @@ class Move(db.Model):
         nullable=False,
         default=0
     )
+
     comments_count = db.Column(
         'komentarze',
         db.Integer,
@@ -97,12 +107,14 @@ class Move(db.Model):
         nullable=False,
         default=0
     )
+
     type = db.Column(
         'logtype',
         db.Enum('0', '1', '2', '3', '4', '5'),
         key='type',
         nullable=False,
     )
+
     author_id = db.Column(
         'user',
         db.Integer,
@@ -111,6 +123,7 @@ class Move(db.Model):
         nullable=False,
         default=None,
     )
+
     username = db.Column(
         'username',
         db.String(20),
@@ -118,6 +131,7 @@ class Move(db.Model):
         nullable=False,
         default=''
     )
+
     moved_on_datetime = db.Column(
         'data',
         db.DateTime,
@@ -125,6 +139,7 @@ class Move(db.Model):
         nullable=False,
         default=datetime.datetime.utcnow,
     )
+
     created_on_datetime = db.Column(
         'data_dodania',
         db.DateTime,
@@ -132,6 +147,7 @@ class Move(db.Model):
         nullable=False,
         default=datetime.datetime.utcnow,
     )
+
     updated_on_datetime = db.Column(
         'timestamp',
         db.DateTime,
@@ -139,12 +155,14 @@ class Move(db.Model):
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow
     )
+
     _application_name = db.Column(
         'app',
         db.String(16),
         key='application_name',
         nullable=True
     )
+
     _application_version = db.Column(
         'app_ver',
         db.String(16),

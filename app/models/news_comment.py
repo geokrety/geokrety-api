@@ -1,5 +1,6 @@
 import datetime
 
+from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import bleach
@@ -16,6 +17,7 @@ class NewsComment(db.Model):
         primary_key=True,
         key='id'
     )
+
     news_id = db.Column(
         'news_id',
         db.Integer,
@@ -23,13 +25,21 @@ class NewsComment(db.Model):
         key='news_id',
         nullable=False
     )
+
     author_id = db.Column(
         'user_id',
         db.Integer,
-        db.ForeignKey('gk-users.id'),
+        db.ForeignKey('gk-users.id', name='fk_news_comment_author'),
         key='author_id',
         nullable=False
     )
+
+    ForeignKeyConstraint(
+        ['author_id'], ['user.id'],
+        use_alter=True,
+        name='fk_news_comment_author'
+    )
+
     created_on_datetime = db.Column(
         'date',
         db.DateTime,
@@ -37,10 +47,12 @@ class NewsComment(db.Model):
         nullable=False,
         default=datetime.datetime.utcnow
     )
+
     _comment = db.Column(
         db.String(1000),
         nullable=False
     )
+
     icon = db.Column(
         db.Integer,
         default=0

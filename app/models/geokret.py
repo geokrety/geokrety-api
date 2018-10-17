@@ -86,18 +86,34 @@ class Geokret(db.Model):
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow,
     )
+
     owner_id = db.Column(
         'owner',
         db.Integer,
-        db.ForeignKey('gk-users.id'),
+        db.ForeignKey('gk-users.id', name='fk_geokret_owner'),
+        nullable=True,
         key='owner_id',
     )
+
+    ForeignKeyConstraint(
+        ['owner_id'], ['user.id'],
+        use_alter=True,
+        name='fk_geokret_owner'
+    )
+
     holder_id = db.Column(
         'hands_of',
         db.Integer,
-        db.ForeignKey('gk-users.id'),
+        db.ForeignKey('gk-users.id', name='fk_geokret_holder'),
         key='holder_id',
     )
+
+    ForeignKeyConstraint(
+        ['holder_id'], ['user.id'],
+        use_alter=True,
+        name='fk_geokret_holder'
+    )
+
     moves = db.relationship(
         'Move',
         backref="geokret",
@@ -122,8 +138,14 @@ class Geokret(db.Model):
     last_move_id = db.Column(
         'ost_log_id',
         db.Integer,
-        db.ForeignKey('gk-ruchy.id'),
+        db.ForeignKey('gk-ruchy.id', name='fk_last_move'),
         key='last_move_id'
+    )
+
+    ForeignKeyConstraint(
+        ['last_move_id'], ['move.id'],
+        use_alter=True,
+        name='fk_last_move'
     )
 
     # avatar_id = db.Column(
