@@ -56,16 +56,16 @@ class Move(db.Model):
         'alt',
         db.Integer,
         key='altitude',
-        nullable=False,
-        default=-32768
+        nullable=True,
+        default=None,
     )
 
     country = db.Column(
         'country',
         db.String(3),
         key='country',
-        nullable=False,
-        default=''
+        nullable=True,
+        default=None,
     )
 
     distance = db.Column(

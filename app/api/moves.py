@@ -67,6 +67,14 @@ class MovesList(ResourceList):
             tracking_code = data['tracking_code']
             del data['tracking_code']
 
+        # Don't leave longitude if no latitude provided
+        if 'latitude' not in data or not data['latitude']:
+            data.pop('longitude', None)
+
+        # Don't leave latitude if no longitude provided
+        if 'longitude' not in data or not data['longitude']:
+            data.pop('latitude', None)
+
         # Get GeoKret ID from tracking_code
         self.geokret = safe_query(self, Geokret, 'tracking_code', tracking_code, 'tracking-code')
         data["geokret"] = self.geokret.id
@@ -104,7 +112,10 @@ class MovesList(ResourceList):
             if not has_access('is_geokret_owner', geokret_id=self.geokret.id):
                 raise ForbiddenException('Must be the GeoKret Owner', {'pointer': '/data/attributes/geokret-id'})
 
-    def after_post(self, result):
+    def create_object(self, data, kwargs):
+        move = super(MovesList, self).create_object(data, kwargs)
+
+    # def after_post(self, result):
         from app.api.helpers.move_tasks import (
             update_move_country_and_altitude,
             update_move_distances,
@@ -113,13 +124,15 @@ class MovesList(ResourceList):
         )
 
         # Enhance Move content
-        update_move_country_and_altitude.delay(result['data']['id'])
-        update_move_distances.delay(self.geokret.id)
+        update_move_country_and_altitude.delay(move.id)
+        update_move_distances.delay(move.geokret_id)
 
         # Enhance GeoKret content
-        update_geokret_total_moves_count.delay(self.geokret.id)
-        update_geokret_holder.delay(self.geokret.id)
-        db.session.commit()
+        update_geokret_total_moves_count.delay(move.geokret_id)
+        update_geokret_holder.delay(move.geokret_id)
+        # db.session.commit()
+
+        return move
 
         # TODO Generate static files
         # * gpx
