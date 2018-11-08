@@ -33,49 +33,13 @@ class TestMoveCreateGrabbed(BaseTestCase):
         assert self.send_post(payload, user=user)
 
     @request_context
-    def test_move_create_grabbed_field_tracking_code_must_be_present(self):
+    def test_move_create_grabbed_field_waypoint(self):
         geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
-        del payload['data']['attributes']['tracking-code']
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/tracking-code')
-
-    @parameterized.expand(EMPTY_TEST_CASES)
-    @request_context
-    def test_move_create_grabbed_field_tracking_code_cannot_be_blank(self, tracking_code):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
-        payload.set_tracking_code(tracking_code)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/tracking-code')
-
-    @request_context
-    def test_move_create_grabbed_field_altitude_default_value(self):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
+        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)\
+            .set_coordinates()\
+            .set_waypoint('GC5BRQK')
         response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('altitude', -32768)
-
-    @request_context
-    def test_move_create_grabbed_field_country_default_value(self):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('country', '')
-
-    @request_context
-    def test_move_create_grabbed_field_distance_default_value(self):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('distance', 0)
-
-    @request_context
-    def test_move_create_grabbed_field_waypoint_default_value(self):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('waypoint', '')
+        response.assertHasAttribute('waypoint', 'GC5BRQK')
 
     @request_context
     def test_move_create_grabbed_field_latitude_default_value(self):

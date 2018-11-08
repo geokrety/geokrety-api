@@ -13,8 +13,9 @@ from tests.unittests.utils.base_test_case import (BaseTestCase,
 from tests.unittests.utils.payload.move import MovePayload
 from tests.unittests.utils.responses.move import MoveResponse
 from tests.unittests.utils.static_test_cases import (BLANK_CHARACTERS_TEST_CASES,
-                                                     HTML_SUBSET_TEST_CASES,
+                                                     EMPTY_TEST_CASES,
                                                      FLOAT_TESTS_CASES,
+                                                     HTML_SUBSET_TEST_CASES,
                                                      NO_HTML_TEST_CASES,
                                                      NO_HTML_TEST_CASES_SORT,
                                                      UTF8_TEST_CASES)
@@ -368,7 +369,7 @@ class TestMoveCreateCommon(BaseTestCase):
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_field_comment_count_is_automatic(self, move_type):
+    def test_move_create_field_comment_count_is_computed_and_not_overridable(self, move_type):
         geokret = self.blend_geokret()
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
@@ -384,7 +385,7 @@ class TestMoveCreateCommon(BaseTestCase):
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_field_picture_count_is_automatic(self, move_type):
+    def test_move_create_field_picture_count_is_computed_and_not_overridable(self, move_type):
         geokret = self.blend_geokret()
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
@@ -395,34 +396,56 @@ class TestMoveCreateCommon(BaseTestCase):
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
         [MOVE_TYPE_GRABBED],
-        [MOVE_TYPE_COMMENT],
         [MOVE_TYPE_SEEN],
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_field_altitude_is_automatic(self, move_type):
+    def test_move_create_field_altitude_is_computed_and_not_overridable_1(self, move_type):
         geokret = self.blend_geokret()
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
         payload._set_attribute('altitude', 666)
         response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('altitude', -32768)
+        response.assertHasAttribute('altitude', 996)
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_altitude_computed_and_is_not_overridable_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('altitude', 666)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('altitude', None)
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
-        [MOVE_TYPE_GRABBED],
-        [MOVE_TYPE_COMMENT],
         [MOVE_TYPE_SEEN],
         [MOVE_TYPE_DIPPED],
+        [MOVE_TYPE_GRABBED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_field_country_is_automatic(self, move_type):
+    def test_move_create_field_country_is_computed_and_not_overridable_1(self, move_type):
         geokret = self.blend_geokret()
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
-        payload._set_attribute('country', 'fr')
+        payload._set_attribute('country', 'pl')
         response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('country', '')
+        response.assertHasAttribute('country', 'FR')
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_country_is_computed_and_not_overridable_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('country', 'pl')
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('country', None)
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
@@ -432,7 +455,7 @@ class TestMoveCreateCommon(BaseTestCase):
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_field_distance_is_automatic(self, move_type):
+    def test_move_create_field_distance_is_computed_and_not_overridable(self, move_type):
         geokret = self.blend_geokret()
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
@@ -483,6 +506,34 @@ class TestMoveCreateCommon(BaseTestCase):
         geokret = self.blend_geokret()
         payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)\
             .set_coordinates()
+        payload.set_tracking_code(tracking_code)
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/tracking-code')
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_tracking_code_must_be_present_1(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret).set_coordinates()
+        del payload['data']['attributes']['tracking-code']
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/tracking-code')
+
+        payload.set_tracking_code('')
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/tracking-code')
+
+    @parameterized.expand(EMPTY_TEST_CASES)
+    @request_context
+    def test_move_create_field_tracking_code_cannot_be_blank_2(self, tracking_code):
+        geokret = self.blend_geokret()
+        payload = MovePayload(MOVE_TYPE_DROPPED, geokret=geokret).set_coordinates()
         payload.set_tracking_code(tracking_code)
         response = self.send_post(payload, user=self.user_1, code=422)
         response.assertRaiseJsonApiError('/data/attributes/tracking-code')
@@ -541,6 +592,106 @@ class TestMoveCreateCommon(BaseTestCase):
             response.assertRaiseJsonApiError('/data/attributes/longitude')
 
     @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_latitude_mandatory_1(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('longitude', 6.2)
+        del payload['data']['attributes']['latitude']
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/latitude')
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_latitude_mandatory_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('longitude', 6.2)
+        del payload['data']['attributes']['latitude']
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('latitude', None)
+        response.assertHasAttribute('longitude', None)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_longitude_mandatory_1(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('latitude', 6.2)
+        del payload['data']['attributes']['longitude']
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/longitude')
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_longitude_mandatory_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        payload._set_attribute('latitude', 6.2)
+        del payload['data']['attributes']['longitude']
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('latitude', None)
+        response.assertHasAttribute('longitude', None)
+
+    @parameterized.expand([
+        [MOVE_TYPE_COMMENT],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_longitude_mandatory_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertNotHasAttribute('latitude')
+        response.assertNotHasAttribute('longitude')
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_waypoint_1(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)\
+            .set_coordinates()\
+            .set_waypoint('GC5BRQK')
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('waypoint', 'GC5BRQK')
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_waypoint_2(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('waypoint', '')
+
+    @parameterized.expand([
+        [MOVE_TYPE_COMMENT],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_field_waypoint_3(self, move_type):
+        geokret = self.blend_geokret()
+        payload = MovePayload(move_type, geokret=geokret)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertNotHasAttribute('waypoint')
+
+    @parameterized.expand([
         [-180.0],
         [-91.0],
         [-90.1],
@@ -577,3 +728,135 @@ class TestMoveCreateCommon(BaseTestCase):
         payload.set_coordinates(0.0, longitude)
         response = self.send_post(payload, user=self.user_1, code=422)
         response.assertRaiseJsonApiError('/data/attributes/longitude')
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_geokret_last_move_must_be_updated(self, move_type):
+        geokret = self.blend_geokret()
+        self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T21:26:16")
+        payload = MovePayload(move_type, geokret=geokret)\
+            .set_coordinates()
+        response = self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.last_move_id, response.id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_SEEN],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_geokret_last_position_must_be_updated_1(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:37:10")
+        self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:37:20")
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:37:46")\
+            .set_coordinates()
+        # print geokret.created_on_datetime
+        response = self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.last_position_id, response.id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_SEEN],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_geokret_last_position_must_be_updated_1_as_intermediate_move(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:37:10")
+        self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:37:20")
+        move2 = self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:37:30")
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:37:25")\
+            .set_coordinates()
+        # print geokret.created_on_datetime
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.last_position_id, move2.id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_geokret_last_position_must_be_updated_2(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:37:10")
+        move1 = self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                                geokret=geokret, moved_on_datetime="2018-10-19T22:37:20")
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:37:46")\
+            .set_coordinates()
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.last_position_id, move1.id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_geokret_last_position_must_be_updated_2_as_intermediate_move(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:37:10")
+        self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                                geokret=geokret, moved_on_datetime="2018-10-19T22:37:20")
+        move2 = self.blend_move(type=MOVE_TYPE_DROPPED, author=self.user_2,
+                                geokret=geokret, moved_on_datetime="2018-10-19T22:37:40")
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:37:30")\
+            .set_coordinates()
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.last_position_id, move2.id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED, None],
+        [MOVE_TYPE_GRABBED, 'user_1'],
+        [MOVE_TYPE_COMMENT, 'user_2'],
+        [MOVE_TYPE_SEEN, None],
+        [MOVE_TYPE_DIPPED, 'user_1'],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_grabbed_geokret_holder_must_be_updated(self, move_type, username):
+        user_id = getattr(self, username).id if username else None
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:43:44")
+        self.blend_move(type=MOVE_TYPE_GRABBED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:44:00")
+
+        payload = MovePayload(MOVE_TYPE_COMMENT, geokret=geokret, moved_on_datetime="2018-10-19T22:44:04")
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.holder_id, self.user_2.id)
+
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:44:08").set_coordinates()
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.holder_id, user_id)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_create_grabbed_geokret_holder_must_be_updated_as_intermediate_move(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime="2018-10-19T22:49:42")
+        self.blend_move(type=MOVE_TYPE_GRABBED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:49:45")
+        self.blend_move(type=MOVE_TYPE_GRABBED, author=self.user_2,
+                        geokret=geokret, moved_on_datetime="2018-10-19T22:50:05")
+
+        payload = MovePayload(move_type, geokret=geokret, moved_on_datetime="2018-10-19T22:50:00").set_coordinates()
+        self.send_post(payload, user=self.user_1, code=201)
+        self.assertEqual(geokret.holder_id, self.user_2.id)
+
+    # TODO https://github.com/geokrety/geokrety-api/issues/96
+    # @request_context
+    # def test_move_create_dropped_geokret_missing_must_be_updated(self):
+    #     geokret = self.blend_geokret(created_on_datetime="2018-10-19T19:50:29")
+    #     geokret.missing = True
+    #
+    #     payload = MovePayload(MOVE_TYPE_COMMENT, geokret=geokret, moved_on_datetime="2018-10-19T19:52:56")
+    #     self.send_post(payload, user=self.user_1, code=201)
+    #     self.assertFalse(geokret.missing)

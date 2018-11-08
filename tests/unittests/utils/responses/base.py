@@ -112,8 +112,15 @@ class BaseResponse(dict):
         try:
             assert self.get_attribute(attribute) == value
         except AssertionError:  # pragma: no cover
-            raise AttributeError("Attribute value '%s' not the expected one (%s)." %
-                                 (self.get_attribute(attribute), value))
+            raise AttributeError("Attribute '%s' value '%s' not the expected one (%s)." %
+                                 (attribute, self.get_attribute(attribute), value))
+
+    def assertNotHasAttribute(self, attribute):
+        """Assert a response attribute is not present
+        """
+        attribute = attribute.replace('_', '-')
+        assert 'attributes' in self
+        assert attribute not in self['attributes'], attribute
 
     def assertHasRelationshipData(self, relationships, value, obj_type):
         """Assert a response relation has a specific value

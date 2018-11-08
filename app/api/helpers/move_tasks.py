@@ -21,7 +21,7 @@ def update_move_distances(geokret_id):
     last = None
     for move in moves:
         # updates the last_position_id which is the ruch_id for last log of type grabbed, dropped, met or archived
-        if move.type in (MOVE_TYPE_GRABBED, MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
+        if move.type in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
             geokret.last_position_id = move.id
         geokret.last_move_id = move.id
         if move.latitude is None:
@@ -42,17 +42,21 @@ def update_move_country_and_altitude(move_id):
     """
     move = Move.query.get(move_id)
 
-    response = requests.get('https://geo.kumy.org/api/getCountry?lat={}&lon={}'.format(move.latitude, move.longitude))
-    if response.ok:
-        move.country = response.text
-    else:
-        move.country = 'XYZ'
+    if move.latitude is not None and move.longitude is not None:
+        response = requests.get('https://geo.kumy.org/api/getCountry?lat={}&lon={}'.format(move.latitude, move.longitude))
+        if response.ok:
+            move.country = response.text
+        else:
+            move.country = 'XYZ'
 
-    response = requests.get('https://geo.kumy.org/api/getElevation?lat={}&lon={}'.format(move.latitude, move.longitude))
-    if response.ok and response.text != 'None':
-        move.altitude = response.text
+        response = requests.get('https://geo.kumy.org/api/getElevation?lat={}&lon={}'.format(move.latitude, move.longitude))
+        if response.ok and response.text != 'None':
+            move.altitude = response.text
+        else:
+            move.altitude = '-2000'
     else:
-        move.altitude = '-2000'
+        move.country = None
+        move.altitude = None
 
 
 @celery.task(name='update.geokret.total.moves.count')
