@@ -26,7 +26,7 @@ class GeokretyPayload(BasePayload):
         return self
 
     def set_owner(self, user):
-        self._set_relationships('owner', 'user', user.id)
+        self._set_relationships('owner', 'user', str(user.id))
         return self
 
     def set_geokrety_type(self, geokrety_type):
