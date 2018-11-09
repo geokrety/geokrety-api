@@ -37,13 +37,13 @@ class NewsCommentList(ResourceList):
 
         # Defaults to current user
         if 'author' not in data:
-            data['author'] = user.id
+            data['author'] = str(user.id)
 
         if has_access('is_admin'):
             return
 
         # Check author_id
-        if data.get('author') != user.id:
+        if data.get('author') != str(user.id):
             raise ForbiddenException('Author must be yourself',
                                      {'pointer': '/data/relationships/author/data'})
 
@@ -92,7 +92,7 @@ class NewsCommentDetail(ResourceDetail):
             return
 
         # Check author_id
-        if data.get('author', user.id) != user.id:
+        if data.get('author', str(user.id)) != str(user.id):
             raise ForbiddenException('Author must be yourself',
                                      {'pointer': '/data/relationships/author/data'})
 

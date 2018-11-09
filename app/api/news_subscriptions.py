@@ -34,13 +34,13 @@ class NewsSubscriptionList(ResourceList):
         # Set author to current user by default
         user = current_identity
         if 'user' not in data:
-            data['user'] = user.id
+            data['user'] = str(user.id)
 
         if has_access('is_admin'):
             return
 
         # Check author_id
-        if data['user'] != user.id:
+        if data['user'] != str(user.id):
             raise ForbiddenException('User {} must be yourself ({})'.format(data['user'], user.id),
                                      {'pointer': '/data/relationships/user'})
 

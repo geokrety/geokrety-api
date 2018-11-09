@@ -1,6 +1,7 @@
 ### GeoKrety
 src
 .env*
+!.env.example
 
 /apiary.apib
 ### GeoKrety

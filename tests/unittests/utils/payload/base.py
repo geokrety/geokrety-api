@@ -48,7 +48,7 @@ class BasePayload(dict):
         self['data']['relationships'][relationships].update({
             'data': {
                 'type': name,
-                'id': obj_id,
+                'id': unicode(obj_id),
             }
         })
         return self
