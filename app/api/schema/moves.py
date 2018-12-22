@@ -2,7 +2,7 @@ import re
 from string import digits, letters
 
 from flask_rest_jsonapi.exceptions import ObjectNotFound
-from marshmallow import validates
+from marshmallow import validates, validates_schema
 from marshmallow_jsonapi import fields
 from marshmallow_jsonapi.flask import Relationship, Schema
 
@@ -105,6 +105,8 @@ class MoveSchema(Schema):
     )
 
 
+
+
 class MoveWithCoordinatesSchema(MoveSchema):
 
     @validates('waypoint')
@@ -114,7 +116,7 @@ class MoveWithCoordinatesSchema(MoveSchema):
 
         if not all(c in ALLOWED_WAYPOINT_CHARACTERS for c in data):
             raise UnprocessableEntity("Waypoint format is invalid",
-                {'pointer': '/data/attributes/waypoint'})
+                                      {'pointer': '/data/attributes/waypoint'})
 
     @validates('latitude')
     def validate_latitude_valid(self, data):
@@ -139,12 +141,23 @@ class MoveWithCoordinatesSchema(MoveSchema):
         ordered = True
         dateformat = "%Y-%m-%dT%H:%M:%S"
 
-    latitude = fields.Float(required=True)
-    longitude = fields.Float(required=True)
+    latitude = fields.Float(required=True, allow_none=False)
+    longitude = fields.Float(required=True, allow_none=False)
     waypoint = fields.Str(allow_none=True)
 
 
 class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
+
+    @validates_schema
+    def validate_latitude_longitude(self, data):
+        if data.get('latitude') is None and data.get('longitude') is not None:
+            # pass
+            raise UnprocessableEntity("Latitude and longitude must be of the same type",
+                                      {'pointer': '/data/attributes/latitude'})
+        if data.get('latitude') is not None and data.get('longitude') is None:
+            # pass
+            raise UnprocessableEntity("Latitude and longitude must be of the same type",
+                                      {'pointer': '/data/attributes/longitude'})
 
     class Meta:
         type_ = 'move'

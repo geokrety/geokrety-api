@@ -21,7 +21,7 @@ BLANK_CHARACTERS_TEST_CASES = [
 ]
 
 FLOAT_TESTS_CASES = [
-    [None, 201],
+    [None, 422],
     [u'', 422],
     [u'', 422],
     [u'a', 422],
