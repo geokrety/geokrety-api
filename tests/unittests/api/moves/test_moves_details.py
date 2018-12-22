@@ -49,6 +49,9 @@ class TestMoveDetails(BaseTestCase):
         response.assertHasPublicAttributes(move)
         response.assertHasAttribute('latitude', move.latitude)
         response.assertHasAttribute('longitude', move.longitude)
+        response.assertHasAttribute('altitude', move.altitude)
+        response.assertHasAttribute('country', move.country)
+        response.assertHasAttribute('distance', move.distance)
 
     @parameterized.expand([
         [MOVE_TYPE_COMMENT],
@@ -63,3 +66,9 @@ class TestMoveDetails(BaseTestCase):
             response.assertHasAttribute('latitude', move.latitude)
         with self.assertRaises(AssertionError):
             response.assertHasAttribute('longitude', move.longitude)
+        with self.assertRaises(AssertionError):
+            response.assertHasAttribute('altitude', move.altitude)
+        with self.assertRaises(AssertionError):
+            response.assertHasAttribute('country', move.country)
+        with self.assertRaises(AssertionError):
+            response.assertHasAttribute('distance', move.distance)
