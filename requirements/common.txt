@@ -19,6 +19,6 @@ requests[security]==2.21.0
 flask-script==2.0.6
 characterentities==0.1.2
 geopy==1.18.1
-responses==0.10.3
+responses==0.10.5
 celery[redis]==4.2.1
 bleach==3.0.2
