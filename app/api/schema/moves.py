@@ -63,9 +63,6 @@ class MoveSchema(Schema):
     moved_on_datetime = fields.DateTime(required=True)
     application_name = fields.Str(allow_none=True)
     application_version = fields.Str(allow_none=True)
-    altitude = fields.Integer(dump_only=True)
-    country = fields.Str(dump_only=True)
-    distance = fields.Integer(dump_only=True)
     pictures_count = fields.Integer(dump_only=True)
     comments_count = fields.Integer(dump_only=True)
     created_on_datetime = fields.DateTime(dump_only=True)
@@ -144,6 +141,9 @@ class MoveWithCoordinatesSchema(MoveSchema):
     latitude = fields.Float(required=True, allow_none=False)
     longitude = fields.Float(required=True, allow_none=False)
     waypoint = fields.Str(allow_none=True)
+    altitude = fields.Integer(dump_only=True)
+    country = fields.Str(dump_only=True)
+    distance = fields.Integer(dump_only=True)
 
 
 class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
@@ -170,7 +170,6 @@ class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
 
     latitude = fields.Float(allow_none=True)
     longitude = fields.Float(allow_none=True)
-    waypoint = fields.Str(allow_none=True)
 
 
 class MoveDroppedSchema(MoveWithCoordinatesSchema):

@@ -1,3 +1,4 @@
+import numbers
 from datetime import datetime, timedelta
 
 from flask import request
@@ -68,11 +69,11 @@ class MovesList(ResourceList):
             del data['tracking_code']
 
         # Don't leave longitude if no latitude provided
-        if 'latitude' not in data or not data['latitude']:
+        if 'latitude' not in data or not isinstance(data['latitude'], numbers.Number):
             data.pop('longitude', None)
 
         # Don't leave latitude if no longitude provided
-        if 'longitude' not in data or not data['longitude']:
+        if 'longitude' not in data or not isinstance(data['longitude'], numbers.Number):
             data.pop('latitude', None)
 
         # Get GeoKret ID from tracking_code

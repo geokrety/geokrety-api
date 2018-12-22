@@ -55,8 +55,8 @@ def update_move_country_and_altitude(move_id):
         else:
             move.altitude = '-2000'
     else:
-        move.country = None
-        move.altitude = None
+        move.country = ''
+        move.altitude = -32768
 
 
 @celery.task(name='update.geokret.total.moves.count')
