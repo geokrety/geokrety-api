@@ -90,3 +90,16 @@ class TestMoveCreateGrabbed(BaseTestCase):
         payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)
         response = self.send_post(payload, user=self.user_1, code=201)
         response.assertHasAttribute('longitude', None)
+
+    @parameterized.expand([
+        [None],
+        [u''],
+    ])
+    @request_context
+    def test_move_create_grabbed_field_waypoint_can_be_empty(self, waypoint):
+        geokret = self.blend_geokret()
+        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)\
+            .set_coordinates()
+        payload.set_waypoint(waypoint)
+        response = self.send_post(payload, user=self.user_1, code=201)
+        response.assertHasAttribute('waypoint', '')
