@@ -141,7 +141,7 @@ class MoveWithCoordinatesSchema(MoveSchema):
 
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
-    waypoint = fields.Str()
+    waypoint = fields.Str(allow_none=True)
 
 
 class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
