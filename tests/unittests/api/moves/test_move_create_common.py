@@ -201,7 +201,6 @@ class TestMoveCreateCommon(BaseTestCase):
         [MOVE_TYPE_GRABBED],
         [MOVE_TYPE_COMMENT],
         [MOVE_TYPE_SEEN],
-
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
@@ -512,19 +511,6 @@ class TestMoveCreateCommon(BaseTestCase):
         payload.set_waypoint(waypoint)
         response = self.send_post(payload, user=self.user_1, code=422)
         response.assertRaiseJsonApiError('/data/attributes/waypoint')
-
-    @parameterized.expand([
-        [None],
-        [u''],
-    ])
-    @request_context
-    def test_move_create_field_waypoint_can_be_empty(self, waypoint):
-        geokret = self.blend_geokret()
-        payload = MovePayload(MOVE_TYPE_GRABBED, geokret=geokret)\
-            .set_coordinates()
-        payload.set_waypoint(waypoint)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('waypoint', '')
 
     @parameterized.expand(FLOAT_TESTS_CASES)
     @request_context
