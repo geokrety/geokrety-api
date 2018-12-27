@@ -23,6 +23,16 @@ from app.models.geokret import Geokret
 from app.models.move import Move
 
 
+def get_move_type_id(json_data):
+    if 'data' in json_data:
+        if 'relationships' in json_data['data'] and \
+                'type' in json_data['data']['relationships'] and \
+                'data' in json_data['data']['relationships']['type']:
+            return json_data['data']['relationships']['type']['data']['id']
+    raise UnprocessableEntity("Move Type is missing",
+                              {'pointer': '/data/relationships/type'})
+
+
 def get_schema_by_move_type(move_type_id):
     if move_type_id == MOVE_TYPE_GRABBED:
         return MoveGrabbedSchema
@@ -48,10 +58,7 @@ class MovesList(ResourceList):
 
         if 'data' in json_data:
             # Configure schema dynamically
-            if 'relationships' in json_data['data'] and \
-                    'type' in json_data['data']['relationships']:
-                move_type_id = json_data['data']['relationships']['type']['data']['id']
-                self.schema = get_schema_by_move_type(move_type_id)
+            self.schema = get_schema_by_move_type(get_move_type_id(json_data))
 
             # Disallow override author relationship for non admin user
             if 'relationships' in json_data['data'] and \
@@ -76,9 +83,13 @@ class MovesList(ResourceList):
         if 'longitude' not in data or not isinstance(data['longitude'], numbers.Number):
             data.pop('latitude', None)
 
-        # Get GeoKret ID from tracking_code
-        self.geokret = safe_query(self, Geokret, 'tracking_code', tracking_code, 'tracking-code')
-        data["geokret"] = self.geokret.id
+        # Move type comment may be selected by GeoKret ID
+        if data['type'] == MOVE_TYPE_COMMENT and 'geokret_id' in data:
+            self.geokret = safe_query(self, Geokret, 'id', data['geokret_id'], 'geokret-id')
+        else:
+            # Get GeoKret ID from tracking_code
+            self.geokret = safe_query(self, Geokret, 'tracking_code', tracking_code, 'tracking-code')
+            data["geokret"] = self.geokret.id
 
         # Move cannot be done before GeoKret birth
         if data['moved_on_datetime'] < self.geokret.created_on_datetime:

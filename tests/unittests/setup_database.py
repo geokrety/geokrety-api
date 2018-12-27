@@ -13,14 +13,13 @@ class Setup(object):
         app.config.from_object('config.TestingConfig')
         app.secret_key = 'super secret key'
         with app.test_request_context():
-            db.drop_all()
             db.create_all()
         return app.test_client()
 
     @staticmethod
     def drop_db():
         with app.test_request_context():
-            # db.drop_all()
+            db.drop_all()
             db.session.remove()
 
     @staticmethod

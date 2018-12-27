@@ -49,6 +49,10 @@ class MovePayload(BasePayload):
         self._set_attribute('tracking_code', tracking_code)
         return self
 
+    def set_geokret_id(self, geokret_id):
+        self._set_attribute('geokret_id', geokret_id)
+        return self
+
     def set_application_name(self, application_name="GeoKrety API"):
         self._set_attribute('application_name', application_name)
         return self

@@ -42,6 +42,14 @@ class TestMoveCreateCommon(BaseTestCase):
         payload = MovePayload(move_type, geokret=geokret)
         assert self.send_post(payload, code=401)
 
+    @request_context
+    def test_move_create_bad_move_type(self):
+        geokret = self.blend_geokret()
+        payload = MovePayload(666, geokret=geokret)\
+            .set_coordinates()
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/type')
+
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
         [MOVE_TYPE_GRABBED],
@@ -50,12 +58,13 @@ class TestMoveCreateCommon(BaseTestCase):
         [MOVE_TYPE_DIPPED],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_create_bad_move_type(self, move_type):
+    def test_move_create_move_type_is_mandatory(self, move_type):
         geokret = self.blend_geokret()
-        payload = MovePayload(666, geokret=geokret)\
+        payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
+        del payload['data']['relationships']['type']
         response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/type')
+        response.assertRaiseJsonApiError('/data/relationships/type')
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],

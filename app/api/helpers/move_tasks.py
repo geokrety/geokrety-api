@@ -43,13 +43,15 @@ def update_move_country_and_altitude(move_id):
     move = Move.query.get(move_id)
 
     if move.latitude is not None and move.longitude is not None:
-        response = requests.get('https://geo.kumy.org/api/getCountry?lat={}&lon={}'.format(move.latitude, move.longitude))
+        response = requests.get(
+            'https://geo.kumy.org/api/getCountry?lat={}&lon={}'.format(move.latitude, move.longitude))
         if response.ok:
             move.country = response.text
         else:
             move.country = 'XYZ'
 
-        response = requests.get('https://geo.kumy.org/api/getElevation?lat={}&lon={}'.format(move.latitude, move.longitude))
+        response = requests.get(
+            'https://geo.kumy.org/api/getElevation?lat={}&lon={}'.format(move.latitude, move.longitude))
         if response.ok and response.text != 'None':
             move.altitude = response.text
         else:

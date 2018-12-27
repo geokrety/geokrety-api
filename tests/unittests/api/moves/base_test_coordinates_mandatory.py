@@ -5,7 +5,6 @@ from parameterized import parameterized
 from base_test_coordinates import _BaseTestCoordinates
 from tests.unittests.utils.base_test_case import request_context
 from tests.unittests.utils.payload.move import MovePayload
-from tests.unittests.utils.static_test_cases import FLOAT_TESTS_CASES
 
 
 class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
