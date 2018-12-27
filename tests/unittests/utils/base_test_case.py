@@ -67,6 +67,19 @@ def custom_name_geokrety_move_type(testcase_func, param_num, param):
     )
 
 
+def custom_name_geokrety_double_move_type(testcase_func, param_num, param):
+    id_1 = unicode(param.args[0])
+    id_2 = unicode(param.args[1])
+    name_1 = MOVE_TYPES_TEXT.get(id_1, id_1)
+    name_2 = MOVE_TYPES_TEXT.get(id_2, id_2)
+    return u"%s_%s_%s (%s)" % (
+        testcase_func.__name__,
+        parameterized.to_safe_name(name_1),
+        parameterized.to_safe_name(name_2),
+        testcase_func.__name__,
+    )
+
+
 def request_context(func):
     @wraps(func)
     def wrapper(*args, **kwargs):

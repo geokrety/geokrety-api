@@ -151,11 +151,9 @@ class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
     @validates_schema
     def validate_latitude_longitude(self, data):
         if data.get('latitude') is None and data.get('longitude') is not None:
-            # pass
             raise UnprocessableEntity("Latitude and longitude must be of the same type",
                                       {'pointer': '/data/attributes/latitude'})
         if data.get('latitude') is not None and data.get('longitude') is None:
-            # pass
             raise UnprocessableEntity("Latitude and longitude must be of the same type",
                                       {'pointer': '/data/attributes/longitude'})
 
@@ -170,6 +168,27 @@ class MoveWithCoordinatesOptionalSchema(MoveWithCoordinatesSchema):
 
     latitude = fields.Float(allow_none=True)
     longitude = fields.Float(allow_none=True)
+
+
+class MoveWithTrackingCodeOrIdSchema(MoveSchema):
+
+    @validates_schema
+    def validate_tracking_code_or_id(self, data):
+        if data.get('tracking_code') is None and data.get('geokret_id') is None:
+            raise UnprocessableEntity("'Tracking code' or 'GeoKret id' must be specified",
+                                      {'pointer': '/data/attributes/tracking-code'})
+
+    class Meta:
+        type_ = 'move'
+        self_view = 'v1.move_details'
+        self_view_kwargs = {'id': '<id>'}
+        self_view_many = 'v1.moves_list'
+        inflect = dasherize
+        ordered = True
+        dateformat = "%Y-%m-%dT%H:%M:%S"
+
+    tracking_code = fields.Str(required=False, allow_none=True)
+    geokret_id = fields.Integer(required=False, allow_none=True)
 
 
 class MoveDroppedSchema(MoveWithCoordinatesSchema):
@@ -220,7 +239,7 @@ class MoveGrabbedSchema(MoveWithCoordinatesOptionalSchema):
         dateformat = "%Y-%m-%dT%H:%M:%S"
 
 
-class MoveCommentSchema(MoveSchema):
+class MoveCommentSchema(MoveWithTrackingCodeOrIdSchema):
 
     class Meta:
         type_ = 'move'

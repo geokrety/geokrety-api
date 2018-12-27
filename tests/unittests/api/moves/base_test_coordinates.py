@@ -6,7 +6,6 @@ from base_test_move_create import _BaseTestMoveCreate
 from tests.unittests.utils.base_test_case import request_context
 from tests.unittests.utils.payload.move import MovePayload
 from tests.unittests.utils.static_test_cases import (BLANK_CHARACTERS_TEST_CASES,
-                                                     EMPTY_TEST_CASES,
                                                      FLOAT_TESTS_CASES)
 
 
