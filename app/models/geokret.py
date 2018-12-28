@@ -138,7 +138,7 @@ class Geokret(db.Model):
     last_move_id = db.Column(
         'ost_log_id',
         db.Integer,
-        db.ForeignKey('gk-ruchy.id', name='fk_last_move'),
+        db.ForeignKey('gk-ruchy.id', name='fk_last_move', ondelete="SET NULL"),
         key='last_move_id'
     )
 
