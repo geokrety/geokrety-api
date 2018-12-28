@@ -1,5 +1,4 @@
 
-from datetime import datetime
 
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
@@ -7,14 +6,13 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 
 from app.api.bootstrap import api
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
 from app.api.helpers.db import safe_query
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import require_relationship
 from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
-from app.models.move import Move
 from app.models.user import User
 
 
@@ -58,31 +56,7 @@ class GeokretList(ResourceList):
         data['holder'] = data['owner']
 
         if 'born_at_home' in data and data['born_at_home']:
-            self.create_first_move = True
             del data['born_at_home']
-        else:
-            self.create_first_move = False
-
-    def create_object(self, data, kwargs):
-        geokret = self._data_layer.create_object(data, kwargs)
-
-        # Create first move if requested
-        if self.create_first_move:
-            # But only if user has home coordinates
-            owner = safe_query(self, User, 'id', geokret.owner_id, 'id')
-            if owner.latitude and owner.longitude:
-                move = Move(
-                    author_id=geokret.owner_id,
-                    geokret_id=geokret.id,
-                    type=MOVE_TYPE_DIPPED,
-                    moved_on_datetime=datetime.utcnow(),
-                    latitude=owner.latitude,
-                    longitude=owner.longitude,
-                    comment="Born here",
-                )
-                db.session.add(move)
-                db.session.commit()
-        return geokret
 
     schema = GeokretSchemaPublic
     get_schema_kwargs = {'context': {'current_identity': current_identity}}

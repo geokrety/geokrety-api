@@ -17,12 +17,6 @@ class Setup(object):
         return app.test_client()
 
     @staticmethod
-    def drop_db():
-        with app.test_request_context():
-            db.drop_all()
-            db.session.remove()
-
-    @staticmethod
     def truncate_db():
         with app.test_request_context():
             meta = db.metadata

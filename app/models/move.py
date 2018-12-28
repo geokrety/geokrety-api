@@ -1,11 +1,14 @@
-import datetime
+from datetime import datetime, timedelta
 
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import ForeignKeyConstraint, event
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.exc import NoResultFound
 
 import bleach
 import characterentities
+from app.api.helpers.exceptions import UnprocessableEntity
+from app.api.helpers.utilities import round_microseconds
 from app.models import db
 
 # TODO add unicity constraint on geokret_id + moved_on_datetime
@@ -137,7 +140,7 @@ class Move(db.Model):
         db.DateTime,
         key='moved_on_datetime',
         nullable=False,
-        default=datetime.datetime.utcnow,
+        default=datetime.utcnow,
     )
 
     created_on_datetime = db.Column(
@@ -145,15 +148,15 @@ class Move(db.Model):
         db.DateTime,
         key='created_on_datetime',
         nullable=False,
-        default=datetime.datetime.utcnow,
+        default=datetime.utcnow,
     )
 
     updated_on_datetime = db.Column(
         'timestamp',
         db.DateTime,
         key='updated_on_datetime',
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
     )
 
     _application_name = db.Column(
@@ -222,9 +225,34 @@ class Move(db.Model):
     def application_name(cls):
         return cls._application_name
 
+    @hybrid_property
+    def _moved_on_datetime(self):
+        if isinstance(self.moved_on_datetime, str):
+            self.moved_on_datetime = datetime.strptime(self.moved_on_datetime, "%Y-%m-%dT%H:%M:%S")
+        return round_microseconds(self.moved_on_datetime)
 
-# TODO launch async tasks
-# @event.listens_for(Move, 'init')
-# def receive_init(target, args, kwargs):
-#     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
-#     target.created_on_datetime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+@event.listens_for(Move, 'before_insert')
+@event.listens_for(Move, 'before_update')
+def my_before_insert_or_update_listener(mapper, connection, target):
+    # Move cannot be done before GeoKret birth
+    if target._moved_on_datetime < target.geokret.created_on_datetime:
+        raise UnprocessableEntity("Move date cannot be prior GeoKret birth date",
+                                  {'pointer': '/data/attributes/moved-on-datetime'})
+
+    # Move cannot be done in the future
+    if target._moved_on_datetime > datetime.utcnow().replace(microsecond=0) + timedelta(seconds=1):
+        raise UnprocessableEntity("Move date cannot be in the future",
+                                  {'pointer': '/data/attributes/moved-on-datetime'})
+
+    # Identical move date is forbidden
+    try:
+        db.session.query(Move).filter(
+            Move.moved_on_datetime == target.moved_on_datetime,
+            Move.geokret_id == target.geokret.id,
+            Move.id != target.id,
+        ).one()
+        raise UnprocessableEntity("There is already a move at that time",
+                                  {'pointer': '/data/attributes/moved-on-datetime'})
+    except NoResultFound:
+        pass

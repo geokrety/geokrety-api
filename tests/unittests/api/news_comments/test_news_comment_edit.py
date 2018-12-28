@@ -96,7 +96,7 @@ class TestNewsCommentEdit(BaseTestCase):
         news_comment = self.blend_news_comment(author=self.user_1, subscribe=False)
         news_subscription = db.session \
             .query(NewsSubscription) \
-            .filter(NewsSubscription.user_id == self.user_1.id, NewsSubscription.news_id == news_comment.id)
+            .filter(NewsSubscription.user_id == self.user_1.id, NewsSubscription.news_id == news_comment.news.id)
         self.assertEqual(news_subscription.count(), 0)
 
         payload = NewsCommentPayload()

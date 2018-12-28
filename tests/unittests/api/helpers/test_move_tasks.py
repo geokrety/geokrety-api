@@ -166,7 +166,7 @@ class TestMoveTasksHelper(BaseTestCase):
         """Check Move Tasks: update country and altitude failing api"""
 
         # Check api error responses
-        geokret = self.blend_geokret()
+        geokret = self.blend_geokret(created_on_datetime="2017-12-01T17:17:17")
         another_move = self.blend_move(type=MOVE_TYPE_DROPPED, geokret=geokret,
                                        author=self.user_2, moved_on_datetime="2017-12-01T17:17:17",
                                        latitude=42, longitude=42)

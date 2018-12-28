@@ -214,8 +214,8 @@ class TestGeokretCreate(BaseTestCase):
 
     @request_context
     def test_geokret_create_geokret_may_be_born_at_home_with_home_coordinates(self):
-        payload = GeokretyPayload()
-        payload.set_born_at_home()
+        payload = GeokretyPayload()\
+            .set_born_at_home()
         user = self.blend_user(latitude=48.8566, longitude=2.3522)
         response = self.send_post(payload, user=user, code=201)
         response.assertHasRelationshipMoves()
