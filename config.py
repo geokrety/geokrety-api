@@ -44,6 +44,7 @@ class Config(object):
     SENTRY_DSN = env('SENTRY_DSN', default=None)
     REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
     PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='')
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = env('ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES', default=True)
 
     # API configs
     PAGE_SIZE = 20
@@ -106,6 +107,9 @@ class DevelopmentConfig(Config):
     # Test database performance
     SQLALCHEMY_RECORD_QUERIES = True
 
+    # Test features
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = True
+
 
 class TestingConfig(Config):
     """
@@ -119,3 +123,6 @@ class TestingConfig(Config):
     BROKER_BACKEND = 'memory'
     SQLALCHEMY_DATABASE_URI = env('TEST_DATABASE_URL', default=None)
     PROPOGATE_ERROR = True
+
+    # Test features
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = True

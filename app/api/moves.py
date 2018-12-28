@@ -142,7 +142,6 @@ class MovesList(ResourceList):
         # Enhance GeoKret content
         update_geokret_total_moves_count.delay(move.geokret_id)
         update_geokret_holder.delay(move.geokret_id)
-        # db.session.commit()
 
         return move
 
@@ -177,6 +176,24 @@ class MoveDetail(ResourceDetail):
         if kwargs.get('id') is not None:
             move = safe_query(self, Move, 'id', kwargs['id'], 'id')
             self.schema = get_schema_by_move_type(move.type)
+
+    def delete_object(self, data):
+        self.move_deleted_geokret_id = self._data_layer.get_object(data).geokret_id
+        super(MoveDetail, self).delete_object(data)
+
+    def after_delete(self, result):
+        from app.api.helpers.move_tasks import (
+            update_move_distances,
+            update_geokret_total_moves_count,
+            update_geokret_holder,
+        )
+
+        # Enhance Move content
+        update_move_distances.delay(self.move_deleted_geokret_id)
+
+        # Enhance GeoKret content
+        update_geokret_total_moves_count.delay(self.move_deleted_geokret_id)
+        update_geokret_holder.delay(self.move_deleted_geokret_id)
 
     current_identity = current_identity
     decorators = (

@@ -19,6 +19,7 @@ def update_move_distances(geokret_id):
     geokret = Geokret.query.get(geokret_id)
 
     last = None
+    total_distance = 0
     for move in moves:
         # updates the last_position_id which is the ruch_id for last log of type grabbed, dropped, met or archived
         if move.type in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
@@ -32,8 +33,9 @@ def update_move_distances(geokret_id):
 
         distance = geopy.distance.distance((last.latitude, last.longitude), (move.latitude, move.longitude)).km
         move.distance = int(round(distance))
-        geokret.distance += move.distance
+        total_distance += move.distance
         last = move
+    geokret.distance = total_distance
 
 
 @celery.task(name='update.move.country.and.elevation')

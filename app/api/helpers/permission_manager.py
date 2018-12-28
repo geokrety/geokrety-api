@@ -1,3 +1,4 @@
+from flask import current_app as app
 from flask import request
 from flask_jwt import current_identity
 from flask_rest_jsonapi.exceptions import ObjectNotFound
@@ -57,6 +58,12 @@ def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
 
     if move.author_id == user.id:
         return True
+
+    if app.config['ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES']:
+        # Allow GeoKret owner to moderate moves if necessary
+        geokret = Geokret.query.filter(Geokret.id == move.geokret_id).one()
+        if geokret.owner_id == user.id:
+            return True
 
     raise ForbiddenException('Access denied.', {'source': 'move_id'})
 
