@@ -1,6 +1,7 @@
 import re
 from string import digits, letters
 
+from flask import request
 from flask_rest_jsonapi.exceptions import ObjectNotFound
 from marshmallow import validates, validates_schema
 from marshmallow_jsonapi import fields
@@ -102,8 +103,6 @@ class MoveSchema(Schema):
     )
 
 
-
-
 class MoveWithCoordinatesSchema(MoveSchema):
 
     @validates('waypoint')
@@ -174,6 +173,10 @@ class MoveWithTrackingCodeOrIdSchema(MoveSchema):
 
     @validates_schema
     def validate_tracking_code_or_id(self, data):
+        if request.method == 'PATCH':
+            # If we're patching, the rules are checked in moves.py as we
+            # don't have access to old move from here
+            return
         if data.get('tracking_code') is None and data.get('geokret_id') is None:
             raise UnprocessableEntity("'Tracking code' or 'GeoKret id' must be specified",
                                       {'pointer': '/data/attributes/tracking-code'})
@@ -235,7 +238,6 @@ class MoveGrabbedSchema(MoveWithCoordinatesOptionalSchema):
         self_view_many = 'v1.moves_list'
         inflect = dasherize
         ordered = True
-        strict = True
         dateformat = "%Y-%m-%dT%H:%M:%S"
 
 

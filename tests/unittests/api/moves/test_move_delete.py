@@ -22,7 +22,7 @@ class TestMoveDelete(BaseTestCase):
 
     def _blend(self):
         """Create mocked Moves"""
-        self.geokret = self.blend_geokret()
+        self.geokret = self.blend_geokret(created_on_datetime='2018-12-27T23:20:18')
         self.move_1 = mixer.blend(Move, type=MOVE_TYPE_DIPPED, geokret=self.geokret,
                                   moved_on_datetime="2018-12-27T23:38:33",
                                   latitude=43.704233, longitude=6.869833)

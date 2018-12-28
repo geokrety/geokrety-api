@@ -53,6 +53,11 @@ class ResponsesMixin(object):
         responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=43.78000&lon=7.06000',
                       status=200, body='996', match_querystring=True)
 
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getCountry?lat=43.79000&lon=7.06000',
+                      status=200, body='FR', match_querystring=True)
+        responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=43.79000&lon=7.06000',
+                      status=200, body='997', match_querystring=True)
+
         responses.add(responses.GET, 'https://geo.kumy.org/api/getCountry?lat=0.00000&lon=0.00000',
                       status=200, body='', match_querystring=True)
         responses.add(responses.GET, 'https://geo.kumy.org/api/getElevation?lat=0.00000&lon=0.00000',

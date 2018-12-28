@@ -36,6 +36,10 @@ class MovePayload(BasePayload):
         self._set_relationships('type', 'move-type', move_type)
         return self
 
+    def del_type(self):
+        self._del_relationships('type', 'move-type')
+        return self
+
     def set_coordinates(self, latitude=43.78, longitude=7.06):
         self._set_attribute('latitude', latitude)
         self._set_attribute('longitude', longitude)
@@ -71,6 +75,10 @@ class MovePayload(BasePayload):
 
     def set_author(self, user_id):
         self._set_relationships('author', 'user', user_id)
+        return self
+
+    def set_geokret(self, geokret_id):
+        self._set_relationships('geokret', 'geokret', geokret_id)
         return self
 
     def set_moved_on_datetime(self, move_datetime=None):

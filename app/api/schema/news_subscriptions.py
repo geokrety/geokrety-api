@@ -31,7 +31,7 @@ class NewsSubscriptionSchema(Schema):
     news = Relationship(
         attribute='news',
         self_view='v1.news_subscription_news',
-        self_view_kwargs={'id': '<news.id>'},
+        self_view_kwargs={'id': '<id>'},
         related_view='v1.news_details',
         related_view_kwargs={'news_subscription_id': '<id>'},
         schema='NewsSchema',

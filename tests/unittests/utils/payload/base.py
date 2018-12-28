@@ -53,6 +53,10 @@ class BasePayload(dict):
         })
         return self
 
+    def _del_relationships(self, relationships, name):
+        self['data']['relationships'].pop(relationships, None)
+        return self
+
     def _set_relationships_many(self, relationships, name, ids):
         if 'relationships' not in self['data']:  # pragma: no cover
             self['data']['relationships'] = {}

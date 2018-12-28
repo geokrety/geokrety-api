@@ -11,6 +11,36 @@ from app.models.move import Move
 celery = make_celery(current_app)
 
 
+def update_geokret_and_moves(geokrety, moves=None):
+    """ Recompute all values
+    """
+    if moves is None:
+        moves = []
+
+    if not isinstance(geokrety, list):
+        geokrety = [geokrety]
+    if not isinstance(moves, list):
+        moves = [moves]
+
+    for geokret_id in geokrety:
+        # Enhance Move content
+        update_move_distances.delay(geokret_id)
+        # Enhance GeoKret content
+        update_geokret_total_moves_count.delay(geokret_id)
+        update_geokret_holder.delay(geokret_id)
+
+    for move_id in moves:
+        update_move_country_and_altitude.delay(move_id)
+
+    # TODO Generate static files
+    # * gpx
+    # * csv
+    # * geojson
+    # * statpic owner
+    # * statpic mover
+    # *
+
+
 @celery.task(name='update.move.distance')
 def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret

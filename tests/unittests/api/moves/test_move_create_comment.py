@@ -50,4 +50,13 @@ class TestMoveCreateComment(BaseTestCase):
         payload = MovePayload(MOVE_TYPE_COMMENT, geokret=geokret)
         payload.set_geokret_id(geokret.id)
         payload['data']['attributes'].pop('tracking-code', None)
-        assert self.send_post(payload, user=self.user_1)
+        response = self.send_post(payload, user=self.user_1)
+        response.assertHasRelationshipGeokretData(geokret.id)
+
+    @request_context
+    def test_field_id_may_be_ommited_if_tracking_code_was_given(self):
+        geokret = self.blend_geokret()
+        payload = MovePayload(MOVE_TYPE_COMMENT, geokret=geokret)
+        payload.set_tracking_code(geokret.tracking_code)
+        response = self.send_post(payload, user=self.user_1)
+        response.assertHasRelationshipGeokretData(geokret.id)

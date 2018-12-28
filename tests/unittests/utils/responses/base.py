@@ -125,6 +125,10 @@ class BaseResponse(dict):
         try:
             assert 'id' in rel['data']
             assert rel['data']['id'] == str(value)
+        except AssertionError:  # pragma: no cover
+            raise AttributeError("Relationships '%s' value should be '%s' but was '%s'." %
+                                 (relationships, value, rel['data']['id']))
+        try:
             assert 'type' in rel['data']
             assert rel['data']['type'] == obj_type
         except AssertionError:  # pragma: no cover

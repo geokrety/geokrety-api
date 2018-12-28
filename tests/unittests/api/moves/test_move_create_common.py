@@ -94,12 +94,16 @@ class TestMoveCreateCommon(BaseTestCase):
         geokret = self.blend_geokret(created_on_datetime='2018-10-07T15:30:52')
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
-        payload.set_moved_on_datetime('2018-10-07T10:00:00')
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
+
+        payload.set_moved_on_datetime(geokret.created_on_datetime)
+        response = self.send_post(payload, user=self.user_1, code=201)
 
         payload.set_moved_on_datetime('2018-10-07T19:00:00')
         response = self.send_post(payload, user=self.user_1, code=201)
+
+        payload.set_moved_on_datetime('2018-10-07T10:00:00')
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
@@ -113,12 +117,13 @@ class TestMoveCreateCommon(BaseTestCase):
         geokret = self.blend_geokret(created_on_datetime='2018-10-07T15:30:52')
         payload = MovePayload(move_type, geokret=geokret)\
             .set_coordinates()
-        payload.set_moved_on_datetime(datetime.now() + timedelta(hours=6))
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
         payload.set_moved_on_datetime(datetime.utcnow() - timedelta(hours=1))
         response = self.send_post(payload, user=self.user_1, code=201)
+
+        payload.set_moved_on_datetime(datetime.now() + timedelta(hours=6))
+        response = self.send_post(payload, user=self.user_1, code=422)
+        response.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],
@@ -134,6 +139,7 @@ class TestMoveCreateCommon(BaseTestCase):
             .set_coordinates()
         payload.set_moved_on_datetime('2018-10-09T19:40:28')
         self.send_post(payload, user=self.user_1, code=201)
+
         response = self.send_post(payload, user=self.user_1, code=422)
         response.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 

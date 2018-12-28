@@ -103,7 +103,6 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         phpass.PasswordHash.hash_password = self.hash_password_original
-        Setup.drop_db()
 
     def tearDown(self):
         super(BaseTestCase, self).tearDown()
@@ -197,6 +196,7 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
 
         with app.test_request_context():
             print("URL: {}".format(endpoint))
+            print("METHOD: {}".format(method))
             print("PAYLOAD: {}".format(pprint.pformat(payload)))
             response = getattr(self.app, method)(endpoint,
                                                  json=payload,

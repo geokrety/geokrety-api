@@ -1,12 +1,16 @@
-import datetime
 import random
+from datetime import datetime
 
+from flask import request
 from sqlalchemy import ForeignKeyConstraint, event
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import bleach
 import characterentities
+from app.api.helpers.data_layers import MOVE_TYPE_DIPPED
+from app.api.helpers.utilities import has_attribute, round_microseconds
 from app.models import db
+from app.models.move import Move
 
 
 class Geokret(db.Model):
@@ -77,14 +81,14 @@ class Geokret(db.Model):
         db.DateTime,
         nullable=False,
         key='created_on_datetime',
-        default=datetime.datetime.utcnow,
+        default=datetime.utcnow,
     )
     updated_on_datetime = db.Column(
         'timestamp',
         db.TIMESTAMP(timezone=True),
         key='updated_on_datetime',
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
     )
 
     owner_id = db.Column(
@@ -194,3 +198,29 @@ class Geokret(db.Model):
 @event.listens_for(Geokret, 'init')
 def receive_init(target, args, kwargs):
     target.tracking_code = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))  # TODO
+
+
+@event.listens_for(Geokret, 'before_insert')
+def before_insert_listener(mapper, connection, target):
+    if not target.created_on_datetime:
+        target.created_on_datetime = round_microseconds(datetime.utcnow())
+
+
+@event.listens_for(Geokret, 'after_insert')
+def after_insert_listener(mapper, connection, target):
+    @event.listens_for(db.session, "after_flush", once=True)
+    def receive_after_flush(session, context):
+        json_data = request.get_json()
+        if has_attribute(json_data, 'born-at-home') and \
+                json_data['data']['attributes']['born-at-home']:
+            if target.owner.latitude and target.owner.longitude:
+                move = Move(
+                    author=target.owner,
+                    geokret=target,
+                    type=MOVE_TYPE_DIPPED,
+                    moved_on_datetime=target.created_on_datetime,
+                    latitude=target.owner.latitude,
+                    longitude=target.owner.longitude,
+                    comment="Born here",
+                )
+                db.session.add(move)
