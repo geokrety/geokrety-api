@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from sqlalchemy import ForeignKeyConstraint, event
+from sqlalchemy import event
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.exc import NoResultFound
@@ -32,12 +32,7 @@ class Move(db.Model):
         nullable=False,
         default=None
     )
-
-    ForeignKeyConstraint(
-        ['geokret_id'], ['geokret.id'],
-        use_alter=True,
-        name='fk_geokret_moved'
-    )
+    geokret = db.relationship("Geokret", foreign_keys=[geokret_id], backref=db.backref("moves"))
 
     latitude = db.Column(
         'lat',
@@ -126,6 +121,7 @@ class Move(db.Model):
         nullable=False,
         default=None,
     )
+    author = db.relationship("User", foreign_keys=[author_id], backref="moves")
 
     username = db.Column(
         'username',
@@ -172,9 +168,6 @@ class Move(db.Model):
         key='application_version',
         nullable=True
     )
-
-    # geokret = db.relationship('Geokret',
-    #     backref=db.backref('moves', lazy=True))
 
     @hybrid_property
     def comment(self):
