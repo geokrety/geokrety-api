@@ -38,6 +38,7 @@ class GeokretSchemaPublic(Schema):
     description = fields.Str()
     missing = fields.Boolean(dump_only=True)
     distance = fields.Integer(dump_only=True)
+    archived = fields.Boolean(dump_only=True)
     caches_count = fields.Integer(dump_only=True)
     pictures_count = fields.Integer(dump_only=True)
     average_rating = fields.Float(dump_only=True)
@@ -83,29 +84,28 @@ class GeokretSchemaPublic(Schema):
         related_view='v1.moves_list',
         related_view_kwargs={'geokret_id': '<id>'},
         many=True,
-        schema='MoveSchema',
+        schema='DefaultMoveSchema',
         type_='move',
-        #   include_resource_linkage=True
     )
 
     last_position = Relationship(
-        attribute='last_position_id',
+        attribute='last_position',
         self_view='v1.geokret_last_position',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.move_details',
         related_view_kwargs={'geokret_last_position_id': '<id>'},
-        schema='MoveSchema',
+        schema='DefaultMoveSchema',
         type_='move',
         include_resource_linkage=True,
     )
 
     last_move = Relationship(
-        attribute='last_move_id',
+        attribute='last_move',
         self_view='v1.geokret_last_move',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.move_details',
         related_view_kwargs={'geokret_last_move_id': '<id>'},
-        schema='MoveSchema',
+        schema='DefaultMoveSchema',
         type_='move',
         include_resource_linkage=True,
     )

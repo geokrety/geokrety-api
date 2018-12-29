@@ -205,3 +205,28 @@ class TestGeokretDetails(BaseTestCase):
         moves = self.blend_move(count=5, geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED)
         response = self.send_get(geokret.id, user=self.user_1, args={'include': 'moves'})
         response.assertHasRelationshipMovesDatas(moves)
+
+    @request_context
+    def test_geokret_details_has_archived_attribute(self):
+        geokret = self.blend_geokret(created_on_datetime="2018-12-29T21:39:13")
+        assert not geokret.archived
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasAttribute('archived', False)
+
+        self.blend_move(geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED,
+                        moved_on_datetime="2018-12-29T21:40:39")
+        assert not geokret.archived
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasAttribute('archived', False)
+
+        self.blend_move(geokret=geokret, author=self.user_1, type=MOVE_TYPE_ARCHIVED,
+                        moved_on_datetime="2018-12-29T21:40:45")
+        assert geokret.archived
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasAttribute('archived', True)
+
+        self.blend_move(geokret=geokret, author=self.user_1, type=MOVE_TYPE_GRABBED,
+                        moved_on_datetime="2018-12-29T21:51:27")
+        assert not geokret.archived
+        response = self.send_get(geokret.id, user=self.user_1)
+        response.assertHasAttribute('archived', False)

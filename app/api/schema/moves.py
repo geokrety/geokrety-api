@@ -103,6 +103,26 @@ class MoveSchema(Schema):
     )
 
 
+class DefaultMoveSchema(MoveSchema):
+
+    class Meta:
+        type_ = 'move'
+        self_view = 'v1.move_details'
+        self_view_kwargs = {'id': '<id>'}
+        self_view_many = 'v1.moves_list'
+        inflect = dasherize
+        ordered = True
+        dateformat = "%Y-%m-%dT%H:%M:%S"
+
+    # fields managed differently depending on move type
+    waypoint = fields.Str(dump_only=True)
+    latitude = fields.Float(dump_only=True)
+    longitude = fields.Float(dump_only=True)
+    altitude = fields.Integer(dump_only=True)
+    country = fields.Str(dump_only=True)
+    distance = fields.Integer(dump_only=True)
+
+
 class MoveWithCoordinatesSchema(MoveSchema):
 
     @validates('waypoint')

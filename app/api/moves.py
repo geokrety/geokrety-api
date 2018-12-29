@@ -13,10 +13,10 @@ from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import ForbiddenException, UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import has_relationships
-from app.api.schema.moves import (MoveArchiveSchema, MoveCommentSchema,
-                                  MoveDippedSchema, MoveDroppedSchema,
-                                  MoveGrabbedSchema, MoveSeenSchema,
-                                  MoveWithCoordinatesSchema)
+from app.api.schema.moves import (DefaultMoveSchema, MoveArchiveSchema,
+                                  MoveCommentSchema, MoveDippedSchema,
+                                  MoveDroppedSchema, MoveGrabbedSchema,
+                                  MoveSeenSchema)
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
@@ -103,7 +103,7 @@ class MovesList(ResourceList):
         update_geokret_and_moves(move.geokret_id, move.id)
         return move
 
-    schema = MoveWithCoordinatesSchema
+    schema = DefaultMoveSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
     decorators = (
         api.has_permission('auth_required', methods="POST"),
@@ -180,8 +180,8 @@ class MoveDetail(ResourceDetail):
 
         # Comming from Comment require tracking-code
         if old_move.type == MOVE_TYPE_COMMENT and not data.get('tracking_code'):
-                raise UnprocessableEntity("Tracking code is missing",
-                                          {'pointer': '/data/attributes/tracking-code'})
+            raise UnprocessableEntity("Tracking code is missing",
+                                      {'pointer': '/data/attributes/tracking-code'})
         # Now convert tracking-code to GeoKret ID
         if 'tracking_code' in data:
             geokrety_to_update.append(old_move.geokret.id)
@@ -203,7 +203,7 @@ class MoveDetail(ResourceDetail):
                            model=Move, fetch_key_url="id"),
     )
     methods = ('GET', 'PATCH', 'DELETE')
-    schema = MoveDippedSchema
+    schema = DefaultMoveSchema
     data_layer = {
         'session': db.session,
         'model': Move,
@@ -212,7 +212,7 @@ class MoveDetail(ResourceDetail):
 
 class MoveRelationship(ResourceRelationship):
     methods = ['GET']
-    schema = MoveGrabbedSchema
+    schema = DefaultMoveSchema
     data_layer = {
         'session': db.session,
         'model': Move,

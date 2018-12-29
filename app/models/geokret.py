@@ -2,12 +2,14 @@ import random
 from datetime import datetime
 
 from flask import request
-from sqlalchemy import ForeignKeyConstraint, event
+from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.exc import NoResultFound
 
 import bleach
 import characterentities
-from app.api.helpers.data_layers import MOVE_TYPE_DIPPED
+from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
+                                         MOVE_TYPE_DIPPED)
 from app.api.helpers.utilities import has_attribute, round_microseconds
 from app.models import db
 from app.models.move import Move
@@ -98,12 +100,7 @@ class Geokret(db.Model):
         nullable=True,
         key='owner_id',
     )
-
-    ForeignKeyConstraint(
-        ['owner_id'], ['user.id'],
-        use_alter=True,
-        name='fk_geokret_owner'
-    )
+    owner = db.relationship("User", foreign_keys=[owner_id], backref="geokrety_owned")
 
     holder_id = db.Column(
         'hands_of',
@@ -111,18 +108,14 @@ class Geokret(db.Model):
         db.ForeignKey('gk-users.id', name='fk_geokret_holder'),
         key='holder_id',
     )
+    holder = db.relationship("User", foreign_keys=[holder_id], backref="geokrety_held")
 
-    ForeignKeyConstraint(
-        ['holder_id'], ['user.id'],
-        use_alter=True,
-        name='fk_geokret_holder'
-    )
-
-    moves = db.relationship(
+    # This is used to compute the archived status
+    _moves = db.relationship(
         'Move',
-        backref="geokret",
         foreign_keys="Move.geokret_id",
         cascade="all,delete",
+        lazy="dynamic",
     )
 
     last_position_id = db.Column(
@@ -133,11 +126,7 @@ class Geokret(db.Model):
         nullable=True,
         default=None,
     )
-
-    ForeignKeyConstraint(
-        ['last_position_id'], ['move.id'],
-        use_alter=True, name='fk_geokret_last_position'
-    )
+    last_position = db.relationship("Move", foreign_keys=[last_position_id], backref="spotted_geokret")
 
     last_move_id = db.Column(
         'ost_log_id',
@@ -145,12 +134,7 @@ class Geokret(db.Model):
         db.ForeignKey('gk-ruchy.id', name='fk_last_move', ondelete="SET NULL"),
         key='last_move_id'
     )
-
-    ForeignKeyConstraint(
-        ['last_move_id'], ['move.id'],
-        use_alter=True,
-        name='fk_last_move'
-    )
+    last_move = db.relationship("Move", foreign_keys=[last_move_id], backref="moves")
 
     # avatar_id = db.Column(
     #     'avatarid',
@@ -158,6 +142,17 @@ class Geokret(db.Model):
     #     db.ForeignKey('gk-obrazki.id'),
     #     key='avatar_id'
     # )
+
+    @hybrid_property
+    def archived(self):
+        """Compute the archived status
+        """
+        try:
+            last_move = self._moves.filter(Move.type != MOVE_TYPE_COMMENT)\
+                .order_by(Move.moved_on_datetime.desc()).limit(1).one()
+            return last_move.type == MOVE_TYPE_ARCHIVED
+        except NoResultFound:
+            return False
 
     @property
     def average_rating(self):
