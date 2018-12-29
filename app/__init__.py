@@ -15,7 +15,6 @@ from flask_script import Manager
 
 from app.api.helpers.auth import AuthManager
 from app.api.helpers.jwt import jwt_authenticate, jwt_identity
-from app.models import db
 from app.views.celery_ import celery
 from app.views.sentry import sentry
 
@@ -30,6 +29,7 @@ env.read_envfile()
 
 def create_app():
     app.config.from_object(env('APP_CONFIG', default='config.ProductionConfig'))
+    from app.models import db
     db.init_app(app)
 
     _manager = Manager(app)

@@ -5,6 +5,7 @@ from app import current_app, make_celery
 from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
+from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
 
@@ -31,6 +32,8 @@ def update_geokret_and_moves(geokrety, moves=None):
 
     for move_id in moves:
         update_move_country_and_altitude.delay(move_id)
+
+    db.session.commit()
 
     # TODO Generate static files
     # * gpx
