@@ -1,5 +1,6 @@
 from app.api.bootstrap import api
-from app.api.geokrety import GeokretDetail, GeokretList, GeokretRelationship
+from app.api.geokrety import (GeokretDetail, GeokretInACacheList, GeokretList,
+                              GeokretRelationship)
 from app.api.geokrety_types import (GeokretTypeDetail, GeokretTypeList,
                                     GeokretTypeRelationship)
 from app.api.moves import MoveDetail, MoveRelationship, MovesList
@@ -87,6 +88,9 @@ api.route(GeokretList, 'geokrety_list', '/geokrety',
           '/users/<int:owner_id>/geokrety-owned',
           '/users/<int:holder_id>/geokrety-held',
           '/geokrety-types/<int:geokrety_type_id>/geokrety',
+          )
+api.route(GeokretInACacheList, 'geokrety_in_a_cache_list',
+          '/geokrety/in-cache',
           )
 api.route(GeokretDetail, 'geokret_details',
           '/geokrety/<int:id>',

@@ -1,5 +1,6 @@
 
 
+from flask import request
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
@@ -8,6 +9,7 @@ from flask_rest_jsonapi.exceptions import ObjectNotFound
 from app.api.bootstrap import api
 from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
 from app.api.helpers.db import safe_query
+from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import require_relationship
 from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
@@ -70,6 +72,27 @@ class GeokretList(ResourceList):
             'query': query,
         },
     }
+
+
+class GeokretInACacheList(GeokretList):
+
+    def query(self, view_kwargs):
+        """Filter geokrety"""
+        query_ = self.session.query(Geokret)
+
+        waypoint = request.args.get('waypoint')
+        if waypoint:
+            return query_.filter_by(last_position__waypoint=waypoint)
+
+        latitude = request.args.get('latitude')
+        longitude = request.args.get('longitude')
+        if latitude and longitude:
+            return query_\
+                .filter_by(last_position__latitude=latitude)\
+                .filter_by(last_position__latitude=latitude)
+
+        raise UnprocessableEntity("Waypoint or latitude/longitude missing from arguments",
+                                  {'pointer': 'args: waypoint or latitude and longitude'})
 
 
 class GeokretDetail(ResourceDetail):
