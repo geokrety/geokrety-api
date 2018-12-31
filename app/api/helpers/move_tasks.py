@@ -54,9 +54,11 @@ def update_move_distances(geokret_id):
     last = None
     total_distance = 0
     for move in moves:
-        # updates the last_position_id which is the ruch_id for last log of type grabbed, dropped, met or archived
         if move.type in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
             geokret.last_position_id = move.id
+        elif move.type in (MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED):
+            geokret.last_position_id = None
+
         geokret.last_move_id = move.id
         if move.latitude is None:
             continue

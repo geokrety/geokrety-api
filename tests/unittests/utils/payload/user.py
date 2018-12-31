@@ -6,8 +6,13 @@ from .base import BasePayload
 
 
 class UserPayload(BasePayload):
-    def __init__(self):
-        super(UserPayload, self).__init__('user')
+    _url = "/v1/users/{}"
+    _url_collection = "/v1/users"
+    _response_type = 'UserResponse'
+    _response_type_collection = 'UsersCollectionResponse'
+
+    def __init__(self, *args, **kwargs):
+        super(UserPayload, self).__init__('user', *args, **kwargs)
 
     def set_name(self, name):
         self._set_attribute('name', name)

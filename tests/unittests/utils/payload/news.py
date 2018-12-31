@@ -2,12 +2,19 @@
 
 from mixer.backend.flask import mixer
 
+from app.models.user import User
+
 from .base import BasePayload
 
 
 class NewsPayload(BasePayload):
-    def __init__(self):
-        super(NewsPayload, self).__init__('news')
+    _url = "/v1/news/{}"
+    _url_collection = "/v1/news"
+    _response_type = 'NewsResponse'
+    _response_type_collection = 'NewsCollectionResponse'
+
+    def __init__(self, *args, **kwargs):
+        super(NewsPayload, self).__init__('news', *args, **kwargs)
 
     def set_title(self, title):
         self._set_attribute('title', title)
@@ -21,7 +28,8 @@ class NewsPayload(BasePayload):
         self._set_attribute('username', username)
         return self
 
-    def set_author(self, user_id):
+    def set_author(self, user):
+        user_id = user.id if isinstance(user, User) else user
         self._set_relationships('author', 'user', user_id)
         return self
 

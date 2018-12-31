@@ -19,9 +19,9 @@ class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
     def test_as(self, username):
         user = getattr(self, username) if username else None
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        assert self.send_post(payload, user=user)
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            .post(user=user)
 
     @parameterized.expand([
         ['user_1'],
@@ -32,11 +32,11 @@ class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
     def test_field_latitude_must_be_present(self, username):
         user = getattr(self, username) if username else None
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload['data']['attributes'].pop('latitude', None)
-        response = self.send_post(payload, user=user, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/latitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._del_attribute('latitude')\
+            .post(user=user, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/latitude')
 
     @parameterized.expand([
         ['user_1'],
@@ -47,11 +47,11 @@ class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
     def test_field_longitude_must_be_present(self, username):
         user = getattr(self, username) if username else None
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload['data']['attributes'].pop('longitude', None)
-        response = self.send_post(payload, user=user, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/longitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._del_attribute('longitude')\
+            .post(user=user, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/longitude')
 
     @parameterized.expand([
         [None],
@@ -60,11 +60,11 @@ class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
     @request_context
     def test_field_latitude_cannot_be_empty(self, latitude):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload._set_attribute('latitude', latitude)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/latitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._set_attribute('latitude', latitude)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/latitude')
 
     @parameterized.expand([
         [None],
@@ -73,8 +73,8 @@ class _BaseTestCoordinatesMandatory(_BaseTestCoordinates):
     @request_context
     def test_field_longitude_cannot_be_empty(self, longitude):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload._set_attribute('longitude', longitude)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/longitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._set_attribute('longitude', longitude)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/longitude')

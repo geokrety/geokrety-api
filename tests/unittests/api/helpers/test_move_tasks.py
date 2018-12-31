@@ -130,7 +130,7 @@ class TestMoveTasksHelper(BaseTestCase):
             db.session.commit()
 
             # Check in database
-            self.assertEqual(self.geokret1.last_position_id, self.move5.id)
+            self.assertEqual(self.geokret1.last_position_id, None)
 
     def test_update_geokret_last_move(self):
         """Check Move Tasks: compute GeoKret last move"""

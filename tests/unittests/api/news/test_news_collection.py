@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
 
-import urllib
+from parameterized import parameterized
 
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
-from tests.unittests.utils.responses.collections import NewsCollectionResponse
+from tests.unittests.utils.payload.news import NewsPayload
 
 
 class TestNewsCollection(BaseTestCase):
     """Test News collection"""
 
-    def send_get(self, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/news?%s" % (args_)
-        return NewsCollectionResponse(self._send_get(url, **kwargs).get_json())
-
+    @parameterized.expand([
+        [None, 200],
+        ['admin', 200],
+        ['user_1', 200],  # Owner
+        ['user_2', 200],
+    ])
     @request_context
-    def test_news_collection_has_normal_attributes_as_anonymous_user(self):
+    def test_news_collection_can_be_accessed_as(self, username, expected):
         news = self.blend_news(author=self.user_1, count=3)
-        response = self.send_get()
-        i = 0
-        for news_response in response.data:
-            news_response.assertHasPublicAttributes(news[i])
-            i = i + 1
+        user = getattr(self, username) if username else None
+
+        response = NewsPayload()\
+            .get_collection(user=user, code=expected)\
+            .assertCount(3)
+
+        response.data[0].assertHasPublicAttributes(news[0])
+        response.data[1].assertHasPublicAttributes(news[1])
+        response.data[2].assertHasPublicAttributes(news[2])

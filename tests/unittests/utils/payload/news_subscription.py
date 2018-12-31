@@ -1,32 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from mixer.backend.flask import mixer
+from app.models.news import News
+from app.models.user import User
 
 from .base import BasePayload
 
 
 class NewsSubscriptionPayload(BasePayload):
-    def __init__(self):
-        super(NewsSubscriptionPayload, self).__init__('news-subscription')
+    _url = "/v1/news-subscriptions/{}"
+    _url_collection = "/v1/news-subscriptions"
+    _response_type = 'NewsSubscriptionResponse'
+    _response_type_collection = 'NewsSubscriptionCollectionResponse'
 
-    def set_subscribed(self, subscribed):
-        self._set_attribute('subscribed', subscribed)
-        return self
+    def __init__(self, news=None, *args, **kwargs):
+        super(NewsSubscriptionPayload, self).__init__('news-subscription', *args, **kwargs)
 
-    def set_user(self, user_id):
+        if news is not None:
+            self.set_news(news)
+
+    def set_user(self, user):
+        user_id = user.id if isinstance(user, User) else user
         self._set_relationships('user', 'user', user_id)
         return self
 
-    def set_news(self, news_id):
+    def set_news(self, news):
+        news_id = news.id if isinstance(news, News) else news
         self._set_relationships('news', 'news', news_id)
         return self
-
-    def set_obj(self, obj):
-        self._set_attribute('subscribed_on_datetime', obj.subscribed_on_datetime)
-        self.set_subscribed(obj.subscribed)
-        return self
-
-    def blend(self):
-        with mixer.ctx(commit=False):
-            self.set_obj(mixer.blend('app.models.news_subscription.NewsSubscription'))
-            return self

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from parameterized import parameterized
 
 from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
@@ -11,22 +9,16 @@ from app.api.helpers.data_layers import (GEOKRET_TYPE_BOOK, GEOKRET_TYPE_COIN,
 from tests.unittests.utils.base_test_case import (BaseTestCase,
                                                   custom_name_geokrety_type,
                                                   request_context)
-from tests.unittests.utils.responses.geokrety_types import \
-    GeokretyTypesResponse
+from tests.unittests.utils.payload.geokret_type import GeokretTypePayload
 
 
-class fakeGeokretyType(object):
+class mockGeokretyType(object):
     def __init__(self, name):
         self.name = name
 
 
 class TestGeokretyTypeDetails(BaseTestCase):
     """Test GeoKrety Types details"""
-
-    def send_get(self, obj_id, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/geokrety-types/%s?%s" % (obj_id, args_)
-        return GeokretyTypesResponse(self._send_get(url, **kwargs).get_json())
 
     @parameterized.expand([
         [GEOKRET_TYPE_TRADITIONAL, "Traditional"],
@@ -36,8 +28,9 @@ class TestGeokretyTypeDetails(BaseTestCase):
         [GEOKRET_TYPE_KRETYPOST, "KretyPost"],
     ], doc_func=custom_name_geokrety_type)
     @request_context
-    def test_geokrety_types_details_has_normal_attributes_as_anonymous_user(self, move_type, expected):
-        fake_type = fakeGeokretyType(expected)
-        response = self.send_get(move_type)
-        response.assertHasAttribute('name', fake_type.name)
-        response.assertHasPublicAttributes(fake_type)
+    def test_geokrety_types_details_has_normal_attributes_as_anonymous_user(self, geokret_type, expected):
+        mocked_type = mockGeokretyType(expected)
+        GeokretTypePayload()\
+            .get(geokret_type)\
+            .assertHasAttribute('name', mocked_type.name)\
+            .assertHasPublicAttributes(mocked_type)

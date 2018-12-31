@@ -3,7 +3,7 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
 
 from app.api.bootstrap import api
-from app.api.helpers.exceptions import ForbiddenException, UnprocessableEntity
+from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.news_subscriptions import NewsSubscriptionSchema
 from app.models import db
@@ -25,12 +25,6 @@ class NewsSubscriptionList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
-
-        # Check author_id
-        if not data.get('subscribed'):
-            raise UnprocessableEntity('Setting subscribed to False has no sense',
-                                      {'pointer': '/data/attributes/subscribed'})
-
         # Set author to current user by default
         user = current_identity
         if 'user' not in data:
@@ -65,7 +59,7 @@ class NewsSubscriptionDetail(ResourceDetail):
         api.has_permission('is_user_itself', methods="GET,PATCH,DELETE",
                            fetch="user_id", fetch_as="user_id", model=NewsSubscription),
     )
-    methods = ['GET', 'PATCH', 'DELETE']
+    methods = ['GET', 'DELETE']
     schema = NewsSubscriptionSchema
     data_layer = {
         'session': db.session,

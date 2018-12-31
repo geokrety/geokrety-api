@@ -1,35 +1,32 @@
 # -*- coding: utf-8 -*-
 
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
+from tests.unittests.utils.payload.news import NewsPayload
 
 
 class TestNewsRelationships(BaseTestCase):
     """Test News relationships"""
 
-    def validate(self, url, item_id):
-        response = self._send_get(url.format(self.news.id), user=self.user_2).get_json()
-        self.assertEqual(response['data']['id'], item_id)
-
-    def validate_multiple(self, url, item_id):
-        response = self._send_get(url.format(self.news.id), user=self.user_2).get_json()
-        self.assertEqual(response['data'][0]['id'], item_id)
+    @request_context
+    def test_news_comments_relationship(self):
+        news = self.blend_news(author=self.user_1)
+        news_comment = self.blend_news_comment(news=news)
+        NewsPayload(_url_collection="/v1/news/{}/relationships/news-comments".format(news.id))\
+            .get_collection()\
+            .assertHasDatas('news-comment', [news_comment.id])
 
     @request_context
-    def test_news_news_comments_relationship(self):
-        self.news = self.blend_news(author=self.user_1)
-        news_comment = self.blend_news_comment(news=self.news)
-        url = "/v1/news/{}/relationships/news-comments"
-        self.validate_multiple(url, news_comment.id)
+    def test_author_relationship(self):
+        news = self.blend_news(author=self.user_1)
+        NewsPayload(_url="/v1/news/{}/relationships/author")\
+            .get(news.id)\
+            .assertHasData('user', news.author.id)
 
     @request_context
-    def test_news_author_relationship(self):
-        self.news = self.blend_news(author=self.user_1)
-        url = "/v1/news/{}/relationships/author"
-        self.validate(url, self.user_1.id)
+    def test_subscribed_users_relationship(self):
+        news = self.blend_news(author=self.user_1)
+        news_subscription = self.blend_news_subscription(news=news)
 
-    @request_context
-    def test_news_subscribed_users_relationship(self):
-        self.news = self.blend_news(author=self.user_1)
-        news_subscription = self.blend_news_subscription(news=self.news)
-        url = "/v1/news/{}/relationships/subscriptions"
-        self.validate_multiple(url, news_subscription.id)
+        NewsPayload(_url_collection="/v1/news/{}/relationships/subscriptions".format(news.id))\
+            .get_collection()\
+            .assertHasDatas('news-subscription', [news_subscription.id])

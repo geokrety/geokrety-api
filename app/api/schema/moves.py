@@ -1,4 +1,3 @@
-import re
 from string import digits, letters
 
 from flask import request
@@ -13,6 +12,7 @@ from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.utilities import dasherize
 from app.models.geokret import Geokret
+from app.views.regex import REG_LATITUDE, REG_LONGITUDE
 
 ALLOWED_TRACKING_CODE_CHARACTERS = set(digits).union(letters)
 ALLOWED_WAYPOINT_CHARACTERS = set(digits).union(letters)
@@ -74,7 +74,7 @@ class MoveSchema(Schema):
         self_view='v1.move_author',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.user_details',
-        related_view_kwargs={'move_author_id': '<id>'},
+        related_view_kwargs={'move_id': '<id>'},
         schema='UserSchema',
         type_='user',
         include_resource_linkage=True,
@@ -136,15 +136,13 @@ class MoveWithCoordinatesSchema(MoveSchema):
 
     @validates('latitude')
     def validate_latitude_valid(self, data):
-        pattern = re.compile("^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$")
-        if data is not None and not pattern.match(str(data)):
+        if data is not None and not REG_LATITUDE.match(str(data)):
             raise UnprocessableEntity("Latitude is invalid",
                                       {'pointer': '/data/attributes/latitude'})
 
     @validates('longitude')
     def validate_longitude_valid(self, data):
-        pattern = re.compile("^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$")
-        if data is not None and not pattern.match(str(data)):
+        if data is not None and not REG_LONGITUDE.match(str(data)):
             raise UnprocessableEntity("Longitude is invalid",
                                       {'pointer': '/data/attributes/longitude'})
 

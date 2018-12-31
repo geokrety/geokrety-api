@@ -2,28 +2,41 @@
 
 import pprint
 
+from tests.unittests.mixins.send_payload_mixin import SendPayloadMixin
 
-class BasePayload(dict):
+
+class BasePayload(SendPayloadMixin, dict):
 
     TYPES = [
         'geokret',
+        'geokret-type',
         'move',
+        'move-type',
         'user',
         'news',
         'news-subscription',
         'news-comment',
     ]
 
-    def __init__(self, obj_type):
+    def __init__(self, obj_type, *args, **kwargs):
+        self._update_payload_attributes(**kwargs)
+        super(BasePayload, self).__init__(*args, **kwargs)
+
         if obj_type not in self.TYPES:  # pragma: no cover
-            raise AttributeError("Invalid Payload type")
+            raise AttributeError("Invalid Payload type ({})".format(obj_type))
+        self.type = obj_type
 
         self.update({
             "data": {
                 "type": obj_type
             }
         })
-        self.blend()
+
+    def _update_payload_attributes(self, **kwargs):
+        if "_url" in kwargs:
+            self._url = kwargs.pop('_url')
+        if "_url_collection" in kwargs:
+            self._url_collection = kwargs.pop('_url_collection')
 
     def set_id(self, value):
         self['data']['id'] = str(value)
@@ -37,6 +50,11 @@ class BasePayload(dict):
             self['data']['attributes'][name] = {}
 
         self['data']['attributes'][name] = value
+        return self
+
+    def _del_attribute(self, attribute):
+        if 'attributes' in self['data']:
+            self['data']['attributes'].pop(attribute, None)
         return self
 
     def _set_relationships(self, relationships, name, obj_id):
@@ -53,7 +71,7 @@ class BasePayload(dict):
         })
         return self
 
-    def _del_relationships(self, relationships, name):
+    def _del_relationships(self, relationships):
         self['data']['relationships'].pop(relationships, None)
         return self
 
@@ -78,5 +96,5 @@ class BasePayload(dict):
     def set_obj(self, obj):  # pragma: no cover
         raise NotImplementedError("`set_obj` is not implemented")
 
-    def pprint(self):
+    def pprint(self):  # pragma: no cover
         pprint.pprint(self)

@@ -34,8 +34,8 @@ class UserDetail(ResourceDetail):
         :param view_kwargs:
         :return:
         """
-        if view_kwargs.get('news_author_id') is not None:
-            news = safe_query(self, News, 'id', view_kwargs['news_author_id'], 'news_author_id')
+        if view_kwargs.get('news_id') is not None:
+            news = safe_query(self, News, 'id', view_kwargs['news_id'], 'news_id')
             view_kwargs['id'] = news.author_id
 
         if view_kwargs.get('news_comment_id') is not None:
@@ -54,8 +54,8 @@ class UserDetail(ResourceDetail):
             geokret = safe_query(self, Geokret, 'id', view_kwargs['geokret_held_id'], 'geokret_held_id')
             view_kwargs['id'] = geokret.holder_id
 
-        if view_kwargs.get('move_author_id') is not None:
-            move = safe_query(self, Move, 'id', view_kwargs['move_author_id'], 'move_author_id')
+        if view_kwargs.get('move_id') is not None:
+            move = safe_query(self, Move, 'id', view_kwargs['move_id'], 'move_id')
             view_kwargs['id'] = move.author_id
 
     def before_delete(self, args, kwargs):

@@ -1,87 +1,72 @@
 # -*- coding: utf-8 -*-
 
+from app.models.user import User
 
-from base import BaseResponse
+from .base import BaseResponse
+from .collections import BaseCollectionResponse
 
 
 class GeokretResponse(BaseResponse):
 
-    @property
-    def name(self):
-        return self.get_attribute('name')
-
-    @property
-    def description(self):
-        return self.get_attribute('description')
-
-    @property
-    def missing(self):
-        return self.get_attribute('missing')
-
-    @property
-    def distance(self):
-        return self.get_attribute('distance')
-
-    @property
-    def caches_count(self):
-        return self.get_attribute('caches-count')
-
-    @property
-    def pictures_count(self):
-        return self.get_attribute('pictures-count')
-
-    @property
-    def average_rating(self):
-        return self.get_attribute('average-rating')
-
-    @property
-    def type(self):
-        return self['relationships']['type']['data']['id']
-
     def assertHasTrackingCode(self, tracking_code):
         self.assertHasAttribute('tracking-code', tracking_code)
+        return self
 
     def assertHasRelationshipOwner(self):
         self.assertHasRelationshipSelf('owner', '/v1/geokrety/%s/relationships/owner' % self.id)
         self.assertHasRelationshipRelated('owner', '/v1/geokrety/%s/owner' % self.id)
+        return self
 
     def assertHasRelationshipHolder(self):
         self.assertHasRelationshipSelf('holder', '/v1/geokrety/%s/relationships/holder' % self.id)
         self.assertHasRelationshipRelated('holder', '/v1/geokrety/%s/holder' % self.id)
+        return self
 
     def assertHasRelationshipGeokretyType(self):
         self.assertHasRelationshipSelf('type', '/v1/geokrety/%s/relationships/type' % self.id)
         self.assertHasRelationshipRelated('type', '/v1/geokrety/%s/type' % self.id)
+        return self
 
     def assertHasRelationshipMoves(self):
         self.assertHasRelationshipSelf('moves', '/v1/geokrety/%s/relationships/moves' % (self.id))
         self.assertHasRelationshipRelated('moves', '/v1/geokrety/%s/moves' % (self.id))
+        return self
 
     def assertHasRelationshipLastPosition(self):
         self.assertHasRelationshipSelf('last-position', '/v1/geokrety/%s/relationships/last-position' % (self.id))
         self.assertHasRelationshipRelated('last-position', '/v1/geokrety/%s/last-position' % (self.id))
+        return self
 
     def assertHasRelationshipLastMove(self):
         self.assertHasRelationshipSelf('last-move', '/v1/geokrety/%s/relationships/last-move' % (self.id))
         self.assertHasRelationshipRelated('last-move', '/v1/geokrety/%s/last-move' % (self.id))
+        return self
 
-    def assertHasRelationshipOwnerData(self, user_id):
+    def assertHasRelationshipOwnerData(self, user):
+        user_id = user.id if isinstance(user, User) else user
         self.assertHasRelationshipData('owner', user_id, 'user')
+        return self
 
-    def assertHasRelationshipHolderData(self, user_id):
+    def assertHasRelationshipHolderData(self, user):
+        user_id = user.id if isinstance(user, User) else user
         self.assertHasRelationshipData('holder', user_id, 'user')
+        return self
 
-    def assertHasRelationshipGeokretyTypeData(self, user_id):
-        self.assertHasRelationshipData('type', user_id, 'type')
+    def assertHasRelationshipGeokretyTypeData(self, type_id):
+        self.assertHasRelationshipData('type', type_id, 'type')
+        return self
 
     def assertHasRelationshipMovesDatas(self, moves_ids):
         self.assertHasRelationshipDatas('moves', moves_ids, 'move')
+        return self
 
     def assertHasRelationshipLastPositionData(self, move_id):
         self.assertHasRelationshipData('last-position', move_id, 'move')
+        return self
 
     def assertHasRelationshipLastMoveData(self, move_id):
         self.assertHasRelationshipData('last-move', move_id, 'move')
+        return self
 
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
@@ -100,3 +85,14 @@ class GeokretResponse(BaseResponse):
         self.assertHasRelationshipLastMove()
         self.assertHasRelationshipGeokretyType()
         self.assertHasRelationshipGeokretyTypeData(obj.type)
+        return self
+
+
+class GeokretyCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(GeokretyCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(GeokretResponse(data_))
+        self['data'] = datas
