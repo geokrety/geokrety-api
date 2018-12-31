@@ -1,13 +1,15 @@
 
 
+from datetime import datetime
+
 from flask import request
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
-from flask_rest_jsonapi.exceptions import ObjectNotFound
+from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound
 
 from app.api.bootstrap import api
-from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST
+from app.api.helpers.data_layers import GEOKRETY_TYPES_LIST, MOVE_TYPE_DIPPED
 from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
@@ -15,7 +17,9 @@ from app.api.helpers.utilities import require_relationship
 from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
 from app.models import db
 from app.models.geokret import Geokret
+from app.models.move import Move
 from app.models.user import User
+from app.views.regex import REG_LATITUDE, REG_LONGITUDE
 
 
 class GeokretList(ResourceList):
@@ -58,7 +62,34 @@ class GeokretList(ResourceList):
         data['holder'] = data['owner']
 
         if 'born_at_home' in data and data['born_at_home']:
+            self._data_layer.__create_first_move = True
             del data['born_at_home']
+        else:
+            self._data_layer.__create_first_move = False
+
+    def after_create_object(self, geokret, data, view_kwargs):
+        # Create first move if requested
+        if self.__create_first_move:
+            # But only if user has home coordinates
+            if geokret.owner.latitude and geokret.owner.longitude:
+                move = Move(
+                    author=geokret.owner,
+                    geokret=geokret,
+                    type=MOVE_TYPE_DIPPED,
+                    moved_on_datetime=datetime.utcnow(),
+                    latitude=geokret.owner.latitude,
+                    longitude=geokret.owner.longitude,
+                    comment="Born here",
+                )
+                geokret.last_move = move
+                db.session.add(move)
+                db.session.add(geokret)
+                try:
+                    db.session.commit()
+                except Exception as e:  # pragma: no cover
+                    db.session.rollback()
+                    raise JsonApiException("Failed to create first move: " + str(e), source={'pointer': '/data'})
+        return geokret
 
     schema = GeokretSchemaPublic
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
@@ -70,6 +101,7 @@ class GeokretList(ResourceList):
         'model': Geokret,
         'methods': {
             'query': query,
+            'after_create_object': after_create_object,
         },
     }
 
@@ -81,18 +113,36 @@ class GeokretInACacheList(GeokretList):
         query_ = self.session.query(Geokret)
 
         waypoint = request.args.get('waypoint')
-        if waypoint:
-            return query_.filter_by(last_position__waypoint=waypoint)
+        if waypoint is not None:
+            if waypoint:
+                return query_.filter(Geokret.last_position.has(Move.waypoint == waypoint))
+            raise UnprocessableEntity("Waypoint is invalid",
+                                      {'pointer': '/argument/waypoint'})
 
         latitude = request.args.get('latitude')
         longitude = request.args.get('longitude')
         if latitude and longitude:
+            if not REG_LATITUDE.match(str(latitude)):
+                raise UnprocessableEntity("Latitude is invalid",
+                                          {'pointer': '/argument/latitude'})
+            if not REG_LONGITUDE.match(str(longitude)):
+                raise UnprocessableEntity("Longitude is invalid",
+                                          {'pointer': '/argument/longitude'})
             return query_\
-                .filter_by(last_position__latitude=latitude)\
-                .filter_by(last_position__latitude=latitude)
+                .filter(Geokret.last_position.has(Move.latitude == latitude))\
+                .filter(Geokret.last_position.has(Move.latitude == latitude))
 
         raise UnprocessableEntity("Waypoint or latitude/longitude missing from arguments",
-                                  {'pointer': 'args: waypoint or latitude and longitude'})
+                                  {'pointer': '/argument/[waypoint or latitude-longitude]'})
+
+    methods = ('GET',)
+    data_layer = {
+        'session': db.session,
+        'model': Geokret,
+        'methods': {
+            'query': query,
+        },
+    }
 
 
 class GeokretDetail(ResourceDetail):

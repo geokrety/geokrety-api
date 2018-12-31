@@ -35,7 +35,7 @@ class GeokretSchemaPublic(Schema):
 
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
-    description = fields.Str()
+    description = fields.Str(allow_none=True)
     missing = fields.Boolean(dump_only=True)
     distance = fields.Integer(dump_only=True)
     archived = fields.Boolean(dump_only=True)

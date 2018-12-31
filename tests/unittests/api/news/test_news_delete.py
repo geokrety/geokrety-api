@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from parameterized import parameterized
 
+from app.models import db
+from app.models.news_comment import NewsComment
+from app.models.news_subscription import NewsSubscription
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
-from tests.unittests.utils.responses.news import NewsResponse
+from tests.unittests.utils.payload.news import NewsPayload
 
 
 class TestNewsDelete(BaseTestCase):
     """Test News delete"""
-
-    def send_delete(self, obj_id, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/news/%s?%s" % (obj_id, args_)
-        return NewsResponse(self._send_delete(url, **kwargs).get_json())
 
     @parameterized.expand([
         [None, 401],
@@ -23,7 +19,35 @@ class TestNewsDelete(BaseTestCase):
         ['user_2', 403],
     ])
     @request_context
-    def test_news_delete_as(self, username, expected):
-        news = self.blend_news()
+    def test_as(self, username, expected):
         user = getattr(self, username) if username else None
-        assert self.send_delete(news.id, user=user, code=expected)
+        news = self.blend_news()
+        NewsPayload().delete(news.id, user=user, code=expected)
+
+    @request_context
+    def test_news_comments_must_be_cleaned(self):
+        news = self.blend_news()
+        self.blend_news_comment(count=3)
+        self.blend_news_comment(news=news, count=5)
+
+        news_comment = db.session \
+            .query(NewsComment) \
+            .filter(NewsComment.news_id == news.id)
+        self.assertEqual(news_comment.count(), 5)
+
+        NewsPayload().delete(news.id, user=self.admin)
+        self.assertEqual(news_comment.count(), 0)
+
+    @request_context
+    def test_news_subscription_must_be_cleaned(self):
+        news = self.blend_news()
+        self.blend_news_subscription(count=2)
+        self.blend_news_subscription(news=news, count=4)
+
+        news_subscription = db.session \
+            .query(NewsSubscription) \
+            .filter(NewsSubscription.news_id == news.id)
+        self.assertEqual(news_subscription.count(), 4)
+
+        NewsPayload().delete(news.id, user=self.admin)
+        self.assertEqual(news_subscription.count(), 0)

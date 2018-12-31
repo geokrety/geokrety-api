@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from base import BaseResponse
+from .base import BaseResponse
+from .collections import BaseCollectionResponse
 
 
 class UserResponse(BaseResponse):
@@ -8,44 +9,56 @@ class UserResponse(BaseResponse):
     def assertHasRelationshipNews(self):
         self.assertHasRelationshipSelf('news', '/v1/users/%s/relationships/news' % self.id)
         self.assertHasRelationshipRelated('news', '/v1/users/%s/news' % self.id)
+        return self
 
     def assertHasRelationshipNewsComments(self):
         self.assertHasRelationshipSelf('news_comments', '/v1/users/%s/relationships/news-comments' % self.id)
         self.assertHasRelationshipRelated('news_comments', '/v1/users/%s/news-comments' % self.id)
+        return self
 
     def assertHasRelationshipNewsSubscriptions(self):
         self.assertHasRelationshipSelf('news_subscriptions', '/v1/users/%s/relationships/news-subscription' % self.id)
         self.assertHasRelationshipRelated('news_subscriptions', '/v1/users/%s/news-subscription' % self.id)
+        return self
 
     def assertHasRelationshipGeokretyOwned(self):
         self.assertHasRelationshipSelf('geokrety_owned', '/v1/users/%s/relationships/geokrety-owned' % self.id)
         self.assertHasRelationshipRelated('geokrety_owned', '/v1/users/%s/geokrety-owned' % self.id)
+        return self
 
     def assertHasRelationshipGeokretyHeld(self):
         self.assertHasRelationshipSelf('geokrety_held', '/v1/users/%s/relationships/geokrety-held' % self.id)
         self.assertHasRelationshipRelated('geokrety_held', '/v1/users/%s/geokrety-held' % self.id)
+        return self
 
     def assertHasRelationshipMoves(self):
         self.assertHasRelationshipSelf('moves', '/v1/users/%s/relationships/moves' % self.id)
         self.assertHasRelationshipRelated('moves', '/v1/users/%s/moves' % self.id)
+        return self
 
     def assertHasRelationshipNewsDatas(self, user_id):
         self.assertHasRelationshipDatas('news', user_id, 'news')
+        return self
 
     def assertHasRelationshipNewsCommentsDatas(self, user_id):
         self.assertHasRelationshipDatas('news_comments', user_id, 'news-comment')
+        return self
 
     def assertHasRelationshipNewsSubscriptionsAuthorDatas(self, user_id):
         self.assertHasRelationshipDatas('news_subscriptions', user_id, 'news-subscription')
+        return self
 
     def assertHasRelationshipGeokretyOwnedDatas(self, user_id):
         self.assertHasRelationshipDatas('geokrety_owned', user_id, 'geokret')
+        return self
 
     def assertHasRelationshipGeokretyHeldDatas(self, user_id):
         self.assertHasRelationshipDatas('geokrety_held', user_id, 'geokret')
+        return self
 
     def assertHasRelationshipMovesDatas(self, user_id):
         self.assertHasRelationshipDatas('moves', user_id, 'move')
+        return self
 
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
@@ -81,6 +94,7 @@ class UserResponse(BaseResponse):
             self.get_attribute('last_mail_datetime')
         with self.assertRaises(AssertionError):
             self.get_attribute('last_login_datetime')
+        return self
 
     def assertHasPrivateAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
@@ -106,3 +120,14 @@ class UserResponse(BaseResponse):
         self.assertHasRelationshipGeokretyHeld()
         self.assertHasRelationshipMoves()
         self.assertHasRelationshipNewsSubscriptions()
+        return self
+
+
+class UsersCollectionResponse(BaseCollectionResponse):
+
+    def __init__(self, data):
+        super(UsersCollectionResponse, self).__init__(data)
+        datas = []
+        for data_ in self.data:
+            datas.append(UserResponse(data_))
+        self['data'] = datas

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from parameterized import parameterized
 
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.news import NewsPayload
-from tests.unittests.utils.responses.news import NewsResponse
 from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
                                                      HTML_SUBSET_TEST_CASES_NO_BLANK,
                                                      NO_HTML_TEST_CASES,
@@ -16,141 +13,127 @@ from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
 class TestNewsCreate(BaseTestCase):
     """Test News create"""
 
-    def send_post(self, payload, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/news?%s" % (args_)
-        return NewsResponse(self._send_post(url, payload=payload, **kwargs).get_json())
+    @request_context
+    def test_as_anonymous(self):
+        NewsPayload().post(user=None, code=401)
 
     @request_context
-    def test_news_create_as_anonymous(self):
-        payload = NewsPayload()
-        assert self.send_post(payload, user=None, code=401)
+    def test_as_authenticated(self):
+        NewsPayload().blend().post(user=self.user_1, code=403)
 
     @request_context
-    def test_news_create_as_authenticated(self):
-        payload = NewsPayload()
-        assert self.send_post(payload, user=self.user_1, code=403)
+    def test_as_admin(self):
+        NewsPayload().blend().post(user=self.admin)
 
     @request_context
-    def test_news_create_as_admin(self):
-        payload = NewsPayload()
-        assert self.send_post(payload, user=self.admin)
+    def test_field_author_can_be_overrided(self):
+        NewsPayload().blend()\
+            .set_author(self.user_1)\
+            .post(user=self.admin)\
+            .assertHasRelationshipAuthorData(self.user_1.id)
 
     @request_context
-    def test_news_create_field_author_enforced_to_current_user(self):
-        payload = NewsPayload()
-        payload.set_author(self.user_1.id)
-        response = self.send_post(payload, user=self.admin)
-        response.assertHasRelationshipAuthorData(self.user_1.id)
+    def test_field_author_enforced_to_current_user_if_undefined(self):
+        NewsPayload().blend()\
+            .set_author('')\
+            .post(user=self.admin)\
+            .assertHasRelationshipAuthorData(self.admin.id)
 
     @request_context
-    def test_news_create_field_author_enforced_to_current_user_if_undefined(self):
-        payload = NewsPayload()
-        payload.set_author('')
-        response = self.send_post(payload, user=self.admin)
-        response.assertHasRelationshipAuthorData(self.admin.id)
+    def test_field_username_can_be_overrided(self):
+        NewsPayload().blend()\
+            .set_username(self.user_1.name)\
+            .post(user=self.admin)\
+            .assertHasAttribute('username', self.user_1.name)
 
     @request_context
-    def test_news_create_field_username_enforced_to_current_user_if_undefined(self):
-        payload = NewsPayload()
-        payload['data']['attributes'].pop('username', None)
-        response = self.send_post(payload, user=self.admin)
-        self.assertEqual(response.username, self.admin.name)
+    def test_field_username_enforced_to_current_user_if_undefined(self):
+        NewsPayload().blend()\
+            ._del_attribute('username')\
+            .post(user=self.admin)\
+            .assertHasAttribute('username', self.admin.name)
 
     @request_context
-    def test_news_create_field_username_can_be_overrided(self):
-        payload = NewsPayload()
-        payload.set_username(self.user_1.name)
-        response = self.send_post(payload, user=self.admin)
-        self.assertEqual(response.username, self.user_1.name)
+    def test_field_title_is_mandatory(self):
+        NewsPayload().blend()\
+            ._del_attribute('title')\
+            .post(user=self.admin, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/title')
 
     @request_context
-    def test_news_create_field_title_is_mandatory(self):
-        payload = NewsPayload()
-        payload['data']['attributes'].pop('title', None)
-        response = self.send_post(payload, user=self.admin, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/title')
-
-    @request_context
-    def test_news_create_field_content_is_mandatory(self):
-        payload = NewsPayload()
-        payload['data']['attributes'].pop('content', None)
-        response = self.send_post(payload, user=self.admin, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/content')
+    def test_field_content_is_mandatory(self):
+        NewsPayload().blend()\
+            ._del_attribute('content')\
+            .post(user=self.admin, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/content')
 
     @parameterized.expand(EMPTY_TEST_CASES)
     @request_context
-    def test_news_create_field_title_cannot_be_blank(self, title):
-        payload = NewsPayload()
-        payload.set_title(title)
-        response = self.send_post(payload, user=self.admin, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/title')
+    def test_field_title_cannot_be_blank(self, title):
+        NewsPayload().blend()\
+            .set_title(title)\
+            .post(user=self.admin, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/title')
 
     @parameterized.expand(EMPTY_TEST_CASES)
     @request_context
-    def test_news_create_field_content_cannot_be_blank(self, content):
-        payload = NewsPayload()
-        payload.set_content(content)
-        response = self.send_post(payload, user=self.admin, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/content')
+    def test_field_content_cannot_be_blank(self, content):
+        NewsPayload().blend()\
+            .set_content(content)\
+            .post(user=self.admin, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/content')
 
     @request_context
-    def test_news_create_field_creation_datetime_set_automatically(self):
-        payload = NewsPayload()
-        payload['data']['attributes'].pop('created-on-datetime', None)
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertCreationDateTime()
-
-    @parameterized.expand(UTF8_TEST_CASES)
-    @request_context
-    def test_news_create_field_name_accept_unicode(self, title, result=None):
-        payload = NewsPayload()
-        payload.set_title(title)
-        result = title if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('title', result)
+    def test_field_creation_datetime_set_automatically(self):
+        NewsPayload().blend()\
+            ._del_attribute('created-on-datetime')\
+            .post(user=self.admin)\
+            .assertCreationDateTime()
 
     @parameterized.expand(UTF8_TEST_CASES)
     @request_context
-    def test_news_create_field_content_accept_unicode(self, content, result=None):
-        payload = NewsPayload()
-        payload.set_content(content)
-        result = content if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('content', result)
+    def test_field_title_accept_unicode(self, title, expected):
+        NewsPayload().blend()\
+            .set_title(title)\
+            .post(user=self.admin)\
+            .assertHasAttribute('title', expected)
 
     @parameterized.expand(UTF8_TEST_CASES)
     @request_context
-    def test_news_create_field_username_accept_unicode(self, username, result=None):
-        payload = NewsPayload()
-        payload.set_username(username)
-        result = username if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('username', result)
+    def test_field_content_accept_unicode(self, content, expected):
+        NewsPayload().blend()\
+            .set_content(content)\
+            .post(user=self.admin)\
+            .assertHasAttribute('content', expected)
+
+    @parameterized.expand(UTF8_TEST_CASES)
+    @request_context
+    def test_field_username_accept_unicode(self, username, expected):
+        NewsPayload().blend()\
+            .set_username(username)\
+            .post(user=self.admin)\
+            .assertHasAttribute('username', expected)
 
     @parameterized.expand(NO_HTML_TEST_CASES)
     @request_context
-    def test_news_create_field_title_doesnt_accept_html(self, title, result=None):
-        payload = NewsPayload()
-        payload.set_title(title)
-        result = title if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('title', result)
+    def test_field_title_doesnt_accept_html(self, title, expected):
+        NewsPayload().blend()\
+            .set_title(title)\
+            .post(user=self.admin)\
+            .assertHasAttribute('title', expected)
 
     @parameterized.expand(HTML_SUBSET_TEST_CASES_NO_BLANK)
     @request_context
-    def test_news_create_field_content_accept_html_subset(self, content, result=None):
-        payload = NewsPayload()
-        payload.set_content(content)
-        result = content if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('content', result)
+    def test_field_content_accept_html_subset(self, content, expected):
+        NewsPayload().blend()\
+            .set_content(content)\
+            .post(user=self.admin)\
+            .assertHasAttribute('content', expected)
 
     @parameterized.expand(NO_HTML_TEST_CASES)
     @request_context
-    def test_news_create_field_username_doesnt_accept_html(self, username, result=None):
-        payload = NewsPayload()
-        payload.set_username(username)
-        result = username if result is None else result
-        response = self.send_post(payload, user=self.admin, code=201)
-        response.assertHasAttribute('username', result)
+    def test_field_username_doesnt_accept_html(self, username, expected):
+        NewsPayload().blend()\
+            .set_username(username)\
+            .post(user=self.admin)\
+            .assertHasAttribute('username', expected)

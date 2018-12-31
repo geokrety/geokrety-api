@@ -15,7 +15,6 @@ class NewsSubscriptionSchema(Schema):
         ordered = True
 
     id = fields.Str(dump_only=True)
-    subscribed = fields.Boolean(required=True)
     subscribed_on_datetime = fields.Date(dump_only=True)
 
     user = Relationship(
@@ -26,6 +25,7 @@ class NewsSubscriptionSchema(Schema):
         related_view_kwargs={'news_subscription_id': '<id>'},
         schema='UserSchema',
         type_='user',
+        include_resource_linkage=True,
     )
 
     news = Relationship(
@@ -36,5 +36,6 @@ class NewsSubscriptionSchema(Schema):
         related_view_kwargs={'news_subscription_id': '<id>'},
         schema='NewsSchema',
         type_='news',
-        required=True
+        required=True,
+        include_resource_linkage=True,
     )

@@ -24,13 +24,6 @@ def has_relationships(json_data, relation):
         'id' in json_data['data']['relationships'][relation]['data']
 
 
-def has_attribute(json_data, attribute):
-    return json_data is not None and \
-        'data' in json_data and \
-        'attributes' in json_data['data'] and \
-        attribute in json_data['data']['attributes']
-
-
 def round_microseconds(date):
     fraction = date.microsecond / 1000000.0
     rounded = round(fraction, 0)

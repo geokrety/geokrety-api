@@ -3,9 +3,6 @@
 import random
 from datetime import datetime, timedelta
 
-from mixer.backend.flask import mixer
-
-from app.models.move import Move
 from base import BasePayload
 
 
@@ -19,25 +16,26 @@ def random_date(start):
 
 
 class MovePayload(BasePayload):
-    def __init__(self, move_type, geokret=None, moved_on_datetime=None):
-        self.update({
-            "data": {
-                "type": 'move'
-            }
-        })
-        self.blend(type=move_type)
+    _url = "/v1/moves/{}"
+    _url_collection = "/v1/moves"
+    _response_type = 'MoveResponse'
+    _response_type_collection = 'MovesCollectionResponse'
+
+    def __init__(self, geokret_type=None, geokret=None, moved_on_datetime=None, *args, **kwargs):
+        super(MovePayload, self).__init__('move', *args, **kwargs)
+
+        if geokret_type is not None:
+            self.set_type(geokret_type)
+
         if geokret is not None:
             self.set_tracking_code(geokret.tracking_code)
             self.set_moved_on_datetime(random_date(geokret.created_on_datetime))
+
         if moved_on_datetime is not None:
             self.set_moved_on_datetime(moved_on_datetime)
 
     def set_type(self, move_type):
         self._set_relationships('type', 'move-type', move_type)
-        return self
-
-    def del_type(self):
-        self._del_relationships('type', 'move-type')
         return self
 
     def set_coordinates(self, latitude=43.78, longitude=7.06):
@@ -55,6 +53,10 @@ class MovePayload(BasePayload):
 
     def set_geokret_id(self, geokret_id):
         self._set_attribute('geokret_id', geokret_id)
+        return self
+
+    def set_geokret(self, geokret_id):
+        self._set_relationships('geokret', 'geokret', geokret_id)
         return self
 
     def set_application_name(self, application_name="GeoKrety API"):
@@ -77,28 +79,9 @@ class MovePayload(BasePayload):
         self._set_relationships('author', 'user', user_id)
         return self
 
-    def set_geokret(self, geokret_id):
-        self._set_relationships('geokret', 'geokret', geokret_id)
-        return self
-
     def set_moved_on_datetime(self, move_datetime=None):
         if isinstance(move_datetime, datetime):
             self._set_attribute('moved_on_datetime', move_datetime.strftime("%Y-%m-%dT%H:%M:%S"))
         else:
             self._set_attribute('moved_on_datetime', move_datetime)
         return self
-
-    def set_obj(self, obj):
-        self.set_type(obj.type)
-        self.set_coordinates(obj.latitude, obj.longitude)
-        self.set_application_name(obj.application_name)
-        self.set_application_version(obj.application_version)
-        self.set_comment(obj.comment)
-        self.set_username(obj.username)
-        self.set_moved_on_datetime(obj.moved_on_datetime)
-        return self
-
-    def blend(self, *args, **kwargs):
-        with mixer.ctx(commit=False):
-            self.set_obj(mixer.blend(Move, *args, **kwargs))
-            return self

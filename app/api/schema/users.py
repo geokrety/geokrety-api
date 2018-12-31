@@ -8,6 +8,7 @@ from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
 from app.models.user import User
+from app.views.regex import REG_LATITUDE, REG_LONGITUDE
 
 
 def drop_private_attributes(item):
@@ -88,6 +89,18 @@ class UserSchema(Schema):
         if data < 0 or data > 23:
             raise UnprocessableEntity("Hour must be between 0 and 23",
                                       {'pointer': '/data/attributes/hour'})
+
+    @validates('latitude')
+    def validate_latitude_valid(self, data):
+        if data is not None and not REG_LATITUDE.match(str(data)):
+            raise UnprocessableEntity("Latitude is invalid",
+                                      {'pointer': '/data/attributes/latitude'})
+
+    @validates('longitude')
+    def validate_longitude_valid(self, data):
+        if data is not None and not REG_LONGITUDE.match(str(data)):
+            raise UnprocessableEntity("Longitude is invalid",
+                                      {'pointer': '/data/attributes/longitude'})
 
     class Meta:
         type_ = 'user'

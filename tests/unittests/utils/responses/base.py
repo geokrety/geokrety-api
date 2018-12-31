@@ -57,10 +57,6 @@ class BaseResponse(dict):
     def created_on_datetime(self):
         return self._format_datetime(self.get_attribute('created-on-datetime'))
 
-    @property
-    def updated_on_datetime(self):
-        return self._format_datetime(self.get_attribute('updated-on-datetime'))
-
     def _format_datetime(self, date_time):
         return datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S')
 
@@ -79,9 +75,6 @@ class BaseResponse(dict):
         assert relationships in self['relationships'], relationships
         return self['relationships'][relationships]
 
-    def assertHasId(self, obj_id):
-        assert self.id == str(obj_id)
-
     def assertHasRelationshipRelated(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
@@ -95,6 +88,7 @@ class BaseResponse(dict):
         except AssertionError:  # pragma: no cover
             raise AttributeError(
                 "assert '%s' in self['relationships']['%s']['links']['related']" % (link, relation_type))
+        return self
 
     def assertHasRelationshipSelf(self, relation_type, link):
         """Assert an error response has a specific pointer
@@ -105,6 +99,7 @@ class BaseResponse(dict):
         assert 'links' in self['relationships'][relation_type], relation_type
         assert 'self' in self['relationships'][relation_type]['links'], relation_type
         assert link in self['relationships'][relation_type]['links']['self'], link
+        return self
 
     def assertHasAttribute(self, attribute, value):
         """Assert a response attribute has a specific value
@@ -114,12 +109,33 @@ class BaseResponse(dict):
         except AssertionError:  # pragma: no cover
             raise AttributeError("Attribute '%s' value '%s' not the expected one (%s)." %
                                  (attribute, self.get_attribute(attribute), value))
+        return self
+
+    def assertAttributeNotPresent(self, attribute):
+        """Assert a response doesn't contains an attribute
+        """
+        try:
+            self.get_attribute(attribute)
+            raise AttributeError("Attribute '{}' was not found in response but we don't expect it.".format(attribute))  # pragma: no cover
+        except AssertionError:
+            pass
+        return self
+
+    def assertNotHasAttribute(self, attribute, value):
+        """Assert a response attribute equals a specific value
+        """
+        try:
+            assert self.get_attribute(attribute) != value
+        except AssertionError:  # pragma: no cover
+            raise AttributeError("Attribute '%s' value '%s' is expected to be different then '%s'." %
+                                 (attribute, self.get_attribute(attribute), value))
+        return self
 
     def assertHasRelationshipData(self, relationships, value, obj_type):
         """Assert a response relation has a specific value
         """
         rel = self._get_relationships(relationships)
-        if value is None:
+        if value is None:  # pragma: no cover
             assert rel['data'] is None
         assert rel['data'] is not None
         try:
@@ -134,6 +150,7 @@ class BaseResponse(dict):
         except AssertionError:  # pragma: no cover
             raise AttributeError("Relationships '%s' should be '%s' but was '%s'." %
                                  (relationships, obj_type, rel['data']['type']))
+        return self
 
     def assertHasRelationshipDatas(self, relationships, values, obj_type):
         """Assert a response relation has specific values
@@ -159,39 +176,52 @@ class BaseResponse(dict):
         except AssertionError:  # pragma: no cover
             raise AttributeError("Included relationships '%s' not found in response, expected %s, found %s." % (
                 relationships, str_values, rel['data']))
+        return self
 
-    def assertHasIncludes(self, relationships, value):  # pragma: no cover
-        raise NotImplementedError("Function assertHasIncludes is not yet implemented")
+    def assertHasData(self, obj_type, value):
+        """Assert a response has a specific data value
+        """
+        assert 'type' in self, "'type' key not found in 'data'"
+        assert 'id' in self, "'id' key not found in 'data'"
+        assert self['type'] == obj_type, "type '{}' expected but found '{}'".format(obj_type, self['type'])
+        assert self['id'] == value, "id '{}' expected but found '{}'".format(value, self['id'])
+        return self
 
     def assertCreationDateTime(self):
         self.assertDateTimePresent('created-on-datetime')
+        return self
 
     def assertUpdatedDateTime(self):
         self.assertDateTimePresent('updated-on-datetime')
+        return self
 
     def assertHasAttributeDateTimeOrNone(self, attribute, date_time):
         if date_time is None:
             return
         self.assertHasAttributeDateTime(attribute, date_time)
+        return self
 
     def assertHasAttributeDateTime(self, attribute, date_time):
         self.assertDateTimePresent(attribute)
         if isinstance(date_time, datetime):
             date_time = date_time.strftime("%Y-%m-%dT%H:%M:%S")
         assert self.get_attribute(attribute)[:-1] == date_time[:-1]
+        return self
 
     def assertDateTimePresent(self, attribute):
         datetime = self.get_attribute(attribute)
         self.assertIsDateTime(datetime)
+        return self
 
     def assertIsDateTime(self, date_time):
-        if isinstance(date_time, datetime):
-            return
+        if isinstance(date_time, datetime):  # pragma: no cover
+            return self
 
         try:
             datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S")
         except ValueError:  # pragma: no cover
-            assert False, 'Date is not parsable'
+            assert False, 'Date is not parsable (%s)' % date_time
+        return self
 
     def assertRaiseJsonApiError(self, pointer):
         """Assert an error response has a specific pointer
@@ -201,8 +231,25 @@ class BaseResponse(dict):
             assert 'source' in error
             assert 'pointer' in error['source']
             if pointer in error['source']['pointer']:
-                return True
+                return self
         assert False, "JsonApiError pointer '{}' not raised".format(pointer)  # pragma: no cover
 
-    def pprint(self):
+    def assertJsonApiErrorCount(self, count):
+        """Assert an error response has a specific number of entries
+        """
+        assert 'errors' in self, "No error found but we expect to see {}".format(count)
+        assert len(self['errors']) == count, "Expected to find {} errors, but was {}" \
+            .format(count, self.count)
+        return self
+
+    def assertDateTimeAlmostEqual(self, first, second, delta=1):
+        """ Compare two datetime attributes, accept maximum difference
+        of `delta` seconds.
+        """
+        first_attribute = datetime.strptime(self.get_attribute(first), "%Y-%m-%dT%H:%M:%S")
+        second_attribute = datetime.strptime(self.get_attribute(second), "%Y-%m-%dT%H:%M:%S")
+        computed_delta = (first_attribute - second_attribute).seconds
+        assert computed_delta == 0 or computed_delta == 1
+
+    def pprint(self):  # pragma: no cover
         pprint.pprint(self)

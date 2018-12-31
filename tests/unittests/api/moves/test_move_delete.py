@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from mixer.backend.flask import mixer
 from parameterized import parameterized
 
@@ -9,16 +7,11 @@ from app.api.helpers.data_layers import MOVE_TYPE_DIPPED
 from app.api.helpers.move_tasks import update_move_distances
 from app.models.move import Move
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
-from tests.unittests.utils.responses.move import MoveResponse
+from tests.unittests.utils.payload.move import MovePayload
 
 
 class TestMoveDelete(BaseTestCase):
     """Test Move delete"""
-
-    def send_delete(self, obj_id, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/moves/%s?%s" % (obj_id, args_)
-        return MoveResponse(self._send_delete(url, **kwargs).get_json())
 
     def _blend(self):
         """Create mocked Moves"""
@@ -47,26 +40,26 @@ class TestMoveDelete(BaseTestCase):
     @request_context
     def test_moves_delete_is_forbidden_as(self, username, expected):
         self.user_0 = self.blend_user()
+        user = getattr(self, username) if username else None
         geokret = self.blend_geokret(owner=self.user_0)
         move = self.blend_move(geokret=geokret, author=self.user_1)
-        user = getattr(self, username) if username else None
-        assert self.send_delete(move.id, user=user, code=expected)
+        MovePayload().delete(move.id, user=user, code=expected)
 
     @request_context
     def test_moves_delete_distance_is_reevaluated_last_move(self):
         self._blend()
-        assert self.send_delete(self.move_4.id, user=self.admin, code=200)
+        MovePayload().delete(self.move_4.id, user=self.admin)
         self.assertEqual(self.geokret.distance, 6)
 
     @request_context
     def test_moves_delete_distance_is_reevaluated_intermediate_moves(self):
         self._blend()
-        assert self.send_delete(self.move_2.id, user=self.admin, code=200)
-        assert self.send_delete(self.move_3.id, user=self.admin, code=200)
+        MovePayload().delete(self.move_2.id, user=self.admin)
+        MovePayload().delete(self.move_3.id, user=self.admin)
         self.assertEqual(self.geokret.distance, 1)
 
     @request_context
     def test_moves_delete_distance_is_reevaluated_first_move(self):
         self._blend()
-        assert self.send_delete(self.move_1.id, user=self.admin, code=200)
+        MovePayload().delete(self.move_1.id, user=self.admin)
         self.assertEqual(self.geokret.distance, 5)

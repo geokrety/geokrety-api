@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import urllib
 from decimal import Decimal
 
 from parameterized import parameterized
@@ -9,7 +8,6 @@ from app.api.helpers.db import safe_query
 from app.models.user import User
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.user import UserPayload
-from tests.unittests.utils.responses.user import UserResponse
 from tests.unittests.utils.static_test_cases import (NO_HTML_TEST_CASES,
                                                      UTF8_TEST_CASES)
 
@@ -17,26 +15,31 @@ from tests.unittests.utils.static_test_cases import (NO_HTML_TEST_CASES,
 class TestUserCreate(BaseTestCase):
     """Test User create"""
 
-    def send_post(self, payload, args=None, **kwargs):
-        args_ = '' if args is None else urllib.urlencode(args)
-        url = "/v1/users?%s" % (args_)
-        return UserResponse(self._send_post(url, payload=payload, **kwargs).get_json())
-
     @request_context
-    def test_user_create_can_be_posted_as_anonymous(self):
-        payload = UserPayload()
-        self.send_post(payload)
+    def test_can_be_posted_as_anonymous(self):
+        UserPayload()\
+            .set_name('someone')\
+            .set_email('someone@example.org')\
+            .set_password('super secret passord')\
+            .set_language('pl')\
+            .set_country('pl')\
+            .post(user=None)\
+            .assertHasAttribute('country', 'pl')\
+            .assertHasAttribute('language', 'pl')\
+            .assertHasAttribute('name', 'someone')\
+            .assertDateTimePresent('join-datetime')\
+
 
     @parameterized.expand([
-        ['admin', 403],
-        ['user_1', 403],
-        ['user_2', 403],
+        ['admin'],
+        ['user_1'],
+        ['user_2'],
     ])
     @request_context
-    def test_user_create_can_be_posted_as(self, username, expected):
+    def test_can_be_posted_as(self, username):
         user = getattr(self, username) if username else None
-        payload = UserPayload()
-        self.send_post(payload, user=user, code=expected)
+        UserPayload()\
+            .post(user=user, code=403)
 
     @parameterized.expand([
         ['name'],
@@ -44,31 +47,26 @@ class TestUserCreate(BaseTestCase):
         ['password'],
     ])
     @request_context
-    def test_user_create_mandatory_field(self, attribute):
-        payload = UserPayload()
-        del payload['data']['attributes'][attribute]
-        response = self.send_post(payload, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/{}'.format(attribute))
+    def test_mandatory_field(self, attribute):
+        UserPayload().blend()\
+            ._del_attribute(attribute)\
+            .post(code=422)\
+            .assertJsonApiErrorCount(1)\
+            .assertRaiseJsonApiError('/data/attributes/{}'.format(attribute))
 
     @request_context
-    def test_user_create_unicity_field_username(self):
-        payload = UserPayload()
-        name = payload['data']['attributes']['name']
-        response = self.send_post(payload)
-        payload.blend()
-        payload.set_name(name)
-        response = self.send_post(payload, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/name')
+    def test_unicity_field_username(self):
+        UserPayload().blend().set_name('someone').post()
+        UserPayload().blend().set_name('someone').post(code=422)\
+            .assertJsonApiErrorCount(1)\
+            .assertRaiseJsonApiError('/data/attributes/name')
 
     @request_context
-    def test_user_create_unicity_field_email(self):
-        payload = UserPayload()
-        email = payload['data']['attributes']['email']
-        response = self.send_post(payload)
-        payload.blend()
-        payload.set_email(email)
-        response = self.send_post(payload, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/email')
+    def test_unicity_field_email(self):
+        UserPayload().blend().set_email('someone@example.org').post()
+        UserPayload().blend().set_email('someone@example.org').post(code=422)\
+            .assertJsonApiErrorCount(1)\
+            .assertRaiseJsonApiError('/data/attributes/email')
 
     @parameterized.expand([
         ['language'],
@@ -81,88 +79,89 @@ class TestUserCreate(BaseTestCase):
         ['hour'],
     ])
     @request_context
-    def test_user_create_optionnal_fields(self, attribute):
-        payload = UserPayload()
-        del payload['data']['attributes'][attribute]
-        self.send_post(payload)
+    def test_optionnal_fields(self, attribute):
+        UserPayload().blend()\
+            ._del_attribute(attribute)\
+            .post()
 
     @request_context
-    def test_user_create_backend_generate_secid(self):
-        payload = UserPayload()
-        response = self.send_post(payload)
+    def test_backend_generate_secid(self):
+        payload = UserPayload().blend()
+        response = payload.post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertNotEqual(unicode(payload['data']['attributes']['secid']), user.secid)
 
     @request_context
-    def test_user_create_backend_generate_join_date_time(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['join-datetime']
-        response = self.send_post(payload)
+    def test_backend_generate_join_date_time(self):
+        response = UserPayload().blend()\
+            ._del_attribute('join-datetime')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         user.join_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
     @request_context
-    def test_user_create_backend_generate_last_update_datetime(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['last-update-datetime']
-        response = self.send_post(payload)
+    def test_backend_generate_last_update_datetime(self):
+        response = UserPayload().blend()\
+            ._del_attribute('last-update-datetime')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         user.last_update_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
     @request_context
-    def test_user_create_backend_generate_last_mail_datetime(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['last-mail-datetime']
-        response = self.send_post(payload)
+    def test_backend_generate_last_mail_datetime(self):
+        response = UserPayload().blend()\
+            ._del_attribute('last-mail-datetime')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.last_mail_datetime)
 
     @request_context
-    def test_user_create_backend_generate_last_login_datetime(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['last-login-datetime']
-        response = self.send_post(payload)
+    def test_backend_generate_last_login_datetime(self):
+        response = UserPayload().blend()\
+            ._del_attribute('last-login-datetime')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.last_login_datetime)
 
     @request_context
-    def test_user_create_valid_email(self):
-        payload = UserPayload()
-        payload.set_email("A@VALID.EMAIL")
-        response = self.send_post(payload)
+    def test_valid_email(self):
+        response = UserPayload().blend()\
+            .set_email("A@VALID.EMAIL")\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertEqual(user.email, "A@VALID.EMAIL")
 
     @request_context
-    def test_user_create_invalid_email(self):
-        payload = UserPayload()
-        payload.set_email("NOT_A_VALID_EMAIL")
-        response = self.send_post(payload, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/email')
+    def test_invalid_email(self):
+        UserPayload().blend()\
+            .set_email("NOT_A_VALID_EMAIL")\
+            .post(code=422)\
+            .assertJsonApiErrorCount(1)\
+            .assertRaiseJsonApiError('/data/attributes/email')
 
     @request_context
-    def test_user_create_password_is_encrypted(self):
+    def test_password_is_encrypted(self):
         import phpass
         phpass.PasswordHash.hash_password = self.hash_password_original
-        payload = UserPayload()
-        response = self.send_post(payload)
+        payload = UserPayload().blend()
+        response = payload.post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertNotEqual(user.password, payload['data']['attributes']['password'])
         self.assertEqual(user.password[:7], "$2a$11$")
 
     @request_context
-    def test_user_create_languages_defaults_to_english_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['language']
-        response = self.send_post(payload)
-        response.assertHasAttribute('language', 'en')
+    def test_languages_defaults_to_english_if_missing(self):
+        UserPayload().blend()\
+            ._del_attribute('language')\
+            .post()\
+            .assertHasAttribute('language', 'en')
 
     @request_context
-    def test_user_create_languages_defaults_to_english_if_empty(self):
-        payload = UserPayload()
-        payload.set_language('')
-        response = self.send_post(payload)
-        response.assertHasAttribute('language', 'en')
+    def test_languages_defaults_to_english_if_empty(self):
+        UserPayload().blend()\
+            .set_language('')\
+            .post()\
+            .assertHasAttribute('language', 'en')
 
     @parameterized.expand([
         ['en', 201],
@@ -172,10 +171,10 @@ class TestUserCreate(BaseTestCase):
         ['t', 422],
     ])
     @request_context
-    def test_user_create_languages_are_checked_against_static_list(self, language, expected):
-        payload = UserPayload()
-        payload.set_language(language)
-        response = self.send_post(payload, code=expected)
+    def test_languages_are_checked_against_static_list(self, language, expected):
+        response = UserPayload().blend()\
+            .set_language(language)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/language')
         else:
@@ -191,28 +190,28 @@ class TestUserCreate(BaseTestCase):
         ['zz', 422],
     ])
     @request_context
-    def test_user_create_countries_are_checked_against_static_list(self, country, expected):
-        payload = UserPayload()
-        payload.set_country(country)
-        response = self.send_post(payload, code=expected)
+    def test_countries_are_checked_against_static_list(self, country, expected):
+        response = UserPayload().blend()\
+            .set_country(country)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/country')
         else:
             response.assertHasAttribute('country', country)
 
     @request_context
-    def test_user_create_countries_defaults_to_none_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['country']
-        response = self.send_post(payload)
-        response.assertHasAttribute('country', None)
+    def test_countries_defaults_to_none_if_missing(self):
+        UserPayload().blend()\
+            ._del_attribute('country')\
+            .post()\
+            .assertHasAttribute('country', None)
 
     @request_context
-    def test_user_create_countries_defaults_to_none_if_empty(self):
-        payload = UserPayload()
-        payload.set_country('')
-        response = self.send_post(payload)
-        response.assertHasAttribute('country', None)
+    def test_countries_defaults_to_none_if_empty(self):
+        UserPayload().blend()\
+            .set_country('')\
+            .post()\
+            .assertHasAttribute('country', None)
 
     @parameterized.expand([
         ['', 422],
@@ -226,12 +225,20 @@ class TestUserCreate(BaseTestCase):
         [0.0, 201],
         [1, 201],
         [1.0, 201],
+        [-180.0, 422],
+        [-91.0, 422],
+        [-90.1, 422],
+        [-90.001, 422],
+        [90.001, 422],
+        [90.1, 422],
+        [91.0, 422],
+        [180.0, 422],
     ])
     @request_context
-    def test_user_create_home_latitude_as_decimal_degrees(self, latitude, expected):
-        payload = UserPayload()
-        payload.set_latitude(latitude)
-        response = self.send_post(payload, code=expected)
+    def test_home_latitude_as_decimal_degrees(self, latitude, expected):
+        response = UserPayload().blend()\
+            .set_latitude(latitude)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/latitude')
         else:
@@ -251,12 +258,20 @@ class TestUserCreate(BaseTestCase):
         [0.0, 201],
         [1, 201],
         [1.0, 201],
+        [-250.0, 422],
+        [-181.0, 422],
+        [-180.1, 422],
+        [-180.001, 422],
+        [180.001, 422],
+        [180.1, 422],
+        [181.0, 422],
+        [250.0, 422],
     ])
     @request_context
-    def test_user_create_home_longitude_as_decimal_degrees(self, longitude, expected):
-        payload = UserPayload()
-        payload.set_longitude(longitude)
-        response = self.send_post(payload, code=expected)
+    def test_home_longitude_as_decimal_degrees(self, longitude, expected):
+        response = UserPayload().blend()\
+            .set_longitude(longitude)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/longitude')
         else:
@@ -264,34 +279,34 @@ class TestUserCreate(BaseTestCase):
             self.assertEqual(user.longitude, Decimal(longitude))
 
     @request_context
-    def test_user_create_home_latitude_default_to_null_if_empty(self):
-        payload = UserPayload()
-        payload.set_latitude(None)
-        response = self.send_post(payload)
+    def test_home_latitude_default_to_null_if_none(self):
+        response = UserPayload().blend()\
+            .set_latitude(None)\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.latitude)
 
     @request_context
-    def test_user_create_home_latitude_default_to_null_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['latitude']
-        response = self.send_post(payload)
+    def test_home_latitude_default_to_null_if_missing(self):
+        response = UserPayload().blend()\
+            ._del_attribute('latitude')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.latitude)
 
     @request_context
-    def test_user_create_home_longitude_default_to_null_if_empty(self):
-        payload = UserPayload()
-        payload.set_longitude(None)
-        response = self.send_post(payload)
+    def test_home_longitude_default_to_null_if_none(self):
+        response = UserPayload().blend()\
+            .set_longitude(None)\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.longitude)
 
     @request_context
-    def test_user_create_home_longitude_default_to_null_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['longitude']
-        response = self.send_post(payload)
+    def test_home_longitude_default_to_null_if_missing(self):
+        response = UserPayload().blend()\
+            ._del_attribute('longitude')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertIsNone(user.longitude)
 
@@ -309,10 +324,10 @@ class TestUserCreate(BaseTestCase):
         [1.1, 422],
     ])
     @request_context
-    def test_user_create_field_daily_mails_is_boolean(self, value, expected_code, expected=False):
-        payload = UserPayload()
-        payload.set_daily_mails(value)
-        response = self.send_post(payload, code=expected_code)
+    def test_field_daily_mails_is_boolean(self, value, expected_code, expected=False):
+        response = UserPayload().blend()\
+            .set_daily_mails(value)\
+            .post(code=expected_code)
         if expected_code == 422:
             response.assertRaiseJsonApiError('/data/attributes/daily-mails')
         else:
@@ -320,10 +335,10 @@ class TestUserCreate(BaseTestCase):
             self.assertEqual(user.daily_mails, expected)
 
     @request_context
-    def test_user_create_field_daily_mails_default_to_false_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['daily-mails']
-        response = self.send_post(payload)
+    def test_field_daily_mails_default_to_false_if_missing(self):
+        response = UserPayload().blend()\
+            ._del_attribute('daily-mails')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertFalse(user.daily_mails)
 
@@ -340,10 +355,10 @@ class TestUserCreate(BaseTestCase):
         [1.1, 201],
     ])
     @request_context
-    def test_user_create_field_observation_radius_is_integer(self, radius, expected):
-        payload = UserPayload()
-        payload.set_observation_radius(radius)
-        response = self.send_post(payload, code=expected)
+    def test_field_observation_radius_is_integer(self, radius, expected):
+        response = UserPayload().blend()\
+            .set_observation_radius(radius)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/observation-radius')
         else:
@@ -351,18 +366,18 @@ class TestUserCreate(BaseTestCase):
             self.assertEqual(user.observation_radius, int(radius))
 
     @request_context
-    def test_user_create_field_observation_radius_default_to_zero_if_empty(self):
-        payload = UserPayload()
-        payload.set_observation_radius(None)
-        response = self.send_post(payload)
+    def test_field_observation_radius_default_to_zero_if_none(self):
+        response = UserPayload().blend()\
+            .set_observation_radius(None)\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertEqual(user.observation_radius, 0)
 
     @request_context
-    def test_user_create_field_observation_radius_default_to_zero_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['observation-radius']
-        response = self.send_post(payload)
+    def test_field_observation_radius_default_to_zero_if_missing(self):
+        response = UserPayload().blend()\
+            ._del_attribute('observation-radius')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertEqual(user.observation_radius, 0)
 
@@ -378,10 +393,10 @@ class TestUserCreate(BaseTestCase):
         [666, 422],
     ])
     @request_context
-    def test_user_create_field_observation_radius_is_betwwen_zero_ten(self, radius, expected):
-        payload = UserPayload()
-        payload.set_observation_radius(radius)
-        response = self.send_post(payload, code=expected)
+    def test_field_observation_radius_is_betwwen_zero_ten(self, radius, expected):
+        response = UserPayload().blend()\
+            .set_observation_radius(radius)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/observation-radius')
         else:
@@ -394,24 +409,9 @@ class TestUserCreate(BaseTestCase):
         ['a', 422],
         ['0', 201],
         ['0.0', 422],
-        [0, 201],
         [0.0, 201],
-        [1, 201],
         [1.0, 201],
         [1.1, 201],
-    ])
-    @request_context
-    def test_user_create_field_hour_is_integer(self, hour, expected):
-        payload = UserPayload()
-        payload.set_hour(hour)
-        response = self.send_post(payload, code=expected)
-        if expected == 422:
-            response.assertRaiseJsonApiError('/data/attributes/hour')
-        else:
-            user = safe_query(self, User, 'id', response.id, 'id')
-            self.assertEqual(user.hour, int(hour))
-
-    @parameterized.expand([
         [-1, 422],
         [0, 201],
         [1, 201],
@@ -427,10 +427,10 @@ class TestUserCreate(BaseTestCase):
         [666, 422],
     ])
     @request_context
-    def test_user_create_field_hour_is_betwwen_zero_ten(self, hour, expected):
-        payload = UserPayload()
-        payload.set_hour(hour)
-        response = self.send_post(payload, code=expected)
+    def test_field_hour_is_integer(self, hour, expected):
+        response = UserPayload().blend()\
+            .set_hour(hour)\
+            .post(code=expected)
         if expected == 422:
             response.assertRaiseJsonApiError('/data/attributes/hour')
         else:
@@ -438,39 +438,39 @@ class TestUserCreate(BaseTestCase):
             self.assertEqual(user.hour, int(hour))
 
     @request_context
-    def test_user_create_field_hour_default_to_zero_if_random(self):
-        payload = UserPayload()
-        payload.set_hour(None)
-        response = self.send_post(payload)
+    def test_field_hour_default_to_random_if_none(self):
+        response = UserPayload().blend()\
+            .set_hour(None)\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertGreaterEqual(user.hour, 0)
         self.assertLessEqual(user.hour, 23)
 
     @request_context
-    def test_user_create_field_hour_default_to_zero_if_missing(self):
-        payload = UserPayload()
-        del payload['data']['attributes']['observation-radius']
-        response = self.send_post(payload)
+    def test_field_hour_default_to_random_if_missing(self):
+        response = UserPayload().blend()\
+            ._del_attribute('hour')\
+            .post()
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertGreaterEqual(user.hour, 0)
         self.assertLessEqual(user.hour, 23)
 
     @parameterized.expand(UTF8_TEST_CASES)
     @request_context
-    def test_user_create_field_username_support_utf8(self, username, expected):
-        payload = UserPayload()
-        payload.set_name(username)
-        response = self.send_post(payload)
-        response.assertHasAttribute('name', expected)
+    def test_field_username_support_utf8(self, username, expected):
+        response = UserPayload().blend()\
+            .set_name(username)\
+            .post()\
+            .assertHasAttribute('name', expected)
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertEqual(user.name, expected)
 
     @parameterized.expand(NO_HTML_TEST_CASES)
     @request_context
-    def test_user_create_field_username_cannot_be_blank(self, username, expected):
-        payload = UserPayload()
-        payload.set_name(username)
-        response = self.send_post(payload)
-        response.assertHasAttribute('name', expected)
+    def test_field_username_cannot_be_blank(self, username, expected):
+        response = UserPayload().blend()\
+            .set_name(username)\
+            .post()\
+            .assertHasAttribute('name', expected)
         user = safe_query(self, User, 'id', response.id, 'id')
         self.assertEqual(user.name, expected)

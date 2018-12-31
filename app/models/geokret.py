@@ -1,16 +1,14 @@
 import random
 from datetime import datetime
 
-from flask import request
 from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.exc import NoResultFound
 
 import bleach
 import characterentities
-from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
-                                         MOVE_TYPE_DIPPED)
-from app.api.helpers.utilities import has_attribute, round_microseconds
+from app.api.helpers.data_layers import MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT
+from app.api.helpers.utilities import round_microseconds
 from app.models import db
 from app.models.move import Move
 
@@ -100,7 +98,11 @@ class Geokret(db.Model):
         nullable=True,
         key='owner_id',
     )
-    owner = db.relationship("User", foreign_keys=[owner_id], backref="geokrety_owned")
+    owner = db.relationship(
+        "User",
+        foreign_keys=[owner_id],
+        backref="geokrety_owned"
+    )
 
     holder_id = db.Column(
         'hands_of',
@@ -108,7 +110,11 @@ class Geokret(db.Model):
         db.ForeignKey('gk-users.id', name='fk_geokret_holder'),
         key='holder_id',
     )
-    holder = db.relationship("User", foreign_keys=[holder_id], backref="geokrety_held")
+    holder = db.relationship(
+        "User",
+        foreign_keys=[holder_id],
+        backref="geokrety_held"
+    )
 
     # This is used to compute the archived status
     _moves = db.relationship(
@@ -126,7 +132,12 @@ class Geokret(db.Model):
         nullable=True,
         default=None,
     )
-    last_position = db.relationship("Move", foreign_keys=[last_position_id], backref="spotted_geokret")
+    last_position = db.relationship(
+        "Move",
+        foreign_keys=[last_position_id],
+        backref="spotted_geokret",
+        post_update=True
+    )
 
     last_move_id = db.Column(
         'ost_log_id',
@@ -134,7 +145,12 @@ class Geokret(db.Model):
         db.ForeignKey('gk-ruchy.id', name='fk_last_move', ondelete="SET NULL"),
         key='last_move_id'
     )
-    last_move = db.relationship("Move", foreign_keys=[last_move_id], backref="moves")
+    last_move = db.relationship(
+        "Move",
+        foreign_keys=[last_move_id],
+        backref="moves",
+        post_update=True
+    )
 
     # avatar_id = db.Column(
     #     'avatarid',
@@ -180,6 +196,8 @@ class Geokret(db.Model):
 
     @description.setter
     def description(self, description):
+        if description is None:
+            description = ''
         # Drop all unallowed html tags
         description_clean = bleach.clean(description, strip=True)
         # Strip spaces
@@ -199,23 +217,9 @@ def receive_init(target, args, kwargs):
 def before_insert_listener(mapper, connection, target):
     if not target.created_on_datetime:
         target.created_on_datetime = round_microseconds(datetime.utcnow())
+    target.updated_on_datetime = target.created_on_datetime
 
 
-@event.listens_for(Geokret, 'after_insert')
-def after_insert_listener(mapper, connection, target):
-    @event.listens_for(db.session, "after_flush", once=True)
-    def receive_after_flush(session, context):
-        json_data = request.get_json()
-        if has_attribute(json_data, 'born-at-home') and \
-                json_data['data']['attributes']['born-at-home']:
-            if target.owner.latitude and target.owner.longitude:
-                move = Move(
-                    author=target.owner,
-                    geokret=target,
-                    type=MOVE_TYPE_DIPPED,
-                    moved_on_datetime=target.created_on_datetime,
-                    latitude=target.owner.latitude,
-                    longitude=target.owner.longitude,
-                    comment="Born here",
-                )
-                db.session.add(move)
+@event.listens_for(Geokret, 'before_update')
+def before_update_listener(mapper, connection, target):
+    target.updated_on_datetime = round_microseconds(datetime.utcnow())

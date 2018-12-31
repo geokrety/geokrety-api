@@ -21,11 +21,12 @@ class _BaseTestCoordinates(_BaseTestMoveCreate):
     def test_field_waypoint_can_be_absent(self, username):
         user = getattr(self, username) if username else None
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload['data']['attributes'].pop('waypoint', None)
-        response = self.send_post(payload, user=user, code=201)
-        response.assertHasAttribute('waypoint', '')
+
+        MovePayload(self.move_type, geokret)\
+            .set_coordinates()\
+            ._del_attribute('waypoint')\
+            .post(user=user)\
+            .assertHasAttribute('waypoint', '')
 
     @parameterized.expand([
         [None],
@@ -34,11 +35,11 @@ class _BaseTestCoordinates(_BaseTestMoveCreate):
     @request_context
     def test_field_waypoint_can_be_empty(self, waypoint):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_waypoint(waypoint)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('waypoint', '')
+        MovePayload(self.move_type, geokret)\
+            .set_coordinates()\
+            .set_waypoint(waypoint)\
+            .post(user=self.user_1)\
+            .assertHasAttribute('waypoint', '')
 
     @parameterized.expand([
         [u'ééééé'],
@@ -49,49 +50,47 @@ class _BaseTestCoordinates(_BaseTestMoveCreate):
     @request_context
     def test_field_waypoint_must_be_alphanumeric(self, waypoint):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_waypoint(waypoint)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/waypoint')
+        MovePayload(self.move_type, geokret)\
+            .set_coordinates()\
+            .set_waypoint(waypoint)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/waypoint')
 
     @parameterized.expand(BLANK_CHARACTERS_TEST_CASES)
     @request_context
     def test_field_waypoint_dont_accept_blank_characters(self, waypoint):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_waypoint(waypoint)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/waypoint')
+        MovePayload(self.move_type, geokret)\
+            .set_coordinates()\
+            .set_waypoint(waypoint)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/waypoint')
 
     @parameterized.expand(FLOAT_TESTS_CASES)
     @request_context
     def test_field_latitude_must_be_decimal(self, latitude, expected):
         geokret = self.blend_geokret()
         payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_coordinates(latitude, 0.0)
+            .set_coordinates(latitude, 0.0)
         if expected == 201:
-            response = self.send_post(payload, user=self.user_1, code=expected)
-            response.assertHasAttribute('latitude', float(latitude))
+            payload.post(user=self.user_1, code=expected)\
+                .assertHasAttribute('latitude', float(latitude))
         else:
-            response = self.send_post(payload, user=self.user_1, code=expected)
-            response.assertRaiseJsonApiError('/data/attributes/latitude')
+            payload.post(user=self.user_1, code=expected)\
+                .assertRaiseJsonApiError('/data/attributes/latitude')
 
     @parameterized.expand(FLOAT_TESTS_CASES)
     @request_context
     def test_field_longitude_must_be_decimal(self, longitude, expected):
         geokret = self.blend_geokret()
         payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_coordinates(0.0, longitude)
+            .set_coordinates(0.0, longitude)
         if expected == 201:
-            response = self.send_post(payload, user=self.user_1, code=expected)
-            response.assertHasAttribute('longitude', float(longitude))
+            payload.post(user=self.user_1, code=expected)\
+                .assertHasAttribute('longitude', float(longitude))
         else:
-            response = self.send_post(payload, user=self.user_1, code=expected)
-            response.assertRaiseJsonApiError('/data/attributes/longitude')
+            payload.post(user=self.user_1, code=expected)\
+                .assertRaiseJsonApiError('/data/attributes/longitude')
 
     @parameterized.expand([
         [-180.0],
@@ -106,11 +105,10 @@ class _BaseTestCoordinates(_BaseTestMoveCreate):
     @request_context
     def test_field_latitude_must_be_valid(self, latitude):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_coordinates(latitude, 0.0)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/latitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates(latitude, 0.0)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/latitude')
 
     @parameterized.expand([
         [-250.0],
@@ -125,35 +123,34 @@ class _BaseTestCoordinates(_BaseTestMoveCreate):
     @request_context
     def test_field_longitude_must_be_valid(self, longitude):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_coordinates(0.0, longitude)
-        response = self.send_post(payload, user=self.user_1, code=422)
-        response.assertRaiseJsonApiError('/data/attributes/longitude')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates(0.0, longitude)\
+            .post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/longitude')
 
     @request_context
     def test_altitude_is_computed_and_not_overridable(self):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload._set_attribute('altitude', 666)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('altitude', 996)
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._set_attribute('altitude', 666)\
+            .post(user=self.user_1)\
+            .assertHasAttribute('altitude', 996)
 
     @request_context
     def test_country_is_computed_and_not_overridable(self):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload._set_attribute('country', 'pl')
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('country', 'FR')
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._set_attribute('country', 'pl')\
+            .post(user=self.user_1)\
+            .assertHasAttribute('country', 'FR')
 
     @request_context
     def test_distance_is_computed_and_not_overridable(self):
         geokret = self.blend_geokret()
-        payload = MovePayload(self.move_type, geokret=geokret)\
-            .set_coordinates()
-        payload._set_attribute('distance', 666)
-        response = self.send_post(payload, user=self.user_1, code=201)
-        response.assertHasAttribute('distance', 0)
+        MovePayload(self.move_type, geokret=geokret)\
+            .set_coordinates()\
+            ._set_attribute('distance', 666)\
+            .post(user=self.user_1)\
+            .assertHasAttribute('distance', 0)
