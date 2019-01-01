@@ -1,15 +1,15 @@
 import geopy.distance
 import requests
+from flask_rest_jsonapi.exceptions import JsonApiException
 
-from app import current_app, make_celery
-from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
+from app.api.helpers.data_layers import (MOVE_COMMENT_TYPE_COMMENT,
+                                         MOVE_COMMENT_TYPE_MISSING,
+                                         MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
-
-celery = make_celery(current_app)
 
 
 def update_geokret_and_moves(geokrety, moves=None):
@@ -23,17 +23,23 @@ def update_geokret_and_moves(geokrety, moves=None):
     if not isinstance(moves, list):
         moves = [moves]
 
+    for move_id in moves:
+        update_move_comments_type(move_id)
+        update_move_country_and_altitude(move_id)
+
     for geokret_id in geokrety:
         # Enhance Move content
-        update_move_distances.delay(geokret_id)
+        update_move_distances(geokret_id)
         # Enhance GeoKret content
-        update_geokret_total_moves_count.delay(geokret_id)
-        update_geokret_holder.delay(geokret_id)
+        update_geokret_total_moves_count(geokret_id)
+        update_geokret_holder(geokret_id)
+        update_geokret_missing(geokret_id)
 
-    for move_id in moves:
-        update_move_country_and_altitude.delay(move_id)
-
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:  # pragma: no cover
+        db.session.rollback()
+        raise JsonApiException("update_geokret_and_moves error: " + str(e), source={'pointer': '/data'})
 
     # TODO Generate static files
     # * gpx
@@ -44,7 +50,6 @@ def update_geokret_and_moves(geokrety, moves=None):
     # *
 
 
-@celery.task(name='update.move.distance')
 def update_move_distances(geokret_id):
     """ Recompute and update all moves distances for a GeoKret
     """
@@ -55,11 +60,11 @@ def update_move_distances(geokret_id):
     total_distance = 0
     for move in moves:
         if move.type in (MOVE_TYPE_DROPPED, MOVE_TYPE_SEEN, MOVE_TYPE_ARCHIVED):
-            geokret.last_position_id = move.id
+            geokret.last_position = move
         elif move.type in (MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED):
-            geokret.last_position_id = None
+            geokret.last_position = None
 
-        geokret.last_move_id = move.id
+        geokret.last_move = move
         if move.latitude is None:
             continue
         if last is None:
@@ -73,7 +78,6 @@ def update_move_distances(geokret_id):
     geokret.distance = total_distance
 
 
-@celery.task(name='update.move.country.and.elevation')
 def update_move_country_and_altitude(move_id):
     """ Obtain and update country and altitude of a move
     """
@@ -98,7 +102,6 @@ def update_move_country_and_altitude(move_id):
         move.altitude = -32768
 
 
-@celery.task(name='update.geokret.total.moves.count')
 def update_geokret_total_moves_count(geokret_id):
     """ Update GeoKret total move count
     """
@@ -111,7 +114,6 @@ def update_geokret_total_moves_count(geokret_id):
     geokret.caches_count = moves.count()
 
 
-@celery.task(name='update.geokret.holder')
 def update_geokret_holder(geokret_id):
     """ Update GeoKret holder
     """
@@ -130,3 +132,27 @@ def update_geokret_holder(geokret_id):
             elif move.type in [MOVE_TYPE_GRABBED, MOVE_TYPE_DIPPED]:
                 geokret.holder_id = move.author_id
                 break
+
+
+def update_geokret_missing(geokret):
+    """ Update GeoKret missing status
+    """
+    if not isinstance(geokret, Geokret):
+        geokret = Geokret.query.get(geokret)
+
+    if geokret.last_position is not None:
+        for comment in geokret.last_position.comments:
+            if comment.type == MOVE_COMMENT_TYPE_MISSING:
+                geokret.missing = True
+                return
+    geokret.missing = False
+
+
+def update_move_comments_type(move_id):
+    """ Convert move comment type to comment when necessary
+    """
+    move = Move.query.get(move_id)
+    if move.type in (MOVE_TYPE_DIPPED, MOVE_TYPE_COMMENT, MOVE_TYPE_GRABBED, MOVE_TYPE_ARCHIVED):
+        for comment in move.comments:
+            comment.type = MOVE_COMMENT_TYPE_COMMENT
+    db.session.add(move)

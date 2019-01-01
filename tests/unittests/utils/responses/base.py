@@ -77,6 +77,12 @@ class BaseResponse(dict):
         assert relationships in self['relationships'], relationships
         return self['relationships'][relationships]
 
+    def assertHasId(self, value):
+        """Assert the ID has value
+        """
+        assert str(self.id) == str(value), "Expected id to be '{}' but was '{}'".format(value, self.id)
+        return self
+
     def assertHasRelationshipRelated(self, relation_type, link):
         """Assert an error response has a specific pointer
         """
@@ -255,3 +261,4 @@ class BaseResponse(dict):
 
     def pprint(self):  # pragma: no cover
         pprint.pprint(self)
+        return self

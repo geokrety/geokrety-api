@@ -43,13 +43,17 @@ class Config(object):
     DATABASE_QUERY_TIMEOUT = 0.1
     SENTRY_DSN = env('SENTRY_DSN', default=None)
     REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
+    RABBITMQ_URL = env('RABBITMQ_URL', default='amqp://guest:guest@localhost:5672/?'
+                       'socket_timeout=10&'
+                       'connection_attempts=2')
     PASSWORD_HASH_SALT = env('PASSWORD_HASH_SALT', default='')
     ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = env('ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES', default=True)
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVE_COMMENTS = env('ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVE_COMMENTS', default=True)
+    ALLOW_MOVE_AUTHOR_TO_MODERATE_MOVE_COMMENTS = env('ALLOW_MOVE_AUTHOR_TO_MODERATE_MOVE_COMMENTS', default=True)
 
     # API configs
     PAGE_SIZE = 20
     SOFT_DELETE = True
-    PROPOGATE_ERROR = env.bool('PROPOGATE_ERROR', default=False)
     DASHERIZE_API = True
     API_PROPOGATE_UNCAUGHT_EXCEPTIONS = env.bool('API_PROPOGATE_UNCAUGHT_EXCEPTIONS', default=True)
     ETAG = True
@@ -102,13 +106,13 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     CACHING = True
-    PROPOGATE_ERROR = True
 
     # Test database performance
     SQLALCHEMY_RECORD_QUERIES = True
 
     # Test features
     ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = True
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVE_COMMENTS = True
 
 
 class TestingConfig(Config):
@@ -122,7 +126,7 @@ class TestingConfig(Config):
     DEBUG_TB_ENABLED = False
     BROKER_BACKEND = 'memory'
     SQLALCHEMY_DATABASE_URI = env('TEST_DATABASE_URL', default=None)
-    PROPOGATE_ERROR = True
 
     # Test features
     ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVES = True
+    ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVE_COMMENTS = True

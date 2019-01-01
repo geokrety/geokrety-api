@@ -78,3 +78,13 @@ class TestUsersLinks(BaseTestCase):
             .assertHasPrivateAttributes(news_subscription.user)
         payload.get(666, user=news_subscription.user, code=404)\
             .assertRaiseJsonApiError('news_subscription_id')
+
+    @request_context
+    def test_user_details_via_move_comment(self):
+        move_comment = self.blend_move_comment()
+        payload = UserPayload(_url="/v1/moves-comments/{}/author")
+
+        payload.get(move_comment.id)\
+            .assertHasPublicAttributes(move_comment.author)
+        payload.get(666, code=404)\
+            .assertRaiseJsonApiError('move_comment_id')
