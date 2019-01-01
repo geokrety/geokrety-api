@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from functools import wraps
 
 import phpass
@@ -10,8 +10,10 @@ from parameterized import parameterized
 
 from app import current_app as app
 from app.api.helpers.data_layers import GEOKRET_TYPES_TEXT, MOVE_TYPES_TEXT
+from app.api.helpers.move_tasks import update_geokret_and_moves
 from app.models.geokret import Geokret
 from app.models.move import Move
+from app.models.move_comment import MoveComment
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.news_subscription import NewsSubscription
@@ -126,9 +128,20 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
 
     def blend_move(self, *args, **kwargs):
         with mixer.ctx():
+            if 'geokret' not in kwargs:
+                kwargs['geokret'] = mixer.blend(Geokret, created_on_datetime="2019-01-12T16:33:46")
             if kwargs.get('count'):
-                return mixer.cycle(kwargs.get('count')).blend(Move, **kwargs)
-            return mixer.blend(Move, **kwargs)
+                last_date = kwargs['geokret'].created_on_datetime
+                moves = []
+                for _ in range(kwargs.get('count')):
+                    last_date = last_date + timedelta(seconds=1)
+                    move = mixer.blend(Move, moved_on_datetime=last_date, **kwargs)
+                    update_geokret_and_moves(move.geokret_id, move.id)
+                    moves.append(move)
+                return moves
+            move = mixer.blend(Move, **kwargs)
+            update_geokret_and_moves(move.geokret_id, move.id)
+            return move
 
     def blend_users(self, count=3, *args, **kwargs):
         self.admin = self.blend_admin(**kwargs)
@@ -155,6 +168,19 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
 
     def blend_geokret(self, *args, **kwargs):
         with mixer.ctx():
+            if 'created_on_datetime' not in kwargs:
+                kwargs['created_on_datetime'] = "2019-01-12T16:33:46"
             if kwargs.get('count'):
                 return mixer.cycle(kwargs.get('count')).blend(Geokret, **kwargs)
             return mixer.blend(Geokret, **kwargs)
+
+    def blend_move_comment(self, *args, **kwargs):
+        with mixer.ctx():
+            if kwargs.get('count'):
+                move_comments = mixer.cycle(kwargs.get('count')).blend(MoveComment, **kwargs)
+                for move_comment in move_comments:
+                    update_geokret_and_moves(move_comment.move.geokret_id, move_comment.move.id)
+                return move_comments
+            move_comment = mixer.blend(MoveComment, **kwargs)
+            update_geokret_and_moves(move_comment.move.geokret_id, move_comment.move.id)
+            return move_comment

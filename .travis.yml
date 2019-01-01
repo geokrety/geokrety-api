@@ -19,6 +19,8 @@ python:
   # - 3.5
 # before-install:
 #   - npm -g install npm@latest
+services:
+  - rabbitmq
 install:
   # - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
   # - npm list -g aglio --depth=0 || npm install -g aglio
@@ -34,7 +36,7 @@ addons:
 before_script:
   - mysql -e 'FLUSH TABLES; DROP DATABASE IF EXISTS geokrety_unittest; CREATE DATABASE geokrety_unittest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 script:
-  - nosetests tests/unittests -v --with-coverage --with-id --nologcapture
+  - nosetests tests/unittests -v --with-coverage --with-id --nologcapture --stop
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
   - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then python-codacy-coverage -r coverage.xml; fi'

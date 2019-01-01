@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from app.api.helpers.data_layers import MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.user import UserPayload
 
@@ -37,8 +38,8 @@ class TestUsersDetails(BaseTestCase):
         news_comments = self.blend_news_comment(author=self.user_1, count=2)
         news_subscriptions = self.blend_news_subscription(user=self.user_1, count=2)
         geokrety_owned = self.blend_geokret(owner=self.user_1, count=2)
-        geokrety_held = self.blend_geokret(holder=self.user_1, count=2)
-        moves = self.blend_move(author=self.user_1, count=2)
+        geokrety_held = self.blend_geokret(holder=self.user_1, type=MOVE_TYPE_GRABBED, count=2)
+        moves = self.blend_move(author=self.user_1, type=MOVE_TYPE_DROPPED, count=2)
 
         UserPayload()\
             .get(self.user_1.id, user=self.admin, args={

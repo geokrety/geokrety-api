@@ -12,6 +12,7 @@ class BasePayload(SendPayloadMixin, dict):
         'geokret-type',
         'move',
         'move-type',
+        'move-comment',
         'user',
         'news',
         'news-subscription',
@@ -72,7 +73,8 @@ class BasePayload(SendPayloadMixin, dict):
         return self
 
     def _del_relationships(self, relationships):
-        self['data']['relationships'].pop(relationships, None)
+        if 'relationships' in self['data']:
+            self['data']['relationships'].pop(relationships, None)
         return self
 
     def _set_relationships_many(self, relationships, name, ids):
@@ -90,7 +92,7 @@ class BasePayload(SendPayloadMixin, dict):
         self['data']['relationships'][relationships]['data'] = datas
         return self
 
-    def blend(self):  # pragma: no cover
+    def blend(self, *args, **kwargs):  # pragma: no cover
         raise NotImplementedError("`blend` is not implemented")
 
     def set_obj(self, obj):  # pragma: no cover
@@ -98,3 +100,4 @@ class BasePayload(SendPayloadMixin, dict):
 
     def pprint(self):  # pragma: no cover
         pprint.pprint(self)
+        return self

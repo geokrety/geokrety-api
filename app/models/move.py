@@ -1,15 +1,18 @@
 from datetime import datetime, timedelta
 
-from sqlalchemy import event
+from sqlalchemy import event, inspect
 from sqlalchemy.dialects.mysql import DOUBLE
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm.exc import NoResultFound
 
 import bleach
 import characterentities
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.utilities import round_microseconds
 from app.models import db
+from app.views.pika_ import pika_
+
+# from app.api.helpers.move_tasks import update_geokret_and_moves
+
 
 # TODO add unicity constraint on geokret_id + moved_on_datetime
 
@@ -32,7 +35,11 @@ class Move(db.Model):
         nullable=False,
         default=None
     )
-    geokret = db.relationship("Geokret", foreign_keys=[geokret_id], backref=db.backref("moves"))
+    geokret = db.relationship(
+        "Geokret",
+        foreign_keys=[geokret_id],
+        backref=db.backref("moves", order_by="-Move.moved_on_datetime")
+    )
 
     latitude = db.Column(
         'lat',
@@ -129,6 +136,13 @@ class Move(db.Model):
         key='username',
         nullable=False,
         default=''
+    )
+
+    # This is used to compute the missing status
+    _move_comments = db.relationship(
+        'MoveComment',
+        foreign_keys="MoveComment.move_id",
+        lazy="dynamic",
     )
 
     moved_on_datetime = db.Column(
@@ -239,13 +253,62 @@ def my_before_insert_or_update_listener(mapper, connection, target):
                                   {'pointer': '/data/attributes/moved-on-datetime'})
 
     # Identical move date is forbidden
-    try:
-        db.session.query(Move).filter(
-            Move.moved_on_datetime == target.moved_on_datetime,
-            Move.geokret_id == target.geokret.id,
-            Move.id != target.id,
-        ).one()
+    if db.session.query(Move).filter(
+        Move.moved_on_datetime == target.moved_on_datetime,
+        Move.geokret_id == target.geokret.id,
+        Move.id != target.id,
+    ).count() > 0:
         raise UnprocessableEntity("There is already a move at that time",
                                   {'pointer': '/data/attributes/moved-on-datetime'})
-    except NoResultFound:
-        pass
+
+
+def _has_changes_that_need_recompute(instance):
+    if inspect(instance).attrs.type.history.has_changes() or \
+            inspect(instance).attrs.moved_on_datetime.history.has_changes() or \
+            inspect(instance).attrs.geokret.history.has_changes():
+        return True
+
+
+@event.listens_for(db.session, 'after_flush')
+def after_flush(session, flush_context):
+    for instance in session.new:
+        if not isinstance(instance, Move):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokret.move.insert",
+                                      body="geokret_id:{0.geokret.id} "
+                                      "move_id:{0.id} "
+                                      "move_type:{0.type} "
+                                      "user_id:{0.author.id}".format(instance))
+
+    for instance in session.dirty:
+        if not isinstance(instance, Move):
+            continue
+        if _has_changes_that_need_recompute(instance):
+            with pika_.pool.acquire() as cxn:
+                cxn.channel.basic_publish(exchange='geokrety',
+                                          routing_key="geokret.move.update",
+                                          body="geokret_id:{0.geokret.id} "
+                                          "move_id:{0.id} "
+                                          "move_type:{0.type} "
+                                          "user_id:{0.author.id}".format(instance))
+                if inspect(instance).attrs.geokret.history.has_changes():
+                    for old_geokret_id in inspect(instance).attrs.geokret.history[2]:
+                        cxn.channel.basic_publish(exchange='geokrety',
+                                                  routing_key="geokret.move.update",
+                                                  body="geokret_id:{1} "
+                                                  "move_id:{0.id} "
+                                                  "move_type:{0.type} "
+                                                  "user_id:{0.author.id}".format(instance, old_geokret_id))
+
+    for instance in session.deleted:
+        if not isinstance(instance, Move):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokret.move.delete",
+                                      body="geokret_id:{0.geokret.id} "
+                                      "move_id:{0.id} "
+                                      "move_type:{0.type} "
+                                      "user_id:{0.author.id}".format(instance))

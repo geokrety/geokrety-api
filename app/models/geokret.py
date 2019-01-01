@@ -120,7 +120,6 @@ class Geokret(db.Model):
     _moves = db.relationship(
         'Move',
         foreign_keys="Move.geokret_id",
-        cascade="all,delete",
         lazy="dynamic",
     )
 

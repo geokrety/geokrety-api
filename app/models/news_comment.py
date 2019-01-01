@@ -49,6 +49,7 @@ class NewsComment(db.Model):
     )
 
     _comment = db.Column(
+        'comment',
         db.String(1000),
         nullable=False
     )

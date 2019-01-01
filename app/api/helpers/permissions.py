@@ -10,6 +10,7 @@ from app.api.helpers.exceptions import (AuthenticationRequired,
                                         ForbiddenException)
 from app.models.geokret import Geokret
 from app.models.move import Move
+from app.models.move_comment import MoveComment
 
 
 def jwt_required(fn, realm=None):
@@ -27,8 +28,6 @@ def jwt_required(fn, realm=None):
             raise AuthenticationRequired('Authentication is required', {'source': ''})
         return fn(*args, **kwargs)
     return decorator
-
-# @jwt_required
 
 
 def is_anonymous(view, view_args, view_kwargs, *args, **kwargs):
@@ -84,6 +83,35 @@ def is_move_author(view, view_args, view_kwargs, *args, **kwargs):
             return True
 
     raise ForbiddenException('Access denied.', {'source': 'move_id'})
+
+
+@jwt_required
+def is_move_comment_author(view, view_args, view_kwargs, *args, **kwargs):
+    user = current_identity
+    if user.is_admin:
+        return True
+
+    try:
+        move_comment = MoveComment.query.filter(MoveComment.id == kwargs['move_comment_id']).one()
+    except NoResultFound:  # pragma: no cover
+        raise ObjectNotFound(
+            'MoveComment %s not found.' % kwargs['move_comment_id'],
+            {'source': 'move_comment_id'})
+
+    if move_comment.author_id == user.id:
+        return True
+
+    if app.config['ALLOW_GEOKRET_OWNER_TO_MODERATE_MOVE_COMMENTS']:
+        # Allow GeoKret owner to moderate move comments if necessary
+        if move_comment.move.geokret.owner_id == user.id:
+            return True
+
+    if app.config['ALLOW_MOVE_AUTHOR_TO_MODERATE_MOVE_COMMENTS']:
+        # Allow Move author to moderate move comments if necessary
+        if move_comment.move.author_id == user.id:
+            return True
+
+    raise ForbiddenException('Access denied.', {'source': 'move_comment_id'})
 
 
 @jwt_required

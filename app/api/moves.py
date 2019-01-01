@@ -1,6 +1,6 @@
 import numbers
 
-from flask import request
+from flask import current_app, request
 from flask_jwt import current_identity
 from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
@@ -20,6 +20,7 @@ from app.api.schema.moves import (DefaultMoveSchema, MoveArchiveSchema,
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
+from app.models.move_comment import MoveComment
 
 
 def get_move_type_id(json_data):
@@ -99,8 +100,9 @@ class MovesList(ResourceList):
 
     def create_object(self, data, kwargs):
         move = super(MovesList, self).create_object(data, kwargs)
-        from app.api.helpers.move_tasks import update_geokret_and_moves
-        update_geokret_and_moves(move.geokret_id, move.id)
+        if current_app.config['TESTING']:
+            from app.api.helpers.move_tasks import update_geokret_and_moves
+            update_geokret_and_moves(move.geokret_id, move.id)
         return move
 
     schema = DefaultMoveSchema
@@ -115,11 +117,21 @@ class MovesList(ResourceList):
         'methods': {
             # 'before_create_object': before_create_object,
             # 'apply_relationships': apply_relationships,
-        }
+        },
     }
 
 
 class MoveDetail(ResourceDetail):
+
+    def before_get_object(self, view_kwargs):
+        """
+        before get method for user object
+        :param view_kwargs:
+        :return:
+        """
+        if view_kwargs.get('move_comment_id') is not None:
+            move_comment = safe_query(self, MoveComment, 'id', view_kwargs['move_comment_id'], 'move_comment_id')
+            view_kwargs['id'] = move_comment.move_id
 
     def before_marshmallow(self, args, kwargs):
         # Configure schema dynamically
@@ -138,7 +150,7 @@ class MoveDetail(ResourceDetail):
             self.schema = get_schema_by_move_type(new_move_type)
 
             # On PATCH, checks are executed only on existing fields in payload, we
-            # need to force include coordinates the activate constrainst checks,
+            # need to force include coordinates to activate constrainst checks,
             # but not necessarily for GRABBED move type as coordinates are optionnal
             if 'attributes' not in json_data['data']:
                 json_data['data']['attributes'] = {}
@@ -168,12 +180,6 @@ class MoveDetail(ResourceDetail):
             move.latitude = None
             move.longitude = None
 
-    def delete_object(self, data):
-        move_deleted_geokret_id = self._data_layer.get_object(data).geokret_id
-        super(MoveDetail, self).delete_object(data)
-        from app.api.helpers.move_tasks import update_geokret_and_moves
-        update_geokret_and_moves(move_deleted_geokret_id)
-
     def update_object(self, data, qs, kwargs):
         old_move = safe_query(self, Move, 'id', kwargs.get('id'), 'id')
         geokrety_to_update = []
@@ -189,12 +195,18 @@ class MoveDetail(ResourceDetail):
 
         # Save update in database
         move = super(MoveDetail, self).update_object(data, qs, kwargs)
-
-        geokrety_to_update.append(move.geokret.id)
-        from app.api.helpers.move_tasks import update_geokret_and_moves
-        update_geokret_and_moves(geokrety_to_update, move.id)
-
+        if current_app.config['TESTING']:
+            geokrety_to_update.append(move.geokret.id)
+            from app.api.helpers.move_tasks import update_geokret_and_moves
+            update_geokret_and_moves(geokrety_to_update, move.id)
         return move
+
+    def delete_object(self, data):
+        move_deleted_geokret_id = self._data_layer.get_object(data).geokret.id
+        super(MoveDetail, self).delete_object(data)
+        if current_app.config['TESTING']:
+            from app.api.helpers.move_tasks import update_geokret_and_moves
+            update_geokret_and_moves(move_deleted_geokret_id)
 
     current_identity = current_identity
     decorators = (
@@ -207,6 +219,9 @@ class MoveDetail(ResourceDetail):
     data_layer = {
         'session': db.session,
         'model': Move,
+        'methods': {
+            'before_get_object': before_get_object,
+        },
     }
 
 

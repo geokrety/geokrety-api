@@ -11,11 +11,9 @@ from flask_cors import CORS
 from flask_jwt import JWT
 from flask_rest_jsonapi.errors import jsonapi_errors
 from flask_rest_jsonapi.exceptions import JsonApiException
-from flask_script import Manager
 
 from app.api.helpers.auth import AuthManager
 from app.api.helpers.jwt import jwt_authenticate, jwt_identity
-from app.views.celery_ import celery
 from app.views.sentry import sentry
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +30,8 @@ def create_app():
     from app.models import db
     db.init_app(app)
 
-    _manager = Manager(app)
+    from app.views.pika_ import pika_
+    pika_.init_app(app)
 
     # TODO take this from config
     app.secret_key = 'super secret key'
@@ -45,10 +44,6 @@ def create_app():
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=24 * 60 * 60)
     app.config['JWT_AUTH_URL_RULE'] = '/auth/session'
     _jwt = JWT(app, jwt_authenticate, jwt_identity)
-
-    # setup celery
-    app.config['CELERY_BROKER_URL'] = app.config['REDIS_URL']
-    app.config['CELERY_RESULT_BACKEND'] = app.config['CELERY_BROKER_URL']
 
     CORS(app, resources={r"/*": {"origins": "*"}})
     AuthManager.init_login(app)
@@ -66,10 +61,10 @@ def create_app():
     if 'SENTRY_DSN' in app.config:
         sentry.init_app(app, dsn=app.config['SENTRY_DSN'])
 
-    return app, _manager, db, _jwt
+    return app, db, _jwt
 
 
-current_app, manager, db, jwt = create_app()
+current_app, db, jwt = create_app()
 
 # @app.before_request
 # def track_user():
@@ -100,25 +95,6 @@ def internal_server_error(error):  # pragma: no cover
         exc = JsonApiException({'pointer': ''}, 'Unknown error')
     return make_response(json.dumps(jsonapi_errors([exc.to_dict()])), exc.status,
                          {'Content-Type': 'application/vnd.api+json'})
-
-
-def make_celery(app=None):
-    app = app or create_app()[0]
-    celery.conf.update(app.config)
-    task_base = celery.Task
-
-    class ContextTask(task_base):
-        abstract = True
-
-        def __call__(self, *args, **kwargs):
-            if current_app.config['TESTING']:
-                with app.test_request_context():
-                    return task_base.__call__(self, *args, **kwargs)
-            with app.app_context():  # pragma: no cover
-                return task_base.__call__(self, *args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
 
 
 if __name__ == '__main__':

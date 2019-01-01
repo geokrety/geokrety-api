@@ -22,3 +22,4 @@ geopy==1.18.1
 responses==0.10.5
 celery[redis]==4.2.1
 bleach==3.0.2
+pika-pool==0.1.3

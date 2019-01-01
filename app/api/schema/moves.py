@@ -102,6 +102,16 @@ class MoveSchema(Schema):
         include_resource_linkage=True,
     )
 
+    comments = Relationship(
+        self_view='v1.move_comments',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.move_comment_list',
+        related_view_kwargs={'move_id': '<id>'},
+        many=True,
+        schema='MoveCommentSchema',
+        type_='move-comment',
+    )
+
 
 class DefaultMoveSchema(MoveSchema):
 

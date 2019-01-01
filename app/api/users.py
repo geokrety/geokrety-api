@@ -1,18 +1,20 @@
+from flask_jwt import current_identity
+from flask_rest_jsonapi import (ResourceDetail, ResourceList,
+                                ResourceRelationship)
+
 from app.api.bootstrap import api
 from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.users import UserSchema
 from app.models import db
+from app.models.geokret import Geokret
+from app.models.move import Move
+from app.models.move_comment import MoveComment
 from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.news_subscription import NewsSubscription
-from app.models.geokret import Geokret
 from app.models.user import User
-from app.models.move import Move
-from flask_jwt import current_identity
-from flask_rest_jsonapi import (ResourceDetail, ResourceList,
-                                ResourceRelationship)
 
 
 class UserList(ResourceList):
@@ -22,8 +24,10 @@ class UserList(ResourceList):
     )
     schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
-    data_layer = {'session': db.session,
-                  'model': User}
+    data_layer = {
+        'session': db.session,
+        'model': User,
+    }
 
 
 class UserDetail(ResourceDetail):
@@ -43,7 +47,8 @@ class UserDetail(ResourceDetail):
             view_kwargs['id'] = news_comment.author_id
 
         if view_kwargs.get('news_subscription_id') is not None:
-            news_subscription = safe_query(self, NewsSubscription, 'id', view_kwargs['news_subscription_id'], 'news_subscription_id')
+            news_subscription = safe_query(self, NewsSubscription, 'id',
+                                           view_kwargs['news_subscription_id'], 'news_subscription_id')
             view_kwargs['id'] = news_subscription.user_id
 
         if view_kwargs.get('geokret_owned_id') is not None:
@@ -57,6 +62,10 @@ class UserDetail(ResourceDetail):
         if view_kwargs.get('move_id') is not None:
             move = safe_query(self, Move, 'id', view_kwargs['move_id'], 'move_id')
             view_kwargs['id'] = move.author_id
+
+        if view_kwargs.get('move_comment_id') is not None:
+            move_comment = safe_query(self, MoveComment, 'id', view_kwargs['move_comment_id'], 'move_comment_id')
+            view_kwargs['id'] = move_comment.author_id
 
     def before_delete(self, args, kwargs):
         # Restrict deleting to admin only
@@ -72,16 +81,20 @@ class UserDetail(ResourceDetail):
     methods = ('GET', 'PATCH', 'DELETE')
     schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
-    data_layer = {'session': db.session,
-                  'model': User,
-                  'methods': {
-                      'before_get_object': before_get_object,
-                  }}
+    data_layer = {
+        'session': db.session,
+        'model': User,
+        'methods': {
+            'before_get_object': before_get_object,
+        },
+    }
 
 
 class UserRelationship(ResourceRelationship):
     methods = ['GET']
     schema = UserSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
-    data_layer = {'session': db.session,
-                  'model': User}
+    data_layer = {
+        'session': db.session,
+        'model': User,
+    }

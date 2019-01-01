@@ -38,6 +38,15 @@ class BaseCollectionResponse(dict):
         for idx, entry in enumerate(self['data']):
             assert 'type' in entry, "'type' key not found in 'data[%s]'" % idx
             assert 'id' in entry, "'id' key not found in 'data[%s]'" % idx
-            assert entry['type'] == obj_type, "Item {}: type '{}' expected but found '{}'".format(idx, obj_type, entry['type'])
-            assert entry['id'] == values[idx], "Item {}: id '{}' expected but found '{}'".format(idx, values[idx], entry['id'])
+            assert entry['type'] == obj_type, "Item {}: type '{}' expected but found '{}'".format(
+                idx, obj_type, entry['type'])
+            assert entry['id'] == values[idx], "Item {}: id '{}' expected but found '{}'".format(
+                idx, values[idx], entry['id'])
+        return self
+
+    def assertHasPaginationLinks(self):
+        """ Assert pagination links are present in links.
+        """
+        assert 'links' in self, "'links' key not present"
+        assert set(['first', 'last', 'self']).issubset(self['links'])
         return self

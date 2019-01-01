@@ -2,13 +2,15 @@ from mixer.backend.flask import mixer
 
 from app import current_app as app
 from app.api.helpers.data_layers import (GEOKRET_TYPE_TRADITIONAL,
+                                         MOVE_COMMENT_TYPE_COMMENT,
+                                         MOVE_COMMENT_TYPE_MISSING,
                                          MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
                                          MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
                                          MOVE_TYPE_SEEN)
 from app.api.helpers.move_tasks import (update_geokret_holder,
                                         update_geokret_total_moves_count,
                                         update_move_country_and_altitude,
-                                        update_move_distances)
+                                        update_move_distances, update_geokret_and_moves)
 from app.models import db
 from app.models.geokret import Geokret
 from app.models.move import Move
@@ -34,27 +36,28 @@ class TestMoveTasksHelper(BaseTestCase):
                                         created_on_datetime="2017-12-01T14:18:22")
 
             # Moves
+            self.move8 = mixer.blend(Move, type=MOVE_TYPE_DROPPED, geokret=self.geokret1,
+                                     author=self.user1, moved_on_datetime="2017-12-01T14:18:22",
+                                     latitude=43.693633, longitude=6.860933)
+            self.move6 = mixer.blend(Move, type=MOVE_TYPE_GRABBED, geokret=self.geokret1,
+                                     author=self.user2, moved_on_datetime="2017-12-01T14:19:22")
+            self.move7 = mixer.blend(Move, type=MOVE_TYPE_COMMENT, geokret=self.geokret1,
+                                     author=self.user2, moved_on_datetime="2017-12-01T14:20:22")
             self.move1 = mixer.blend(Move, type=MOVE_TYPE_DROPPED, geokret=self.geokret1,
                                      author=self.user2, moved_on_datetime="2017-12-01T14:21:22",
                                      latitude=43.694483, longitude=6.85575)
+            self.move5 = mixer.blend(Move, type=MOVE_TYPE_SEEN, geokret=self.geokret1,
+                                     author=self.user3, moved_on_datetime="2017-12-01T14:22:22",
+                                     latitude=43.701767, longitude=6.84085)
+            self.move4 = mixer.blend(Move, type=MOVE_TYPE_DIPPED, geokret=self.geokret1,
+                                     author=self.user4, moved_on_datetime="2017-12-01T14:23:22",
+                                     latitude=43.6792, longitude=6.852933)
+
             self.move2 = mixer.blend(Move, type=MOVE_TYPE_COMMENT, geokret=self.geokret1,
                                      author=self.user1, moved_on_datetime="2017-12-01T14:24:22")
             self.move3 = mixer.blend(Move, type=MOVE_TYPE_DIPPED, geokret=self.geokret1,
                                      author=self.user4, moved_on_datetime="2017-12-01T14:25:22",
                                      latitude=43.704233, longitude=6.869833)
-            self.move4 = mixer.blend(Move, type=MOVE_TYPE_DIPPED, geokret=self.geokret1,
-                                     author=self.user4, moved_on_datetime="2017-12-01T14:23:22",
-                                     latitude=43.6792, longitude=6.852933)
-            self.move5 = mixer.blend(Move, type=MOVE_TYPE_SEEN, geokret=self.geokret1,
-                                     author=self.user3, moved_on_datetime="2017-12-01T14:22:22",
-                                     latitude=43.701767, longitude=6.84085)
-            self.move6 = mixer.blend(Move, type=MOVE_TYPE_GRABBED, geokret=self.geokret1,
-                                     author=self.user2, moved_on_datetime="2017-12-01T14:19:22")
-            self.move7 = mixer.blend(Move, type=MOVE_TYPE_COMMENT, geokret=self.geokret1,
-                                     author=self.user2, moved_on_datetime="2017-12-01T14:20:22")
-            self.move8 = mixer.blend(Move, type=MOVE_TYPE_DROPPED, geokret=self.geokret1,
-                                     author=self.user1, moved_on_datetime="2017-12-01T14:18:22",
-                                     latitude=43.693633, longitude=6.860933)
             self.move9 = mixer.blend(Move, type=MOVE_TYPE_COMMENT, geokret=self.geokret1,
                                      author=self.user3, moved_on_datetime="2017-12-01T14:28:22")
 
@@ -176,3 +179,35 @@ class TestMoveTasksHelper(BaseTestCase):
         # Check in database
         self.assertEqual(another_move.country, 'XYZ')
         self.assertEqual(another_move.altitude, '-2000')
+
+    @request_context
+    def test_update_geokret_missing_status(self):
+        """Check Move Tasks: compute GeoKret missing status"""
+        geokret = self.blend_geokret(missing=False,
+                                     created_on_datetime="2017-12-01T21:54:17")
+        move1 = self.blend_move(geokret=geokret, type=MOVE_TYPE_DROPPED,
+                                moved_on_datetime="2019-01-01T21:54:44")
+
+        move2 = self.blend_move(geokret=geokret, type=MOVE_TYPE_COMMENT,
+                                moved_on_datetime="2019-01-01T21:54:59")
+
+        self.blend_move_comment(move=move1, type=MOVE_COMMENT_TYPE_COMMENT)
+        update_geokret_and_moves(geokret.id, [move1.id, move2.id])
+        self.assertFalse(geokret.missing)
+
+        self.blend_move_comment(move=move2, type=MOVE_COMMENT_TYPE_COMMENT)
+        update_geokret_and_moves(move2.geokret.id)
+        self.assertFalse(geokret.missing)
+
+        self.blend_move_comment(move=move1, type=MOVE_COMMENT_TYPE_MISSING)
+        update_geokret_and_moves(move1.geokret.id)
+        self.assertTrue(geokret.missing)
+
+        move3 = self.blend_move(geokret=geokret, type=MOVE_TYPE_SEEN,
+                                moved_on_datetime="2019-01-01T22:29:07")
+        update_geokret_and_moves(move3.geokret.id)
+        self.assertFalse(geokret.missing)
+
+        self.blend_move_comment(move=move3, type=MOVE_COMMENT_TYPE_MISSING)
+        update_geokret_and_moves(move3.geokret.id)
+        self.assertTrue(geokret.missing)

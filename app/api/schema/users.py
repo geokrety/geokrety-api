@@ -192,3 +192,14 @@ class UserSchema(Schema):
         schema='MoveWithCoordinatesSchema',
         type_='move',
     )
+
+    moves_comments = Relationship(
+        self_view='v1.user_news_comments',
+        self_view_kwargs={'id': '<id>'},
+        related_view='v1.move_comment_list',
+        related_view_kwargs={'author_id': '<id>'},
+        many=True,
+        schema='MoveCommentSchema',
+        type_='move-comment',
+        # include_resource_linkage=True
+    )
