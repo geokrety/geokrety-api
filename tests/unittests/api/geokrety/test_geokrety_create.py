@@ -211,3 +211,10 @@ class TestGeokretCreate(BaseTestCase):
             .assertHasRelationshipAuthorData(user)\
             .assertHasRelationshipGeokretData(response.id)\
             .assertHasAttribute('comment', "Born here")
+
+    @request_context
+    def test_bulk_operation_is_not_yet_supported(self):
+        payload = GeokretPayload("Name")
+        payload['data'] = [payload['data']]
+        payload.post(user=self.user_1, code=422)\
+            .assertRaiseJsonApiError('/data')
