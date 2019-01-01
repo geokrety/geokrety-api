@@ -44,6 +44,8 @@ class BaseResponse(dict):
             self.update(data['data'])
         else:
             self.update(data)
+        if data is not None and data.get('included'):
+            self['included'] = data['included']
 
     @property
     def id(self):
