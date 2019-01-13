@@ -16,6 +16,7 @@ from app.api.news_subscriptions import (NewsSubscriptionDetail,
                                         NewsSubscriptionList,
                                         NewsSubscriptionRelationship)
 from app.api.users import UserDetail, UserList, UserRelationship
+from app.api.badges import BadgeDetail, BadgeList, BadgeRelationship
 
 api.route(UserList, 'users_list',
           '/users',
@@ -23,6 +24,7 @@ api.route(UserList, 'users_list',
 api.route(UserDetail,
           'user_details',
           '/users/<int:id>',
+          '/badges/<int:badge_author_id>/author',
           '/news/<int:news_id>/author',
           '/news-comments/<int:news_comment_id>/author',
           '/news-subscriptions/<int:news_subscription_id>/user',
@@ -138,3 +140,12 @@ api.route(MoveRelationship, 'move_geokret', '/moves/<int:id>/relationships/geokr
 api.route(MoveRelationship, 'move_author', '/moves/<int:id>/relationships/author')
 api.route(MoveRelationship, 'move_type', '/moves/<int:id>/relationships/type')
 api.route(MoveRelationship, 'move_comments', '/moves/<int:id>/relationships/comments')
+
+api.route(BadgeList, 'badges_list',
+          '/badges',
+          '/users/<int:author_id>/created-badges',
+          )
+api.route(BadgeDetail, 'badge_details',
+          '/badges/<int:id>',
+          )
+api.route(BadgeRelationship, 'badge_author', '/badges/<int:id>/relationships/author')

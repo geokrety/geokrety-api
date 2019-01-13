@@ -15,6 +15,7 @@ from app.models.news import News
 from app.models.news_comment import NewsComment
 from app.models.news_subscription import NewsSubscription
 from app.models.user import User
+from app.models.badge import Badge
 
 
 class UserList(ResourceList):
@@ -66,6 +67,10 @@ class UserDetail(ResourceDetail):
         if view_kwargs.get('move_comment_id') is not None:
             move_comment = safe_query(self, MoveComment, 'id', view_kwargs['move_comment_id'], 'move_comment_id')
             view_kwargs['id'] = move_comment.author_id
+
+        if view_kwargs.get('badge_author_id') is not None:
+            badge = safe_query(self, Badge, 'id', view_kwargs['badge_author_id'], 'badge_author_id')
+            view_kwargs['id'] = badge.author_id
 
     def before_delete(self, args, kwargs):
         # Restrict deleting to admin only

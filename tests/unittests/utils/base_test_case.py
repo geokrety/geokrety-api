@@ -11,6 +11,7 @@ from parameterized import parameterized
 from app import current_app as app
 from app.api.helpers.data_layers import GEOKRET_TYPES_TEXT, MOVE_TYPES_TEXT
 from app.api.helpers.move_tasks import update_geokret_and_moves
+from app.models.badge import Badge
 from app.models.geokret import Geokret
 from app.models.move import Move
 from app.models.move_comment import MoveComment
@@ -184,3 +185,9 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
             move_comment = mixer.blend(MoveComment, **kwargs)
             update_geokret_and_moves(move_comment.move.geokret_id, move_comment.move.id)
             return move_comment
+
+    def blend_badge(self, *args, **kwargs):
+        with mixer.ctx():
+            if kwargs.get('count'):
+                return mixer.cycle(kwargs.get('count')).blend(Badge, **kwargs)
+            return mixer.blend(Badge, **kwargs)

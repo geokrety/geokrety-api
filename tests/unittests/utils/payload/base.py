@@ -8,6 +8,7 @@ from tests.unittests.mixins.send_payload_mixin import SendPayloadMixin
 class BasePayload(SendPayloadMixin, dict):
 
     TYPES = [
+        'badge',
         'geokret',
         'geokret-type',
         'move',
