@@ -4,13 +4,14 @@ import random
 import phpass
 from flask import current_app as app
 from flask import request
-from sqlalchemy import event
+from sqlalchemy import event, inspect
 from sqlalchemy.dialects.mysql import DOUBLE, INTEGER
 from sqlalchemy.ext.hybrid import hybrid_property
 
 import bleach
 import characterentities
 from app.models import db
+from app.views.pika_ import pika_
 
 
 def random_0_23():
@@ -195,3 +196,60 @@ class User(db.Model):
 def receive_init(target, args, kwargs):
     target.secid = ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(84))  # TODO
     target.ip = request.remote_addr
+
+
+MONITORED_ATTRIBUTES = [
+    '_name',
+    'is_admin',
+    '_password',
+    'email',
+    'daily_mails',
+    'ip',
+    'language',
+    'latitude',
+    'longitude',
+    'observation_radius',
+    'country',
+    'hour',
+    'statpic_id',
+    'last_mail_datetime',
+    'last_login_datetime',
+    'last_update_datetime',
+    'secid',
+]
+
+
+def _has_changes_that_need_event(instance):
+    instance_attrs = inspect(instance).attrs
+    for attribute in MONITORED_ATTRIBUTES:
+        if hasattr(instance_attrs, attribute) and \
+                getattr(instance_attrs, attribute).history.has_changes():
+            return True
+
+
+@event.listens_for(db.session, 'after_flush')
+def after_flush(session, flush_context):
+    for instance in session.new:
+        if not isinstance(instance, User):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.user.insert",
+                                      body=u"user_id:{0.id} username:{0.name}".format(instance))
+
+    for instance in session.dirty:
+        if not isinstance(instance, User):
+            continue
+        with pika_.pool.acquire() as cxn:
+            if _has_changes_that_need_event(instance):
+                cxn.channel.basic_publish(exchange='geokrety',
+                                          routing_key="geokrety.user.update",
+                                          body=u"user_id:{0.id} username:{0.name}".format(instance))
+
+    for instance in session.deleted:
+        if not isinstance(instance, User):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.user.delete",
+                                      body=u"user_id:{0.id} username:{0.name}".format(instance))

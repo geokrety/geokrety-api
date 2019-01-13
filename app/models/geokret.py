@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from sqlalchemy import event
+from sqlalchemy import event, inspect
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -11,6 +11,7 @@ from app.api.helpers.data_layers import MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT
 from app.api.helpers.utilities import round_microseconds
 from app.models import db
 from app.models.move import Move
+from app.views.pika_ import pika_
 
 
 class Geokret(db.Model):
@@ -222,3 +223,56 @@ def before_insert_listener(mapper, connection, target):
 @event.listens_for(Geokret, 'before_update')
 def before_update_listener(mapper, connection, target):
     target.updated_on_datetime = round_microseconds(datetime.utcnow())
+
+
+MONITORED_ATTRIBUTES = [
+    'tracking_code',
+    '_name',
+    '_description',
+    'type',
+    'missing',
+    'distance',
+    'caches_count',
+    'pictures_count',
+    'updated_on_datetime',
+    'owner_id',
+    'holder_id',
+    'last_position_id',
+    'last_move_id',
+]
+
+
+def _has_changes_that_need_event(instance):
+    instance_attrs = inspect(instance).attrs
+    for attribute in MONITORED_ATTRIBUTES:
+        if hasattr(instance_attrs, attribute) and \
+                getattr(instance_attrs, attribute).history.has_changes():
+            return True
+
+
+@event.listens_for(db.session, 'after_flush')
+def after_flush(session, flush_context):
+    for instance in session.new:
+        if not isinstance(instance, Geokret):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.geokret.insert",
+                                      body="geokret_id:{0.id}".format(instance))
+
+    for instance in session.dirty:
+        if not isinstance(instance, Geokret):
+            continue
+        with pika_.pool.acquire() as cxn:
+            if _has_changes_that_need_event(instance):
+                cxn.channel.basic_publish(exchange='geokrety',
+                                          routing_key="geokrety.geokret.update",
+                                          body="geokret_id:{0.id}".format(instance))
+
+    for instance in session.deleted:
+        if not isinstance(instance, Geokret):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.geokret.delete",
+                                      body="geokret_id:{0.id}".format(instance))

@@ -1,9 +1,12 @@
 import datetime
 
-from app.models import db
+from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
+
 import bleach
 import characterentities
+from app.models import db
+from app.views.pika_ import pika_
 
 
 class News(db.Model):
@@ -109,3 +112,30 @@ class News(db.Model):
     @username.expression
     def username(cls):
         return cls._username
+
+
+@event.listens_for(db.session, 'after_flush')
+def after_flush(session, flush_context):
+    for instance in session.new:
+        if not isinstance(instance, News):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.news.insert",
+                                      body="news_id:{0.id}".format(instance))
+
+    for instance in session.dirty:
+        if not isinstance(instance, News):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.news.update",
+                                      body="news_id:{0.id}".format(instance))
+
+    for instance in session.deleted:
+        if not isinstance(instance, News):
+            continue
+        with pika_.pool.acquire() as cxn:
+            cxn.channel.basic_publish(exchange='geokrety',
+                                      routing_key="geokrety.news.delete",
+                                      body="news_id:{0.id}".format(instance))

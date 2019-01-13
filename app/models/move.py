@@ -276,7 +276,7 @@ def after_flush(session, flush_context):
             continue
         with pika_.pool.acquire() as cxn:
             cxn.channel.basic_publish(exchange='geokrety',
-                                      routing_key="geokret.move.insert",
+                                      routing_key="geokrety.move.insert",
                                       body="geokret_id:{0.geokret.id} "
                                       "move_id:{0.id} "
                                       "move_type:{0.type} "
@@ -288,7 +288,7 @@ def after_flush(session, flush_context):
         if _has_changes_that_need_recompute(instance):
             with pika_.pool.acquire() as cxn:
                 cxn.channel.basic_publish(exchange='geokrety',
-                                          routing_key="geokret.move.update",
+                                          routing_key="geokrety.move.update",
                                           body="geokret_id:{0.geokret.id} "
                                           "move_id:{0.id} "
                                           "move_type:{0.type} "
@@ -296,7 +296,7 @@ def after_flush(session, flush_context):
                 if inspect(instance).attrs.geokret.history.has_changes():
                     for old_geokret_id in inspect(instance).attrs.geokret.history[2]:
                         cxn.channel.basic_publish(exchange='geokrety',
-                                                  routing_key="geokret.move.update",
+                                                  routing_key="geokrety.move.update",
                                                   body="geokret_id:{1} "
                                                   "move_id:{0.id} "
                                                   "move_type:{0.type} "
@@ -307,7 +307,7 @@ def after_flush(session, flush_context):
             continue
         with pika_.pool.acquire() as cxn:
             cxn.channel.basic_publish(exchange='geokrety',
-                                      routing_key="geokret.move.delete",
+                                      routing_key="geokrety.move.delete",
                                       body="geokret_id:{0.geokret.id} "
                                       "move_id:{0.id} "
                                       "move_type:{0.type} "
