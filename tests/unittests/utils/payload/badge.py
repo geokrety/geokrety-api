@@ -37,10 +37,10 @@ class BadgePayload(BasePayload):
         self.set_name(obj.name)
         self.set_description(obj.description)
         self.set_filename(obj.filename)
-        self.set_created_on_datetime(obj.created_on_datetime)
+        # self.set_created_on_datetime(obj.created_on_datetime)
         return self
 
-    def blend(self):
+    def blend(self, *args, **kwargs):
         with mixer.ctx(commit=False):
             self._blend = mixer.blend('app.models.badge.Badge')
             self.set_obj(self._blend)

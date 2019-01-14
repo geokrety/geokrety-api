@@ -18,7 +18,7 @@ class BadgeSchema(Schema):
                                       {'pointer': '/data/attributes/name'})
 
     @validates('filename')
-    def validate_file_blank(self, data):
+    def validate_filename_blank(self, data):
         data = characterentities.decode(data).replace('\x00', '').strip()
         if not data:
             raise UnprocessableEntity("Badge filename cannot be blank",
@@ -36,7 +36,7 @@ class BadgeSchema(Schema):
 
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
-    description = fields.Str()
+    description = fields.Str(allow_none=True)
     filename = fields.Str(required=True)
     created_on_datetime = fields.Date(dump_only=True)
 

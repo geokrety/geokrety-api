@@ -55,9 +55,13 @@ class Badge(db.Model):
         db.ForeignKey('gk-users.id'),
         key='author_id',
         nullable=False,
-        default=None,
     )
-    author = db.relationship("User", foreign_keys=[author_id], backref="created_badges")
+
+    author = db.relationship(
+        "User",
+        foreign_keys=[author_id],
+        backref="created_badges"
+    )
 
     @hybrid_property
     def name(self):
@@ -80,6 +84,8 @@ class Badge(db.Model):
 
     @description.setter
     def description(self, description):
+        if self._description is None:
+            return None
         description_clean = bleach.clean(description, strip=True)
         self._description = characterentities.decode(description_clean).strip()
 

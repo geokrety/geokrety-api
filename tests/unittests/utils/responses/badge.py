@@ -18,12 +18,23 @@ class BadgeResponse(BaseResponse):
         self.assertHasRelationshipData('author', user_id, 'user')
         return self
 
+    # def assertHasRelationshipHolders(self):
+    #     self.assertHasRelationshipSelf('holders', '/v1/badges/%s/relationships/holders' % self.id)
+    #     self.assertHasRelationshipRelated('holders', '/v1/badges/%s/holders' % self.id)
+    #     return self
+    #
+    # def assertHasRelationshipHoldersData(self, user):
+    #     user_id = user.id if isinstance(user, User) else user
+    #     self.assertHasRelationshipData('holders', user_id, 'user')
+    #     return self
+
     def assertHasPublicAttributes(self, obj):
         self.assertHasAttribute('name', obj.name)
         self.assertHasAttribute('description', obj.description)
         self.assertHasAttribute('filename', obj.filename)
         self.assertHasAttributeDateTime('created_on_datetime', obj.created_on_datetime)
         self.assertHasRelationshipAuthor()
+        # self.assertHasRelationshipHolders()
         return self
 
 
