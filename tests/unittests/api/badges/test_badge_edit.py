@@ -5,6 +5,7 @@ from parameterized import parameterized
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.badge import BadgePayload
 from tests.unittests.utils.static_test_cases import (EMPTY_TEST_CASES,
+                                                     HTML_SUBSET_TEST_CASES,
                                                      HTML_SUBSET_TEST_CASES_NO_BLANK,
                                                      UTF8_TEST_CASES)
 
@@ -52,6 +53,36 @@ class TestBadgeEdit(BaseTestCase):
             .set_name(name)\
             .patch(badge.id, user=self.admin)\
             .assertHasName(expected)
+
+    @parameterized.expand(EMPTY_TEST_CASES)
+    @request_context
+    def test_field_description_can_be_empty(self, description):
+        badge = self.blend_badge()
+        BadgePayload()\
+            .blend()\
+            .set_description(description)\
+            .patch(badge.id, user=self.admin)\
+            .assertHasDescription("")
+
+    @parameterized.expand(HTML_SUBSET_TEST_CASES)
+    @request_context
+    def test_field_description_support_html_subset(self, description, expected):
+        badge = self.blend_badge()
+        BadgePayload()\
+            .blend()\
+            .set_description(description)\
+            .patch(badge.id, user=self.admin)\
+            .assertHasDescription(expected)
+
+    @parameterized.expand(UTF8_TEST_CASES)
+    @request_context
+    def test_field_description_support_utf8(self, description, expected):
+        badge = self.blend_badge()
+        BadgePayload()\
+            .blend()\
+            .set_description(description)\
+            .patch(badge.id, user=self.admin)\
+            .assertHasDescription(expected)
 
     @request_context
     def test_relationships_author_can_be_overrided(self):

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -79,19 +80,24 @@ class Badge(db.Model):
     @hybrid_property
     def description(self):
         if self._description is None:
-            return None
+            return u''
         return characterentities.decode(self._description)
 
     @description.setter
     def description(self, description):
-        if self._description is None:
-            return None
+        if description is None:
+            return u''
         description_clean = bleach.clean(description, strip=True)
-        self._description = characterentities.decode(description_clean).strip()
+        self._description = characterentities.decode(description_clean).replace('\x00', '').strip()
 
     @description.expression
     def description(cls):
         return cls._description
+
+
+@event.listens_for(Badge, 'init')
+def receive_init(target, args, kwargs):
+    target.filename = uuid.uuid4().hex
 
 
 @event.listens_for(db.session, 'after_flush')

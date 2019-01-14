@@ -8,6 +8,10 @@ from .collections import BaseCollectionResponse
 
 class BadgeResponse(BaseResponse):
 
+    @property
+    def filename(self):
+        return self.get_attribute('filename')
+
     def assertHasName(self, value):
         self.assertHasAttribute('name', value)
         return self

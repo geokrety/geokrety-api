@@ -37,7 +37,7 @@ class BadgeSchema(Schema):
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(allow_none=True)
-    filename = fields.Str(required=True)
+    filename = fields.Str(dump_only=True)
     created_on_datetime = fields.Date(dump_only=True)
 
     author = Relationship(

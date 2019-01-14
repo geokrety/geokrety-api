@@ -29,9 +29,9 @@ class BadgeList(ResourceList):
 
 class BadgeDetail(ResourceDetail):
     decorators = (
-        api.has_permission('is_admin', methods="PATCH"),
+        api.has_permission('is_admin', methods="PATCH,DELETE"),
     )
-    methods = ('GET', 'PATCH')
+    methods = ('GET', 'PATCH', 'DELETE')
     schema = BadgeSchema
     get_schema_kwargs = {'context': {'current_identity': current_identity}}
     data_layer = {
