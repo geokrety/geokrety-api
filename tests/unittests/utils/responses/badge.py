@@ -8,6 +8,18 @@ from .collections import BaseCollectionResponse
 
 class BadgeResponse(BaseResponse):
 
+    def assertHasName(self, value):
+        self.assertHasAttribute('name', value)
+        return self
+
+    def assertHasDescription(self, value):
+        self.assertHasAttribute('description', value)
+        return self
+
+    def assertHasFilename(self, value):
+        self.assertHasAttribute('filename', value)
+        return self
+
     def assertHasRelationshipAuthor(self):
         self.assertHasRelationshipSelf('author', '/v1/badges/%s/relationships/author' % self.id)
         self.assertHasRelationshipRelated('author', '/v1/badges/%s/author' % self.id)
@@ -29,9 +41,9 @@ class BadgeResponse(BaseResponse):
     #     return self
 
     def assertHasPublicAttributes(self, obj):
-        self.assertHasAttribute('name', obj.name)
-        self.assertHasAttribute('description', obj.description)
-        self.assertHasAttribute('filename', obj.filename)
+        self.assertHasName(obj.name)
+        self.assertHasDescription(obj.description)
+        self.assertHasFilename(obj.filename)
         self.assertHasAttributeDateTime('created_on_datetime', obj.created_on_datetime)
         self.assertHasRelationshipAuthor()
         # self.assertHasRelationshipHolders()
