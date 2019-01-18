@@ -114,22 +114,22 @@ class TestMoveCreateCommon(BaseTestCase):
             .assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
     @parameterized.expand([
-        [MOVE_TYPE_DROPPED],
-        [MOVE_TYPE_GRABBED],
-        [MOVE_TYPE_COMMENT],
-        [MOVE_TYPE_SEEN],
-        [MOVE_TYPE_DIPPED],
+        [MOVE_TYPE_DROPPED, 422],
+        [MOVE_TYPE_GRABBED, 422],
+        [MOVE_TYPE_COMMENT, 201],
+        [MOVE_TYPE_SEEN, 422],
+        [MOVE_TYPE_DIPPED, 422],
     ], doc_func=custom_name_geokrety_move_type)
     @request_context
-    def test_move_on_datetime_must_not_be_at_the_same_datetime(self, move_type):
+    def test_move_on_datetime_must_not_be_at_the_same_datetime(self, move_type, expected):
         geokret = self.blend_geokret(created_on_datetime='2018-10-07T15:30:52')
         payload = MovePayload(move_type, geokret=geokret)\
-            .set_coordinates()
-        payload.set_moved_on_datetime('2018-10-09T19:40:28')\
-            .post(user=self.user_1)
-
-        payload.post(user=self.user_1, code=422)\
-            .assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
+            .set_coordinates()\
+            .set_moved_on_datetime('2018-10-09T19:40:28')
+        payload.post(user=self.user_1)
+        move = payload.post(user=self.user_1, code=expected)
+        if expected == 422:
+            move.assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
     @parameterized.expand([
         [MOVE_TYPE_DROPPED],

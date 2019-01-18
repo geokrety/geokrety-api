@@ -16,10 +16,8 @@ from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import require_relationship
 from app.api.schema.geokrety import GeokretSchemaCreate, GeokretSchemaPublic
 from app.models import db
-from app.models.geokret import Geokret
-from app.models.move import Move
-from app.models.user import User
 from app.views.regex import REG_LATITUDE, REG_LONGITUDE
+from geokrety_api_models import Geokret, Move, User
 
 
 class GeokretList(ResourceList):

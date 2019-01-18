@@ -8,7 +8,7 @@ from app.api.helpers.data_layers import (MOVE_COMMENT_TYPE_COMMENT,
                                          MOVE_TYPE_DIPPED, MOVE_TYPE_DROPPED,
                                          MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
 from app.api.helpers.db import safe_query
-from app.models.move_comment import MoveComment
+from geokrety_api_models import MoveComment
 from tests.unittests.utils.base_test_case import (BaseTestCase,
                                                   custom_name_geokrety_move_type,
                                                   request_context)

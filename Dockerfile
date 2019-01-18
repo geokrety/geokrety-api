@@ -17,7 +17,7 @@ RUN apk add --no-cache \
 
 COPY requirements.txt requirements.txt
 COPY requirements requirements
-RUN  pip install --no-cache-dir -r requirements.txt
+RUN  pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /src
 EXPOSE 5000

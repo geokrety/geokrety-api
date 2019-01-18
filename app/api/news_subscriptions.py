@@ -7,7 +7,7 @@ from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.news_subscriptions import NewsSubscriptionSchema
 from app.models import db
-from app.models.news_subscription import NewsSubscription
+from geokrety_api_models import NewsSubscription
 
 
 class NewsSubscriptionList(ResourceList):

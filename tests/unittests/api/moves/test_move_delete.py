@@ -4,8 +4,9 @@ from mixer.backend.flask import mixer
 from parameterized import parameterized
 
 from app.api.helpers.data_layers import MOVE_TYPE_DIPPED
-from app.api.helpers.move_tasks import update_move_distances
-from app.models.move import Move
+from app.models import db
+from geokrety_api_models import Move
+from geokrety_api_models.utilities.move_tasks import update_move_distances
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.move import MovePayload
 
@@ -28,7 +29,7 @@ class TestMoveDelete(BaseTestCase):
         self.move_4 = mixer.blend(Move, type=MOVE_TYPE_DIPPED, geokret=self.geokret,
                                   moved_on_datetime="2018-12-27T23:42:15",
                                   latitude=43.693633, longitude=6.860933)
-        update_move_distances(self.geokret.id)
+        update_move_distances(db.session, self.geokret.id)
 
     @parameterized.expand([
         [None, 401],

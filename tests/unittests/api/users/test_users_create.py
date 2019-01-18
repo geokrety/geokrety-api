@@ -5,7 +5,7 @@ from decimal import Decimal
 from parameterized import parameterized
 
 from app.api.helpers.db import safe_query
-from app.models.user import User
+from geokrety_api_models import User
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.user import UserPayload
 from tests.unittests.utils.static_test_cases import (NO_HTML_TEST_CASES,

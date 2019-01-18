@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app.models.news import News
-from app.models.user import User
+from geokrety_api_models import News, User
 
 from .base import BaseResponse
 from .collections import BaseCollectionResponse

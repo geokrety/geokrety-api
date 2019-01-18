@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app.models.user import User
+from geokrety_api_models import User
 
 from .base import BaseResponse
 from .collections import BaseCollectionResponse
@@ -11,6 +11,10 @@ class BadgeResponse(BaseResponse):
     @property
     def filename(self):
         return self.get_attribute('filename')
+
+    @property
+    def upload_url(self):
+        return self.get_attribute('upload_url')
 
     def assertHasName(self, value):
         self.assertHasAttribute('name', value)

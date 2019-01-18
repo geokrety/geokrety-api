@@ -3,8 +3,7 @@
 from parameterized import parameterized
 
 from app.models import db
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
+from geokrety_api_models import NewsComment, NewsSubscription
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.news import NewsPayload
 

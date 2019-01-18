@@ -6,9 +6,7 @@ from app.api.bootstrap import api
 from app.api.helpers.db import safe_query
 from app.api.schema.news import NewsSchema
 from app.models import db
-from app.models.news import News
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
+from geokrety_api_models import News, NewsComment, NewsSubscription
 
 
 class NewsList(ResourceList):

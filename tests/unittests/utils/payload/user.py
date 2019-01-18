@@ -109,6 +109,6 @@ class UserPayload(BasePayload):
 
     def blend(self):
         with mixer.ctx(commit=False):
-            self._blend = mixer.blend('app.models.user.User')
+            self._blend = mixer.blend('geokrety_api_models.User')
             self.set_obj(self._blend)
             return self

@@ -7,8 +7,8 @@ from app.api.helpers.data_layers import COUNTRIES, LANGUAGES
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
-from app.models.user import User
 from app.views.regex import REG_LATITUDE, REG_LONGITUDE
+from geokrety_api_models import User
 
 
 def drop_private_attributes(item):

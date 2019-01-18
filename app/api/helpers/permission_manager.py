@@ -5,8 +5,13 @@ from sqlalchemy.orm.exc import NoResultFound
 from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permissions import (auth_required, has_touched_geokret,
                                          is_admin, is_anonymous,
+                                         is_date_in_the_future,
                                          is_geokret_holder, is_geokret_owner,
-                                         is_move_author, is_user_itself, is_move_comment_author)
+                                         is_move_author,
+                                         is_move_before_geokret_birth,
+                                         is_move_comment_author,
+                                         is_there_a_move_at_that_datetime,
+                                         is_user_itself)
 
 permissions = {
     'is_anonymous': is_anonymous,
@@ -18,6 +23,9 @@ permissions = {
     'is_move_author': is_move_author,
     'is_move_comment_author': is_move_comment_author,
     'has_touched_geokret': has_touched_geokret,
+    'is_there_a_move_at_that_datetime': is_there_a_move_at_that_datetime,
+    'is_move_before_geokret_birth': is_move_before_geokret_birth,
+    'is_date_in_the_future': is_date_in_the_future,
 }
 
 

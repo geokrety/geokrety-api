@@ -33,6 +33,12 @@ def create_app():
     from app.views.pika_ import pika_
     pika_.init_app(app)
 
+    from app.views.minio import storage
+    storage.init_app(app)
+
+    from app.models.events import register_database_events
+    register_database_events(db)
+
     # TODO take this from config
     app.secret_key = 'super secret key'
 
@@ -51,11 +57,6 @@ def create_app():
     with app.app_context():
         from app.api.bootstrap import api_v1
         app.register_blueprint(api_v1)
-
-    if app.config['SERVE_STATIC']:
-        app.add_url_rule('/static/<path:filename>',
-                         endpoint='static',
-                         view_func=app.send_static_file)
 
     # sentry
     if 'SENTRY_DSN' in app.config:

@@ -5,7 +5,6 @@ from parameterized import parameterized
 
 from app.api.helpers.data_layers import (MOVE_COMMENT_TYPE_MISSING,
                                          MOVE_TYPE_DROPPED)
-from app.api.helpers.move_tasks import update_geokret_and_moves
 from tests.unittests.utils.base_test_case import BaseTestCase, request_context
 from tests.unittests.utils.payload.move_comment import MoveCommentPayload
 
@@ -83,7 +82,6 @@ class TestMoveCommentDelete(BaseTestCase):
     def test_geokret_missing_status_computed(self):
         move = self.blend_move(type=MOVE_TYPE_DROPPED)
         move_comment = self.blend_move_comment(move=move, type=MOVE_COMMENT_TYPE_MISSING, author=self.user_1)
-        update_geokret_and_moves(move.geokret_id)
         self.assertTrue(move.geokret.missing)
         MoveCommentPayload().delete(move_comment.id, user=self.user_1)
         self.assertFalse(move.geokret.missing)

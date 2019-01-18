@@ -5,7 +5,7 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
 from app.api.bootstrap import api
 from app.api.schema.badges import BadgeSchema
 from app.models import db
-from app.models.badge import Badge
+from geokrety_api_models.badge import Badge
 
 
 class BadgeList(ResourceList):

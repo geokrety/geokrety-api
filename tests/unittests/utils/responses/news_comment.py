@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app.models.user import User
+from geokrety_api_models import User
 
 from .base import BaseResponse
 from .collections import BaseCollectionResponse

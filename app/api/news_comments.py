@@ -8,10 +8,7 @@ from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.news_comments import NewsCommentSchema
 from app.models import db
-from app.models.news import News
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
-from app.models.user import User
+from geokrety_api_models import News, NewsComment, NewsSubscription, User
 
 
 class NewsCommentList(ResourceList):

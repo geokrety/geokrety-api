@@ -1,3 +1,5 @@
+geokrety-api-models==0.0.3
+
 git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety2#egg=flask-rest-jsonapi
 git+https://github.com/geokrety/flask.git@issue-2900#egg=Flask&version=1.0.2
 marshmallow-jsonapi==0.21.0
@@ -14,12 +16,13 @@ pytz==2018.9
 mysqlclient==1.3.14
 factory_boy==2.11.1
 git+https://github.com/exavolt/python-phpass.git#egg=python-phpass
-bcrypt==3.1.5
+bcrypt==3.1.6
 requests[security]==2.21.0
 flask-script==2.0.6
 characterentities==0.1.2
 geopy==1.18.1
-responses==0.10.5
 celery[redis]==4.2.1
 bleach==3.1.0
 pika-pool==0.1.3
+minio==4.0.10
+Flask-Minio==0.1.2

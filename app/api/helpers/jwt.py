@@ -1,9 +1,10 @@
 import json
 
 import phpass
-from app.models.user import User
 from flask import current_app as app
 from flask_jwt import _default_request_handler
+
+from geokrety_api_models import User
 
 
 def jwt_authenticate(username, password):

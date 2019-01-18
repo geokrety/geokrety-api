@@ -1,9 +1,10 @@
+from flask_rest_jsonapi.exceptions import ObjectNotFound
+from mixer.backend.flask import mixer
+
 from app import current_app as app
 from app.api.helpers.db import get_count, get_or_create, safe_query, save_to_db
 from app.models import db
-from app.models.user import User
-from flask_rest_jsonapi.exceptions import ObjectNotFound
-from mixer.backend.flask import mixer
+from geokrety_api_models import User
 from tests.unittests.utils.base_test_case import BaseTestCase
 
 

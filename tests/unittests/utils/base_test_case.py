@@ -10,17 +10,12 @@ from parameterized import parameterized
 
 from app import current_app as app
 from app.api.helpers.data_layers import GEOKRET_TYPES_TEXT, MOVE_TYPES_TEXT
-from app.api.helpers.move_tasks import update_geokret_and_moves
-from app.models.badge import Badge
-from app.models.geokret import Geokret
-from app.models.move import Move
-from app.models.move_comment import MoveComment
-from app.models.news import News
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
-from app.models.user import User
+from geokrety_api_models import (Badge, Geokret, Move, MoveComment, News,
+                                 NewsComment, NewsSubscription, User)
+from geokrety_api_models.utilities.move_tasks import update_geokret_and_moves
 from tests.unittests.mixins.responses_mixin import ResponsesMixin
 from tests.unittests.setup_database import Setup
+from app.models import db
 
 
 def mock_hash_password(obj, password):
@@ -137,11 +132,11 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
                 for _ in range(kwargs.get('count')):
                     last_date = last_date + timedelta(seconds=1)
                     move = mixer.blend(Move, moved_on_datetime=last_date, **kwargs)
-                    update_geokret_and_moves(move.geokret_id, move.id)
+                    update_geokret_and_moves(db.session, move.geokret_id, move.id)
                     moves.append(move)
                 return moves
             move = mixer.blend(Move, **kwargs)
-            update_geokret_and_moves(move.geokret_id, move.id)
+            update_geokret_and_moves(db.session, move.geokret_id, move.id)
             return move
 
     def blend_users(self, count=3, *args, **kwargs):
@@ -180,10 +175,10 @@ class BaseTestCase(ResponsesMixin, unittest.TestCase):
             if kwargs.get('count'):
                 move_comments = mixer.cycle(kwargs.get('count')).blend(MoveComment, **kwargs)
                 for move_comment in move_comments:
-                    update_geokret_and_moves(move_comment.move.geokret_id, move_comment.move.id)
+                    update_geokret_and_moves(db.session, move_comment.move.geokret_id, move_comment.move.id)
                 return move_comments
             move_comment = mixer.blend(MoveComment, **kwargs)
-            update_geokret_and_moves(move_comment.move.geokret_id, move_comment.move.id)
+            update_geokret_and_moves(db.session, move_comment.move.geokret_id, move_comment.move.id)
             return move_comment
 
     def blend_badge(self, *args, **kwargs):

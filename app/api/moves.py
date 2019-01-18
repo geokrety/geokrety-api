@@ -18,9 +18,8 @@ from app.api.schema.moves import (DefaultMoveSchema, MoveArchiveSchema,
                                   MoveDroppedSchema, MoveGrabbedSchema,
                                   MoveSeenSchema)
 from app.models import db
-from app.models.geokret import Geokret
-from app.models.move import Move
-from app.models.move_comment import MoveComment
+from geokrety_api_models import Geokret, Move, MoveComment
+from geokrety_api_models.utilities.move_tasks import update_geokret_and_moves
 
 
 def get_move_type_id(json_data):
@@ -98,11 +97,31 @@ class MovesList(ResourceList):
             if not has_access('is_geokret_owner', geokret_id=self.geokret.id):
                 raise ForbiddenException('Must be the GeoKret Owner', {'pointer': '/data/attributes/geokret-id'})
 
+        if data.get('moved_on_datetime'):
+            # Check There is already a move at that date time
+            if has_access('is_there_a_move_at_that_datetime',
+                          **data):
+                raise UnprocessableEntity("There is already a move at that datetime",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
+            # Check date time not before GeoKret birth
+            if has_access('is_move_before_geokret_birth', **{
+                    'geokret_id': self.geokret.id,
+                    'moved_on_datetime': data.get('moved_on_datetime'),
+            }):
+                raise UnprocessableEntity("Move date cannot be prior GeoKret birth date",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
+            # Check date time not in the future
+            if has_access('is_date_in_the_future',
+                          date_time=data.get('moved_on_datetime')):
+                raise UnprocessableEntity("Move date and time cannot be in the future",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
     def create_object(self, data, kwargs):
         move = super(MovesList, self).create_object(data, kwargs)
-        if current_app.config['TESTING']:
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(move.geokret_id, move.id)
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
+            update_geokret_and_moves(db.session, move.geokret_id, move.id)
         return move
 
     schema = DefaultMoveSchema
@@ -174,6 +193,27 @@ class MoveDetail(ResourceDetail):
             raise ForbiddenException("Geokret relationships cannot be changed",
                                      {'pointer': '/data/relationships/geokret'})
 
+        if data.get('moved_on_datetime'):
+            # Check There is already a move at that date time
+            if has_access('is_there_a_move_at_that_datetime',
+                          id=kwargs['id'],
+                          **data):
+                raise UnprocessableEntity("There is already a move at that datetime",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
+            # Check date time not before GeoKret birth
+            if has_access('is_move_before_geokret_birth',
+                          id=kwargs['id'],
+                          **data):
+                raise UnprocessableEntity("Move date and time cannot be prior GeoKret birth date",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
+            # Check date time not in the future
+            if has_access('is_date_in_the_future',
+                          date_time=data.get('moved_on_datetime')):
+                raise UnprocessableEntity("Move date and time cannot be in the future",
+                                          {'pointer': '/data/attributes/moved-on-datetime'})
+
         # Remove old coordinates
         if data.get('type') == MOVE_TYPE_COMMENT:
             move = safe_query(self, Move, 'id', kwargs['id'], 'id')
@@ -195,18 +235,16 @@ class MoveDetail(ResourceDetail):
 
         # Save update in database
         move = super(MoveDetail, self).update_object(data, qs, kwargs)
-        if current_app.config['TESTING']:
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
             geokrety_to_update.append(move.geokret.id)
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(geokrety_to_update, move.id)
+            update_geokret_and_moves(db.session, geokrety_to_update, move.id)
         return move
 
     def delete_object(self, data):
         move_deleted_geokret_id = self._data_layer.get_object(data).geokret.id
         super(MoveDetail, self).delete_object(data)
-        if current_app.config['TESTING']:
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(move_deleted_geokret_id)
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
+            update_geokret_and_moves(db.session, move_deleted_geokret_id)
 
     current_identity = current_identity
     decorators = (

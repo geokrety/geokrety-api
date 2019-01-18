@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import current_app as app
@@ -7,10 +8,9 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from app.api.helpers.data_layers import MOVE_TYPE_COMMENT
 from app.api.helpers.exceptions import (AuthenticationRequired,
-                                        ForbiddenException)
-from app.models.geokret import Geokret
-from app.models.move import Move
-from app.models.move_comment import MoveComment
+                                        ForbiddenException,
+                                        UnprocessableEntity)
+from geokrety_api_models import Geokret, Move, MoveComment
 
 
 def jwt_required(fn, realm=None):
@@ -169,4 +169,41 @@ def has_touched_geokret(view, view_args, view_kwargs, *args, **kwargs):
             .filter(Move.type != MOVE_TYPE_COMMENT).count() > 0:
         return True
 
-    raise ForbiddenException('Has never touched the GeoKret.', {'source': 'geokret_id'})
+    raise ForbiddenException('Has never touched the GeoKret.',
+                             {'source': 'geokret_id'})
+
+
+def is_there_a_move_at_that_datetime(view, view_args, view_kwargs, *args, **kwargs):
+    if kwargs.get('type') == MOVE_TYPE_COMMENT:
+        raise UnprocessableEntity('Date from comments are not necessarily unique.')
+
+    geokret_id = kwargs.get('geokret')
+    if geokret_id is None:
+        geokret_id = Move.query.get(kwargs['id']).geokret_id
+    if Move.query \
+        .filter(Move.geokret_id == geokret_id) \
+        .filter(Move.moved_on_datetime == kwargs['moved_on_datetime']) \
+        .filter(Move.type != MOVE_TYPE_COMMENT) \
+        .filter(Move.id != kwargs.get('id')) \
+            .count() == 0:
+        raise UnprocessableEntity('There is no move at that datetime.')
+
+
+def is_move_before_geokret_birth(view, view_args, view_kwargs, *args, **kwargs):
+    geokret_id = kwargs.get('geokret_id')
+    moved_on_datetime = kwargs.get('moved_on_datetime')
+    if kwargs.get('id') is not None \
+            and moved_on_datetime is None:
+        moved_on_datetime = Move.query.get(kwargs.get('id')).moved_on_datetime
+    if geokret_id is None:
+        geokret_id = Move.query.get(kwargs['id']).geokret_id
+    geokret = Geokret.query.get(geokret_id)
+    if moved_on_datetime < geokret.created_on_datetime:
+        return
+    raise UnprocessableEntity('Move date not prior to GeoKret birth.')
+
+
+def is_date_in_the_future(view, view_args, view_kwargs, *args, **kwargs):
+    if kwargs.get('date_time') > datetime.utcnow().replace(microsecond=0) + timedelta(seconds=1):
+        return
+    raise UnprocessableEntity('Date time is not in the future.')

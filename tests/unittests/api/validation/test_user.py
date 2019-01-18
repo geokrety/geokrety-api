@@ -1,8 +1,9 @@
+from mixer.backend.flask import mixer
+
 from app import current_app as app
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.schema.users import UserSchema
-from app.models.user import User
-from mixer.backend.flask import mixer
+from geokrety_api_models import User
 from tests.unittests.utils.base_test_case import BaseTestCase
 
 

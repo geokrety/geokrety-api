@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+
 from parameterized import parameterized
 
 from app.api.helpers.data_layers import (MOVE_TYPE_COMMENT, MOVE_TYPE_DIPPED,
                                          MOVE_TYPE_DROPPED, MOVE_TYPE_GRABBED,
                                          MOVE_TYPE_SEEN)
-from tests.unittests.utils.base_test_case import BaseTestCase, request_context
+from tests.unittests.utils.base_test_case import (BaseTestCase,
+                                                  custom_name_geokrety_move_type,
+                                                  request_context)
 from tests.unittests.utils.payload.move import MovePayload
 from tests.unittests.utils.static_test_cases import (HTML_SUBSET_TEST_CASES,
                                                      UTF8_TEST_CASES)
@@ -217,6 +221,28 @@ class TestMoveEdit(BaseTestCase):
 
         payload.set_moved_on_datetime(geokret.created_on_datetime)\
             .patch(move.id, user=self.user_1)
+
+    @parameterized.expand([
+        [MOVE_TYPE_DROPPED],
+        [MOVE_TYPE_GRABBED],
+        [MOVE_TYPE_COMMENT],
+        [MOVE_TYPE_SEEN],
+        [MOVE_TYPE_DIPPED],
+    ], doc_func=custom_name_geokrety_move_type)
+    @request_context
+    def test_move_on_datetime_must_not_be_in_the_future(self, move_type):
+        geokret = self.blend_geokret(created_on_datetime='2019-01-24T18:24:31')
+        move = self.blend_move(type=MOVE_TYPE_GRABBED, geokret=geokret,
+                               moved_on_datetime='2019-01-24T18:26:42')
+
+        payload = MovePayload(MOVE_TYPE_DIPPED)\
+            .set_id(move.id)\
+            .set_coordinates()
+        payload.set_moved_on_datetime(datetime.utcnow() - timedelta(hours=1))\
+            .patch(move.id, user=self.admin)
+        payload.set_moved_on_datetime(datetime.utcnow() + timedelta(hours=6))\
+            .patch(move.id, user=self.admin, code=422)\
+            .assertRaiseJsonApiError('/data/attributes/moved-on-datetime')
 
     @request_context
     def test_move_datetime_same_as_another_move(self):

@@ -3,8 +3,7 @@
 from mixer.backend.flask import mixer
 
 from app.api.helpers.data_layers import MOVE_COMMENT_TYPE_COMMENT
-from app.models.move import Move
-from app.models.user import User
+from geokrety_api_models import Move, User
 
 from .base import BasePayload
 
@@ -46,9 +45,9 @@ class MoveCommentPayload(BasePayload):
         move = kwargs.get('move')
         if move is None:
             with mixer.ctx():
-                move = mixer.blend('app.models.move.Move')
+                move = mixer.blend('geokrety_api_models.Move')
         with mixer.ctx(commit=False):
-            move_comment = mixer.blend('app.models.move_comment.MoveComment',
+            move_comment = mixer.blend('geokrety_api_models.MoveComment',
                                        type=MOVE_COMMENT_TYPE_COMMENT,
                                        move=move)
             self.set_obj(move_comment)

@@ -9,14 +9,11 @@ from flask import Flask
 # placed only below this
 sys.path.insert(1, path.abspath(path.join(__file__, "../..")))
 
-from app.models import db
-
-from app.models.user import User
-from app.models.geokret import Geokret
-from app.models.news import News
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
 from mixer.backend.flask import mixer
+
+from app.models import db
+from geokrety_api_models import (Geokret, News, NewsComment, NewsSubscription,
+                                 User)
 
 
 stash = {}

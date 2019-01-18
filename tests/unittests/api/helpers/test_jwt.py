@@ -1,8 +1,9 @@
-from app import current_app as app
-from app.api.helpers.jwt import get_identity, jwt_authenticate
-from app.models.user import User
 from flask_jwt import _default_jwt_encode_handler
 from mixer.backend.flask import mixer
+
+from app import current_app as app
+from app.api.helpers.jwt import get_identity, jwt_authenticate
+from geokrety_api_models import User
 from tests.unittests.utils.base_test_case import BaseTestCase
 
 

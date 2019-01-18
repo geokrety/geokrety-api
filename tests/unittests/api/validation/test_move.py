@@ -7,7 +7,7 @@ from app.api.helpers.data_layers import (MOVE_TYPE_ARCHIVED, MOVE_TYPE_COMMENT,
                                          MOVE_TYPE_GRABBED, MOVE_TYPE_SEEN)
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.schema.moves import MoveSchema
-from app.models.geokret import Geokret
+from geokrety_api_models import Geokret
 from tests.unittests.utils.base_test_case import BaseTestCase
 
 

@@ -2,7 +2,7 @@
 
 from mixer.backend.flask import mixer
 
-from app.models.user import User
+from geokrety_api_models import User
 
 from .base import BasePayload
 
@@ -40,5 +40,5 @@ class NewsPayload(BasePayload):
 
     def blend(self):
         with mixer.ctx(commit=False):
-            self.set_obj(mixer.blend('app.models.news.News'))
+            self.set_obj(mixer.blend('geokrety_api_models.News'))
             return self

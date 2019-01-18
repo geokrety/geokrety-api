@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app.models.move import Move
-from app.models.user import User
+from geokrety_api_models import Move, User
 
 from .base import BaseResponse
 from .collections import BaseCollectionResponse

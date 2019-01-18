@@ -160,7 +160,7 @@ class TestGeokretyInACacheCollection(BaseTestCase):
             .get_collection(args={'waypoint': 'ABC123'})\
             .assertCount(1)
 
-        MovePayload(MOVE_TYPE_ARCHIVED, geokret=geokret)\
+        move = MovePayload(MOVE_TYPE_ARCHIVED, geokret=geokret)\
             .set_moved_on_datetime("2019-01-01T02:21:46")\
             .post(user=self.admin)
         GeokretyInCachePayload()\
@@ -170,9 +170,8 @@ class TestGeokretyInACacheCollection(BaseTestCase):
             .get_collection(args={'waypoint': 'ABC123'})\
             .assertCount(0)
 
-        # Change date to be before dropped
         MovePayload(moved_on_datetime="2019-01-01T02:21:30")\
-            .patch(geokret.last_move.id, user=self.admin)
+            .patch(move.id, user=self.admin)
         GeokretyInCachePayload()\
             .get_collection(args={'latitude': 52.07567, 'longitude': 9.35367})\
             .assertCount(1)

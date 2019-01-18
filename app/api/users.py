@@ -8,14 +8,8 @@ from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.users import UserSchema
 from app.models import db
-from app.models.geokret import Geokret
-from app.models.move import Move
-from app.models.move_comment import MoveComment
-from app.models.news import News
-from app.models.news_comment import NewsComment
-from app.models.news_subscription import NewsSubscription
-from app.models.user import User
-from app.models.badge import Badge
+from geokrety_api_models import (Badge, Geokret, Move, MoveComment, News,
+                                 NewsComment, NewsSubscription, User)
 
 
 class UserList(ResourceList):

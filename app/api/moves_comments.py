@@ -10,7 +10,8 @@ from app.api.helpers.exceptions import ForbiddenException
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.moves_comments import MoveCommentSchema
 from app.models import db
-from app.models.move_comment import MoveComment
+from geokrety_api_models import MoveComment
+from geokrety_api_models.utilities.move_tasks import update_geokret_and_moves
 
 
 class MoveCommentList(ResourceList):
@@ -30,9 +31,8 @@ class MoveCommentList(ResourceList):
 
     def create_object(self, data, kwargs):
         move_comment = super(MoveCommentList, self).create_object(data, kwargs)
-        if current_app.config['TESTING']:
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(move_comment.move.geokret.id)
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
+            update_geokret_and_moves(db.session, move_comment.move.geokret.id)
         return move_comment
 
     methods = ['GET', 'POST']
@@ -59,17 +59,15 @@ class MoveCommentDetail(ResourceDetail):
 
     def update_object(self, data, qs, kwargs):
         move_comment = super(MoveCommentDetail, self).update_object(data, qs, kwargs)
-        if current_app.config['TESTING']:
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(move_comment.move.geokret.id)
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
+            update_geokret_and_moves(db.session, move_comment.move.geokret.id)
         return move_comment
 
     def delete_object(self, data):
         move_comment_deleted_geokret_id = self._data_layer.get_object(data).move.geokret.id
         super(MoveCommentDetail, self).delete_object(data)
-        if current_app.config['TESTING']:
-            from app.api.helpers.move_tasks import update_geokret_and_moves
-            update_geokret_and_moves(move_comment_deleted_geokret_id)
+        if not current_app.config['ASYNC_OBJECTS_ENHANCEMENT']:
+            update_geokret_and_moves(db.session, move_comment_deleted_geokret_id)
 
     methods = ['GET', 'PATCH', 'DELETE']
     decorators = (

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from app.api.helpers.data_layers import GEOKRET_TYPE_TRADITIONAL
-from app.models.user import User
+from geokrety_api_models import User
 
 from .base import BasePayload
 

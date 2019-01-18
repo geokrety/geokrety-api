@@ -11,8 +11,8 @@ from app.api.helpers.data_layers import MOVE_TYPES_LIST
 from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.utilities import dasherize
-from app.models.geokret import Geokret
 from app.views.regex import REG_LATITUDE, REG_LONGITUDE
+from geokrety_api_models import Geokret
 
 ALLOWED_TRACKING_CODE_CHARACTERS = set(digits).union(letters)
 ALLOWED_WAYPOINT_CHARACTERS = set(digits).union(letters)

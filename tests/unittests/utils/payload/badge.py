@@ -2,7 +2,7 @@
 
 from mixer.backend.flask import mixer
 
-from app.models.user import User
+from geokrety_api_models import User
 
 from .base import BasePayload
 
@@ -42,6 +42,6 @@ class BadgePayload(BasePayload):
 
     def blend(self, *args, **kwargs):
         with mixer.ctx(commit=False):
-            self._blend = mixer.blend('app.models.badge.Badge')
+            self._blend = mixer.blend('geokrety_api_models.Badge')
             self.set_obj(self._blend)
             return self
