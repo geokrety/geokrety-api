@@ -11,7 +11,7 @@ class TestNewsRelationships(BaseTestCase):
     def test_news_comments_relationship(self):
         news = self.blend_news(author=self.user_1)
         news_comment = self.blend_news_comment(news=news)
-        NewsPayload(_url_collection="/v1/news/{}/relationships/news-comments".format(news.id))\
+        NewsPayload(_url_collection="/v1/news/{}/relationships/comments".format(news.id))\
             .get_collection()\
             .assertHasDatas('news-comment', [news_comment.id])
 

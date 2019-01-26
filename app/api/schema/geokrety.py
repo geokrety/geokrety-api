@@ -74,7 +74,7 @@ class GeokretSchemaPublic(Schema):
         related_view='v1.geokrety_type_details',
         related_view_kwargs={'geokret_id': '<id>'},
         schema='GeoKretyTypesSchema',
-        type_='type',
+        type_='geokrety-type',
         include_resource_linkage=True,
     )
 

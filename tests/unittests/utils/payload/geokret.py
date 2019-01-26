@@ -44,7 +44,7 @@ class GeokretPayload(BasePayload):
         return self
 
     def set_geokret_type(self, geokrety_type):
-        self._set_relationships('type', 'type', geokrety_type)
+        self._set_relationships('type', 'geokrety-type', geokrety_type)
         return self
 
 

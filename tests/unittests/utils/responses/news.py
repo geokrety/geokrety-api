@@ -14,8 +14,8 @@ class NewsResponse(BaseResponse):
         return self
 
     def assertHasRelationshipNewsComments(self):
-        self.assertHasRelationshipSelf('news-comments', '/v1/news/%s/relationships/news-comments' % self.id)
-        self.assertHasRelationshipRelated('news-comments', '/v1/news/%s/news-comments' % self.id)
+        self.assertHasRelationshipSelf('comments', '/v1/news/%s/relationships/comments' % self.id)
+        self.assertHasRelationshipRelated('comments', '/v1/news/%s/comments' % self.id)
         return self
 
     def assertHasRelationshipAuthorData(self, user):
