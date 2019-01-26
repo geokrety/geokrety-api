@@ -21,24 +21,27 @@ secrets:
 
 
 services:
-  # server:
-  #   build: .
-  #   image: geokretyapi_server:latest
-  #   volumes:
-  #     - ./:/src/
-  #   configs:
-  #     - source: env-config
-  #       target: /src/.env
-  #   deploy:
-  #     labels:
-  #       traefik.frontend.rule: Host:api.geokrety.house.kumy.net
-  #       traefik.port: "5000"
-  #   networks:
-  #     - traefik_default
-  #     - default
-  #   environment:
-  #     - APP_CONFIG=config.ProductionConfig
-  #   command: gunicorn -w 4 -b 0.0.0.0:5000 --reload app:app --access-logfile=- --error-logfile=-
+  api:
+    build: .
+    image: geokrety_api:latest
+    volumes:
+      - ./:/src/
+    configs:
+      - source: env-config
+        target: /src/.env
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.frontend.rule=Host:api.geokrety.house.kumy.net"
+        - "traefik.docker.network=traefik_default"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.port=5000"
+    networks:
+      - traefik_default
+      - default
+    environment:
+      - APP_CONFIG=config.ProductionConfig
+    command: gunicorn -w 4 -b 0.0.0.0:5000 --reload app:current_app --access-logfile=- --error-logfile=-
 
   minio:
     image: minio/minio
@@ -80,7 +83,6 @@ services:
     #   RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: '-rabbitmq_management path_prefix "/rabbit"'
 
   connector:
-    # image: templum/rabbitmq-connector:feature_refactor
     image: templum/rabbitmq-connector:0.1.0
     environment:
       RMQ_TOPICS: "geokrety.geokret.insert,geokrety.geokret.update"
