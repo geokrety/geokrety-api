@@ -88,16 +88,6 @@ def push_to_ctx():
         _request_ctx_stack.top.current_identity = _jwt.identity_callback(payload)
 
 
-@app.errorhandler(500)
-def internal_server_error(error):  # pragma: no cover
-    if current_app.config['PROPOGATE_ERROR'] is True:
-        exc = JsonApiException({'pointer': ''}, str(error))
-    else:
-        exc = JsonApiException({'pointer': ''}, 'Unknown error')
-    return make_response(json.dumps(jsonapi_errors([exc.to_dict()])), exc.status,
-                         {'Content-Type': 'application/vnd.api+json'})
-
-
 if __name__ == '__main__':
     # Start application
     current_app.run()
