@@ -51,7 +51,7 @@ class BaseResponse(dict):
     def id(self):
         assert 'id' in self
         try:
-            return self['id']
+            return int(self['id'])
         except AssertionError:  # pragma: no cover
             raise AttributeError("Object id not found in response.")
 

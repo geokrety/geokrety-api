@@ -57,7 +57,7 @@ class MoveSchema(Schema):
         ordered = True
         dateformat = "%Y-%m-%dT%H:%M:%S"
 
-    id = fields.Integer(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     tracking_code = fields.Str(required=True, load_only=True)
     comment = fields.Str(allow_none=True)
     username = fields.Str(dump_only=True)

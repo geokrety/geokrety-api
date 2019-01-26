@@ -14,7 +14,7 @@ class NewsSubscriptionSchema(Schema):
         strict = True
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     subscribed_on_datetime = fields.Date(dump_only=True)
 
     user = Relationship(

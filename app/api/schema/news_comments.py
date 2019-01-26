@@ -24,7 +24,7 @@ class NewsCommentSchema(Schema):
         inflect = dasherize
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     comment = fields.Str(required=True)
     icon = fields.Integer(dump_only=True)
     created_on_datetime = fields.Date(dump_only=True)

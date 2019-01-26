@@ -110,7 +110,7 @@ class UserSchema(Schema):
         inflect = dasherize
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     name = fields.Str(required=True)
     language = fields.Str(validate=validate.Length(max=2), allow_none=True)
     country = fields.Str(allow_none=True)
