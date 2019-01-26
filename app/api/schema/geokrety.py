@@ -33,7 +33,7 @@ class GeokretSchemaPublic(Schema):
         inflect = dasherize
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(allow_none=True)
     missing = fields.Boolean(dump_only=True)

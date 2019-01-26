@@ -33,7 +33,7 @@ class NewsSchema(Schema):
         strict = True
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     # publication_datetime = fields.Date()
     title = fields.Str(required=True)
     content = fields.Str(required=True)

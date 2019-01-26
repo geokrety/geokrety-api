@@ -68,7 +68,7 @@ class BasePayload(SendPayloadMixin, dict):
         self['data']['relationships'][relationships].update({
             'data': {
                 'type': name,
-                'id': unicode(obj_id),
+                'id': obj_id,
             }
         })
         return self

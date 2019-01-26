@@ -33,7 +33,7 @@ class MoveCommentSchema(Schema):
         inflect = dasherize
         ordered = True
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     comment = fields.Str(required=True)
     type = fields.Integer(allow_none=False)
     created_on_datetime = fields.Date(dump_only=True)

@@ -27,7 +27,7 @@ class BadgeSchema(Schema):
         ordered = True
         dateformat = "%Y-%m-%dT%H:%M:%S"
 
-    id = fields.Str(dump_only=True)
+    id = fields.Integer(as_string=True, dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(allow_none=True)
     filename = fields.Str(dump_only=True)
