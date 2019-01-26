@@ -10,6 +10,18 @@ from app.api.helpers.permission_manager import has_access
 from app.api.helpers.utilities import dasherize
 
 
+class TrackingCodeField(fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        # Is authenticated?
+        if not has_access('auth_required'):
+            return None
+
+        if has_access('is_geokret_holder', geokret_id=obj.id) or \
+                has_access('is_geokret_owner', geokret_id=obj.id) or \
+                has_access('has_touched_geokret', geokret_id=obj.id):
+            return obj.tracking_code
+
+
 class GeokretSchemaPublic(Schema):
 
     @validates('name')
@@ -110,20 +122,7 @@ class GeokretSchemaPublic(Schema):
         include_resource_linkage=True,
     )
 
-    tracking_code = fields.Method('tracking_code_or_none')
-
-    def tracking_code_or_none(self, geokret):
-        """Add the tracking_code only if user has already touched the GK
-        """
-
-        # Is authenticated?
-        if not has_access('auth_required'):
-            return None
-
-        if has_access('is_geokret_holder', geokret_id=geokret.id) or \
-                has_access('is_geokret_owner', geokret_id=geokret.id) or \
-                has_access('has_touched_geokret', geokret_id=geokret.id):
-            return geokret.tracking_code
+    tracking_code = TrackingCodeField(attribute='tracking_code')
 
 
 class GeokretSchema(GeokretSchemaPublic):
