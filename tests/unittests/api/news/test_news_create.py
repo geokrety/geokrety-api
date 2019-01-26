@@ -35,7 +35,7 @@ class TestNewsCreate(BaseTestCase):
     @request_context
     def test_field_author_enforced_to_current_user_if_undefined(self):
         NewsPayload().blend()\
-            .set_author('')\
+            ._del_relationships('author')\
             .post(user=self.admin)\
             .assertHasRelationshipAuthorData(self.admin.id)
 

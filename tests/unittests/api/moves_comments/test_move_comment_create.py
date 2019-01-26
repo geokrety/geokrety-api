@@ -35,7 +35,6 @@ class TestMoveCommentCreate(BaseTestCase):
         MoveCommentPayload()\
             .set_type(MOVE_COMMENT_TYPE_COMMENT)\
             .set_move(move)\
-            .set_author(user)\
             .set_comment("Some comment")\
             .post(user=user, code=expected)
 
@@ -58,7 +57,7 @@ class TestMoveCommentCreate(BaseTestCase):
     def test_relationships_author_cant_be_overrided(self):
         MoveCommentPayload().blend()\
             .set_author(self.user_2)\
-            .post(user=self.user_1, code=403)\
+            .post(user=self.user_1, code=422)\
             .assertRaiseJsonApiError('/data/relationships/author/data')
 
     @request_context
