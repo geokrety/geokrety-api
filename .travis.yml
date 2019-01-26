@@ -36,12 +36,9 @@ before_install:
   # installing newer docker
   - wget https://dl.minio.io/server/minio/release/linux-amd64/minio && chmod +x minio
   - mkdir .vars && ./minio server .vars &
-#  # Aglio
-#   - npm -g install npm@latest
 
 install:
   # - npm list -g dredd@4.0.0 --depth=0 || npm install -g dredd@4.0.0
-  # - npm list -g aglio --depth=0 || npm install -g aglio
   - pip install -r requirements/tests.txt
 before_script:
   - mysql -e 'FLUSH TABLES; DROP DATABASE IF EXISTS geokrety_unittest; CREATE DATABASE geokrety_unittest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
@@ -51,12 +48,37 @@ after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
   - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then python-codacy-coverage -r coverage.xml; fi'
   # - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then cat docs/*.apib > apiary.apib; dredd; fi'  # TODO: Enable later, it's quite long during initial dev
-  # - 'aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense'
+
+
+before_deploy:
+  - python setup.py sdist
+  - npm -g install npm@latest
+  - npm list -g aglio --depth=0 || npm install -g aglio
+  - aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense
 deploy:
-  provider: pages
-  skip_cleanup: true
-  local_dir: docs/
-  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
-  target_branch: gh-pages
-  on:
-    branch: master
+  - provider: pages
+    skip_cleanup: true
+    local_dir: docs/
+    github_token:
+      secure: pOLHKxFohWDtsZWupq0ps0R4xsun2AoStnkU1seOvP526AhCQRDrPlRxmtdLelGssyGvVT5vmjlUO59UZFeOPU8QF23ekvZxjWOpJaMB9zuV4b5SFEmi79n3QMRLbotLuSqA0zsd+eff1HBCbXwT/qSMVRNvCpylCQG+Ibtel6RzZrSkG46n7X2tJSkvfp51C204SN+BvGjY2cDGz09LNFNDc7WNHFZfndJvahCb7yimcjwA4Q8jCC+oRyyO5D3Vqij69C0/nHctpPuoHjJsQLfrl3NKCMQrBenpLX1sGrJWjGQLHmyf8WEt3XDXFiupmsuYjLsvpDg+GKbKrxZUN51MJ8oRlJ5O8Y/LVPQmMXx0RZjy/ffp0EZJELA60P1cr0DG09JVobR4++ZWl2fgPuGeg0nTBuiSX5oQQcLgrerk59sXwbh8QoecMrpWl9UP5uqh4mTFWbvKgy1kEAYhopyrlpMD4wlqL4d+nH9HTEd0mTGGzC2MxtnEbu9ErR0gJcBlkVA81L9tdvQuBpN9aRnuy1/c98pOjqLf1+oqzHl0wsLEzPF6SlGU9MYBk+KflEo3dcNGFNcaA/ULZdA1Z9NDskEFqXi9dsCi0hH4fEvr6PIarREZCRt8AivounWZVkaL6KrcFPFfdLk6tu+iGlQ3uc0VX+Vt6Vyc1Y5c4Kw=
+    target_branch: gh-pages
+    on:
+      tags: true
+
+  - provider: releases
+    api_key:
+      secure: pOLHKxFohWDtsZWupq0ps0R4xsun2AoStnkU1seOvP526AhCQRDrPlRxmtdLelGssyGvVT5vmjlUO59UZFeOPU8QF23ekvZxjWOpJaMB9zuV4b5SFEmi79n3QMRLbotLuSqA0zsd+eff1HBCbXwT/qSMVRNvCpylCQG+Ibtel6RzZrSkG46n7X2tJSkvfp51C204SN+BvGjY2cDGz09LNFNDc7WNHFZfndJvahCb7yimcjwA4Q8jCC+oRyyO5D3Vqij69C0/nHctpPuoHjJsQLfrl3NKCMQrBenpLX1sGrJWjGQLHmyf8WEt3XDXFiupmsuYjLsvpDg+GKbKrxZUN51MJ8oRlJ5O8Y/LVPQmMXx0RZjy/ffp0EZJELA60P1cr0DG09JVobR4++ZWl2fgPuGeg0nTBuiSX5oQQcLgrerk59sXwbh8QoecMrpWl9UP5uqh4mTFWbvKgy1kEAYhopyrlpMD4wlqL4d+nH9HTEd0mTGGzC2MxtnEbu9ErR0gJcBlkVA81L9tdvQuBpN9aRnuy1/c98pOjqLf1+oqzHl0wsLEzPF6SlGU9MYBk+KflEo3dcNGFNcaA/ULZdA1Z9NDskEFqXi9dsCi0hH4fEvr6PIarREZCRt8AivounWZVkaL6KrcFPFfdLk6tu+iGlQ3uc0VX+Vt6Vyc1Y5c4Kw=
+    file_glob: true
+    file: dist/geokrety-api-*.tar.gz
+    skip_cleanup: true
+    on:
+      tags: true
+      repo: geokrety/geokrety-api
+
+  - provider: pypi
+    user: geokrety-bot
+    password:
+      secure: MTfwKPOeG79UuNaLWjlCxtoP97CGCJkVKr5Cn9zAN/7wEetfra+9bT/1NKCB8ZwHh6mdE3tOwwV4fDr9gzlM78MtxH9qCTvgPjt/gPi1/2fJoQ75f40ytvDru8YIDtkCEF0eqlYdRBEP1CuC+6c+TYYRMw8QRZbC5+L2zPnrSQscAjU9HugPZt/+WT3iH1qTRPAyHdqnBCEN8RHHGMrYZTHwmGUPk4z63ZUFip7lsubVrDoXYn8GadwBMGpFxh43f8MMVU7ffc8C8FHK1eoaTXHIVTbiHlB95BFa7hkhEvSeqi397G7dsT1NLSzRF+kIF9VvsQYcaOuncGAQNwfWxu3cMUM8XkFgXjOy2jUd2L1mSBgokhukX3F7/kwN0RTp3AX64P6Vqa17R5+hVOiTW6WYhpN1Qg+HAjHOihn1Z6Geg8KLlrxF1zZGfmUnjrRC/szBZd6z78QPgAYO+LqMSrDGoo82cD/MYe02QglHIJQpPjmeQxZJpZmOLYJYJgqc24O4oJYI3LuunUVaM9HWo4Yd+dbg1wyO4n8BRaEINGXeP63Qnw8RnkA7iRLsniaNs9R/hPp9OihuOn4BUOvMkuVehhti95ghL+UJCkwIOXnKAnfEG7sLKMsC0YCMe4KHAEMvzvp1FhEjkXBVKwv4datMMWTNJULtVT4dzUToT1c=
+    on:
+      tags: true
+      repo: geokrety/geokrety-api
