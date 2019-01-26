@@ -51,6 +51,12 @@ class TestGeokretDetails(BaseTestCase):
             .get(geokret.id, user=self.user_1)\
             .assertHasTrackingCode(geokret.tracking_code)
 
+    @request_context
+    def test_unexistent_geokret(self):
+        GeokretPayload()\
+            .get(666)\
+            .assertDataIsNone()
+
     @parameterized.expand([
         [MOVE_TYPE_DROPPED, True],
         [MOVE_TYPE_GRABBED, True],

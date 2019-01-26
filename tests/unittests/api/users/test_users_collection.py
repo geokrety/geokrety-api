@@ -33,3 +33,27 @@ class TestUsersCollection(BaseTestCase):
         response.data[0].assertHasPrivateAttributes(self.admin)
         response.data[1].assertHasPrivateAttributes(self.user_1)
         response.data[2].assertHasPrivateAttributes(self.user_2)
+
+    @request_context
+    def test_pagination(self):
+        self.blend_badge(count=3)
+        response = UserPayload()\
+            .get_collection(args={'page[size]': '1'})\
+            .assertCount(6)\
+            .assertHasPaginationLinks()
+        self.assertEqual(len(response['data']), 1)
+        response.data[0].assertHasId(self.admin.id)
+
+    @request_context
+    def test_users_without_blank_email(self):
+        self.user_1.email = ""
+        UserPayload()\
+            .get_collection(user=self.admin)\
+            .assertCount(3)
+
+    @request_context
+    def test_users_without_no_email(self):
+        self.user_1.email = None
+        UserPayload()\
+            .get_collection(user=self.admin)\
+            .assertCount(3)

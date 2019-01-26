@@ -77,6 +77,12 @@ class BaseResponse(dict):
         assert relationships in self['relationships'], relationships
         return self['relationships'][relationships]
 
+    def assertDataIsNone(self):
+        """Assert the data attribute is None
+        """
+        assert 'data' in self
+        assert self['data'] is None, self['data']
+
     def assertHasId(self, value):
         """Assert the ID has value
         """

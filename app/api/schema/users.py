@@ -27,6 +27,20 @@ def drop_private_attributes(item):
     return item
 
 
+class EmailOrBlank(fields.Email):
+    """Field that serializes to a title case string and deserializes
+    to a lower case string.
+    """
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value == '' or value is None:
+            return value
+        return super(EmailOrBlank, self)._serialize(value, attr, obj, **kwargs)
+
+    # def _deserialize(self, value, attr, data, **kwargs):
+    #     return value.lower()
+
+
 class UserSchema(Schema):
 
     @post_dump(pass_many=True)
@@ -116,7 +130,7 @@ class UserSchema(Schema):
     country = fields.Str(allow_none=True)
     join_datetime = fields.Date(dump_only=True)
 
-    email = fields.Email(required=True)
+    email = EmailOrBlank(required=True)
     password = fields.Str(load_only=True, required=True)
     latitude = fields.Float(allow_none=True)
     longitude = fields.Float(allow_none=True)
