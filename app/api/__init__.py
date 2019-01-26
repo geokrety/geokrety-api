@@ -50,15 +50,15 @@ api.route(NewsDetail, 'news_details',
           '/news-comments/<int:news_comment_id>/news',
           '/news-subscriptions/<int:news_subscription_id>/news',
           )
-api.route(NewsRelationship, 'news_comments', '/news/<int:id>/relationships/news-comments')
+api.route(NewsRelationship, 'news_comments', '/news/<int:id>/relationships/comments')
 api.route(NewsRelationship, 'news_author', '/news/<int:id>/relationships/author')
 api.route(NewsRelationship, 'news_news_subscription', '/news/<int:id>/relationships/subscriptions')
 
 api.route(NewsCommentList, 'news_comments_list',
           '/news-comments',
           '/users/<int:author_id>/news-comments',
-          '/news/<int:news_id>/news-comments',
-          '/moves/<int:move_id>/news-comments',
+          '/news/<int:news_id>/comments',
+          '/moves/<int:move_id>/comments',
           )
 api.route(NewsCommentDetail, 'news_comment_details',
           '/news-comments/<int:id>',

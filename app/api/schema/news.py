@@ -53,7 +53,7 @@ class NewsSchema(Schema):
         include_resource_linkage=True
     )
 
-    news_comments = Relationship(
+    comments = Relationship(
         self_view='v1.news_comments',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.news_comments_list',

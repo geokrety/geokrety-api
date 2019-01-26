@@ -27,4 +27,4 @@ class TestGeokretyRelationships(BaseTestCase):
         geokret = self.blend_geokret(type=GEOKRET_TYPE_HUMAN)
         GeokretPayload(_url="/v1/geokrety/{}/relationships/type")\
             .get(geokret.id, user=self.user_2)\
-            .assertHasData('type', GEOKRET_TYPE_HUMAN)
+            .assertHasData('geokrety-type', GEOKRET_TYPE_HUMAN)

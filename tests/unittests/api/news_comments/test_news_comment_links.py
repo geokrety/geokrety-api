@@ -10,7 +10,7 @@ class TestNewsCommentLinks(BaseTestCase):
     @request_context
     def test_news_comment_via_news(self):
         news_comment = self.blend_news_comment()
-        response = NewsCommentPayload(_url_collection="/v1/news/{}/news-comments"
+        response = NewsCommentPayload(_url_collection="/v1/news/{}/comments"
                                       .format(news_comment.news.id))\
             .get_collection(user=self.user_2)\
             .assertCount(1)
@@ -19,7 +19,7 @@ class TestNewsCommentLinks(BaseTestCase):
     @request_context
     def test_news_comment_via_news_unexistent(self):
         self.blend_news_comment()
-        NewsCommentPayload(_url_collection="/v1/news/{}/news-comments"
+        NewsCommentPayload(_url_collection="/v1/news/{}/comments"
                            .format(666))\
             .get_collection(user=self.user_2, code=404)\
             .assertRaiseJsonApiError('news_id')

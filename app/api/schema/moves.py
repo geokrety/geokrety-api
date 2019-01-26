@@ -108,7 +108,7 @@ class MoveSchema(Schema):
         related_view='v1.move_comment_list',
         related_view_kwargs={'move_id': '<id>'},
         many=True,
-        schema='MoveCommentSchema',
+        schema='app.api.schema.moves_comments.MoveCommentSchema',
         type_='move-comment',
     )
 
