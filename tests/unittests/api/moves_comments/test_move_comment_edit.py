@@ -82,7 +82,7 @@ class TestMoveCommentEdit(BaseTestCase):
         move_comment = self.blend_move_comment(author=self.user_1)
         MoveCommentPayload()\
             .set_author(self.user_2)\
-            .patch(move_comment.id, user=self.user_1, code=403)\
+            .patch(move_comment.id, user=self.user_1, code=422)\
             .assertRaiseJsonApiError('/data/relationships/author/data')
 
     @request_context

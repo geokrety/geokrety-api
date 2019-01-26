@@ -6,7 +6,7 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
 
 from app.api.bootstrap import api
-from app.api.helpers.exceptions import ForbiddenException
+from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.moves_comments import MoveCommentSchema
 from app.models import db
@@ -26,7 +26,7 @@ class MoveCommentList(ResourceList):
 
         # Check author_id
         if data.get('author') != str(current_identity.id):
-            raise ForbiddenException("Author Relationship override disallowed",
+            raise UnprocessableEntity("Author Relationship override disallowed",
                                      {'pointer': '/data/relationships/author/data'})
 
     def create_object(self, data, kwargs):
@@ -54,7 +54,7 @@ class MoveCommentDetail(ResourceDetail):
 
         # Check author_id
         if data.get('author', str(current_identity.id)) != str(current_identity.id):
-            raise ForbiddenException('Author must be yourself',
+            raise UnprocessableEntity('Author must be yourself',
                                      {'pointer': '/data/relationships/author/data'})
 
     def update_object(self, data, qs, kwargs):
