@@ -97,7 +97,5 @@ jobs:
           verbose: true
           on:
             repo: geokrety/geokrety-api
-            branches:
-              only:
-                - testtravis
+            branch: testtravis
           #   # tags: true
