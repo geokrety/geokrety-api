@@ -95,6 +95,9 @@ jobs:
           target_branch: gh-pages
           keep-history: false
           verbose: true
-          # on:
-          #   repo: geokrety/geokrety-api
+          on:
+            repo: geokrety/geokrety-api
+            branches:
+              only:
+                - testtravis
           #   # tags: true
