@@ -1,19 +1,11 @@
 language: python
 sudo: required
 group: edge
-services:
-  - rabbitmq
 cache:
   - pip
 python:
   - 2.7
   # - 3.5
-addons:
-  - mariadb: '10.0'
-  - apt:
-    packages:
-      - python-dev
-      - libmysqlclient-dev
 
 
 stages:
@@ -29,6 +21,14 @@ jobs:
   include:
     - stage: test
       name: testing code
+      services:
+        - rabbitmq
+      addons:
+        - mariadb: '10.0'
+        - apt:
+          packages:
+            - python-dev
+            - libmysqlclient-dev
       env:
         - >-
           APP_CONFIG="config.TestingConfig"
