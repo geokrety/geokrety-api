@@ -79,10 +79,11 @@ jobs:
       cache:
         - directories:
           - $HOME/.nvm/versions/node/
-      before_install:
-        - npm install -g aglio
+      # before_install:
+      #   - npm install -g aglio
       script:
-        - aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense
+        # - aglio -i docs/apiary.apib -o docs/index.html --theme-variables slate --theme-full-width --no-theme-condense
+        - touch docs/index.html
         - ls -l docs/
       deploy:
         - provider: pages
@@ -93,6 +94,6 @@ jobs:
           target_branch: gh-pages
           keep-history: true
           verbose: true
-          # on:
-          #   tags: true
-          #   repo: geokrety/geokrety-api
+          on:
+            repo: geokrety/geokrety-api
+            # tags: true
