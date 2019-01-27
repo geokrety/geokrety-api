@@ -75,6 +75,7 @@ jobs:
 
     - stage: deploy-documentation
       name: deploy documentation
+      language: node_js
       cache:
         - directories:
           - $HOME/.nvm/versions/node/
