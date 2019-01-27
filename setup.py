@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="geokrety-api",
-    version="0.0.1",
+    version="0.0.2",
     author="Mathieu Alorent",
     author_email="kumy@geokrety.org",
     description="GeoKrety JSONAPI server",
