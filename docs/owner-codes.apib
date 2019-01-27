@@ -22,8 +22,8 @@ TODO: need to define endpoint for adoption
 | Parameter               | Description                                  | Type    | Required | Readonly | Public  |
 |:------------------------|----------------------------------------------|---------|----------|----------|---------|
 | `code`                  | GeoKret adoption secret code                 | string  | **yes**  | -        | -       |
-| `generated-on-date-time`| Generated on date time                       | date    | -        | **yes**  | -       |
-| `claimed-on-date-time`  | Claimed on date time                         | date    | -        | **yes**  | -       |
+| `generated-on-datetime`| Generated on date time                       | date    | -        | **yes**  | -       |
+| `claimed-on-datetime`  | Claimed on date time                         | date    | -        | **yes**  | -       |
 
 ---
 
@@ -145,7 +145,7 @@ Retrieve paginated list of Owner Codes.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `generated-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `generated-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -270,8 +270,8 @@ Retrieve paginated list of Owner Codes.
 - `code`: `SECRETCODE` (string, required)
 
 ## `owner-codes-attributes` (owner-codes-attributes-write)
-- `generated-on-date-time`: `2007-10-25T12:10:22` (string)
-- `claimed-on-date-time`: `2007-10-26T18:31:20` (string)
+- `generated-on-datetime`: `2007-10-25T12:10:22` (string)
+- `claimed-on-datetime`: `2007-10-26T18:31:20` (string)
 
 ## `owner-codes-user` (object)
 - `links` (object)

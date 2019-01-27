@@ -31,7 +31,7 @@ TODO: Users will need to lookup by waypoint, when filling `ruchy.php`
 | `country-name`          | Country full name                            | string  | **yes**  | -        | -       |
 | `link`                  | Link to the cache                            | string  | **yes**  | -        | -       |
 | `status`                | Cache current status                         | integer | **yes**  | -        | -       |
-| `updated-on-date-time`  | Updated on date time                         | date    | -        | **yes**  | -       |
+| `updated-on-datetime`  | Updated on date time                         | date    | -        | **yes**  | -       |
 
 ---
 
@@ -135,7 +135,7 @@ Retrieve paginated list of Waypoints.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `updated-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `updated-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -186,7 +186,7 @@ Retrieve paginated list of Waypoints.
 ## `waypoints-attributes` (waypoints-attributes-write)
 - `altitude`: `123` (number)
 - `country`: `fr` (string)
-- `updated-on-date-time`: `2007-10-26T18:31:20` (string)
+- `updated-on-datetime`: `2007-10-26T18:31:20` (string)
 
 ## `waypoints-user` (object)
 - `links` (object)

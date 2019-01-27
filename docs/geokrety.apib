@@ -27,8 +27,8 @@ Resources related to GeoKrety in the API.
 | `caches-count`           | Total visited caches                      | integer | -        | **yes**  | **yes** |
 | `pictures-count`         | Total GeoKret pictures                    | integer | -        | **yes**  | **yes** |
 | `average-rating`         | Average note for this Geokret             | float   | -        | **yes**  | **yes** |
-| `created-on-date-time`   | Creation on date time                     | date    | -        | **yes**  | **yes** |
-| `updated-on-date-time`   | Updated on date time                      | date    | -        | **yes**  | **yes** |
+| `created-on-datetime`   | Creation on date time                     | date    | -        | **yes**  | **yes** |
+| `updated-on-datetime`   | Updated on date time                      | date    | -        | **yes**  | **yes** |
 
  - 1. Only self-owned GeoKret, or already grabbed/seen moves
 ---
@@ -207,7 +207,7 @@ Retrieve paginated list of GeoKrety.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -239,7 +239,7 @@ Retrieve paginated list of GeoKrety.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -275,7 +275,7 @@ Retrieve paginated list of GeoKrety.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -311,7 +311,7 @@ Retrieve paginated list of GeoKrety.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -347,7 +347,7 @@ Retrieve paginated list of GeoKrety.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -508,8 +508,8 @@ Retrieve paginated list of GeoKrety.
 - `caches-count`: `8` (number)
 - `pictures-count`: `82` (number)
 - `average-rating`: `4` (number)
-- `created-on-date-time`: `2007-10-25T12:10:22` (string)
-- `updated-on-date-time`: `2007-10-26T18:31:20` (string)
+- `created-on-datetime`: `2007-10-25T12:10:22` (string)
+- `updated-on-datetime`: `2007-10-26T18:31:20` (string)
 
 ## `geokrety-owner` (object)
 - `links` (object)

@@ -32,10 +32,10 @@ Resources related to users in the API.
 | `statpic-url`           | User's StatPic image url               | string  | -        | **yes**  | **yes** |
 | `avatar-url`            | User's Avatar image url                | string  | -        | **yes**  | **yes** |
 | `secid`                 | User secret id for legacy API          | string  | -        | -        |         |
-| `joined-date-time`      | News creation date                     | date    | -        | **yes**  | **yes** |
-| `last-update-date-time` | Date of last account update            | date    | -        | **yes**  |         |
-| `last-mail-date-time`   | Date of last sent mail (daily mail)    | date    | -        | **yes**  |         |
-| `last-login-date-time`  | Date of last login                     | date    | -        | **yes**  |         |
+| `joined-datetime`      | News creation date                     | date    | -        | **yes**  | **yes** |
+| `last-update-datetime` | Date of last account update            | date    | -        | **yes**  |         |
+| `last-mail-datetime`   | Date of last sent mail (daily mail)    | date    | -        | **yes**  |         |
+| `last-login-datetime`  | Date of last login                     | date    | -        | **yes**  |         |
 
 ---
 
@@ -827,10 +827,10 @@ Get the author of a Rate.
 - `hour`: `7` (number)
 - `statpic-url`: `https://static.geokrety.org/statpics/1.png` (string)
 - `avatar-url`: `https://static.geokrety.org/avatars/1.png` (string)
-- `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
-- `last-update-date-time`: `2017-01-26T19:46:44+00:00` (string)
-- `last-mail-date-time`: `2017-03-29T07:52:02` (string, optional, nullable)
-- `last-login-date-time`: `2017-03-14T22:04:05` (string, optional, nullable)
+- `join-datetime`: `2017-01-26T19:46:44+00:00` (string, required)
+- `last-update-datetime`: `2017-01-26T19:46:44+00:00` (string)
+- `last-mail-datetime`: `2017-03-29T07:52:02` (string, optional, nullable)
+- `last-login-datetime`: `2017-03-14T22:04:05` (string, optional, nullable)
 - `secid`: `abc123` (string)
 
 ## `users-attributes-public` (users-attributes)
@@ -838,7 +838,7 @@ Get the author of a Rate.
 - `country`: `fr` (string)
 - `statpic-url`: `https://static.geokrety.org/statpics/1.png` (string)
 - `avatar-url`: `https://static.geokrety.org/avatars/1.png` (string)
-- `join-date-time`: `2017-01-26T19:46:44+00:00` (string, required)
+- `join-datetime`: `2017-01-26T19:46:44+00:00` (string, required)
 
 ## `users-news` (object)
 - `links` (object)

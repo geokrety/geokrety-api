@@ -28,7 +28,7 @@ Setting `subscribed` to `False` will internally delete the associated row.
 | Parameter                | Description                               | Type    | Required | Readonly | Public  |
 |:-------------------------|-------------------------------------------|---------|----------|----------|---------|
 | `subscribed`             | User subscription status                  | boolean | **yes**  | -        | -       |
-| `subscribed-on-date-time`| Subscription on date time                 | date    | -        | **yes**  | -       |
+| `subscribed-on-datetime`| Subscription on date time                 | date    | -        | **yes**  | -       |
 
 ---
 
@@ -170,7 +170,7 @@ This is reserved to Administrators.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5bnumber%5d (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `subscribed-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `subscribed-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -307,7 +307,7 @@ If no user specified, currently connected user will be used.
 - `subscribed`: `true` (boolean, required)
 
 ## `news-subscriptions-attributes` (news-subscriptions-attributes-write)
-- `subscribed-on-date-time`: `2007-10-26T18:31:20` (string)
+- `subscribed-on-datetime`: `2007-10-26T18:31:20` (string)
 
 ## `news-subscriptions-news` (object)
 - `links` (object)

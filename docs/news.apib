@@ -21,8 +21,8 @@ Resources related to news.
 | `content`               | The full text of the news                 | string  | **yes**  | -        | **yes** |
 | `username`              | Override the username who posted the news | string  | -        | -        | **yes** |
 | `comments-count`        | How many comment are attached to the news | integer | -        | **yes**  | **yes** |
-| `created-on-date-time`  | News creation date                        | date    | -        | **yes**  | **yes** |
-| `last-comment-date-time`| Date of the last comment                  | date    | -        | **yes**  | **yes** |
+| `created-on-datetime`  | News creation date                        | date    | -        | **yes**  | **yes** |
+| `last-comment-datetime`| Date of the last comment                  | date    | -        | **yes**  | **yes** |
 
 ---
 
@@ -188,7 +188,7 @@ Retrieve paginated list of news.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -220,7 +220,7 @@ Retrieve paginated list of news.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -256,7 +256,7 @@ Retrieve paginated list of news.
 + Parameters
     + page%5Bsize%5D (optional, integer, `10`) - Maximum number of resources in a single paginated response.
     + page%5Bnumber%5D (optional, integer, `2`) - Page number to be fetched for the paginated response.
-    + sort (optional, string, `created-on-date-time`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
+    + sort (optional, string, `created-on-datetime`) - Sort the resources according to the given attribute in ascending order. Append '-' to sort in descending order.
     + filter (optional, string, ``) - Filter according to the flask-rest-jsonapi filtering system. Please refer: http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html for more.
 
 
@@ -325,9 +325,9 @@ Retrieve paginated list of news.
 - `username`: `someone` (string, optional, nullable)
 
 ## `news-attributes` (news-attributes-write)
-- `created-on-date-time`: `2007-10-26T18:31:20` (string, required)
+- `created-on-datetime`: `2007-10-26T18:31:20` (string, required)
 - `comments-count`: `0` (number, required)
-- `last-comment-date-time` (string, optional, nullable)
+- `last-comment-datetime` (string, optional, nullable)
 
 ## `news-news-comments` (object)
 - `links` (object)
