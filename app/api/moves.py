@@ -49,6 +49,15 @@ def get_schema_by_move_type(move_type_id):
 
 class MovesList(ResourceList):
 
+    def query(self, view_kwargs):
+        """Filter news-comments"""
+        query_ = self.session.query(Move)
+
+        if view_kwargs.get('geokret_id') is not None:
+            safe_query(self, Geokret, 'id', view_kwargs['geokret_id'], 'geokret_id')
+            query_ = query_.filter(Move.geokret_id == view_kwargs['geokret_id'])
+        return query_
+
     def post(self, *args, **kwargs):
         json_data = request.get_json()
 
@@ -134,6 +143,7 @@ class MovesList(ResourceList):
         'session': db.session,
         'model': Move,
         'methods': {
+            'query': query,
             # 'before_create_object': before_create_object,
             # 'apply_relationships': apply_relationships,
         },

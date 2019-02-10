@@ -6,15 +6,25 @@ from flask_rest_jsonapi import (ResourceDetail, ResourceList,
                                 ResourceRelationship)
 
 from app.api.bootstrap import api
+from app.api.helpers.db import safe_query
 from app.api.helpers.exceptions import UnprocessableEntity
 from app.api.helpers.permission_manager import has_access
 from app.api.schema.moves_comments import MoveCommentSchema
 from app.models import db
-from geokrety_api_models import MoveComment
+from geokrety_api_models import Move, MoveComment
 from geokrety_api_models.utilities.move_tasks import update_geokret_and_moves
 
 
 class MoveCommentList(ResourceList):
+
+    def query(self, view_kwargs):
+        """Filter move-comments"""
+        query_ = self.session.query(MoveComment)
+
+        if view_kwargs.get('move_id') is not None:
+            safe_query(self, Move, 'id', view_kwargs['move_id'], 'move_id')
+            query_ = query_.filter(MoveComment.move_id == view_kwargs['move_id'])
+        return query_
 
     def before_post(self, args, kwargs, data=None):
         # Defaults to current user
@@ -43,6 +53,9 @@ class MoveCommentList(ResourceList):
     data_layer = {
         'session': db.session,
         'model': MoveComment,
+        'methods': {
+            'query': query,
+        },
     }
 
 
