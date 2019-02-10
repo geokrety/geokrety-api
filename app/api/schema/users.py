@@ -208,7 +208,7 @@ class UserSchema(Schema):
     )
 
     moves_comments = Relationship(
-        self_view='v1.user_news_comments',
+        self_view='v1.user_moves_comments',
         self_view_kwargs={'id': '<id>'},
         related_view='v1.move_comment_list',
         related_view_kwargs={'author_id': '<id>'},

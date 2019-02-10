@@ -88,7 +88,7 @@ api.route(MovesTypeDetail, 'move_type_details',
 api.route(MoveCommentList, 'move_comment_list',
           '/moves-comments',
           '/users/<int:author_id>/moves-comments',
-          '/moves/<int:news_id>/moves-comments',
+          '/moves/<int:move_id>/moves-comments',
           )
 api.route(MoveCommentDetail, 'move_comment_details',
           '/moves-comments/<int:id>',
