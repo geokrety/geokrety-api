@@ -1,4 +1,5 @@
 ### GeoKrety
+vars/
 src
 .env*
 !.env.example
