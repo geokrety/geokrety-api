@@ -45,6 +45,8 @@ class UserSchema(Schema):
 
     @post_dump(pass_many=True)
     def remove_private_attributes(self, data, many):
+        if data['data'] is None:
+            return data
         if many:
             for item in data['data']:
                 if not has_access('is_user_itself', user_id=item['id']):
