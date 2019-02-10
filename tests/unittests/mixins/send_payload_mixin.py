@@ -77,7 +77,8 @@ class SendPayloadMixin(object):
                                      "password": password
                                  }), follow_redirects=True)
 
-        assert response.status_code == 200
+        assert response.status_code == 200, "Authentication failed with code {}".format(
+            response.status_code)
         assert 'Content-Type' in response.headers
         assert response.headers['Content-Type'] == 'application/json'
         raised = False
