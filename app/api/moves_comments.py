@@ -37,7 +37,7 @@ class MoveCommentList(ResourceList):
         # Check author_id
         if data.get('author') != str(current_identity.id):
             raise UnprocessableEntity("Author Relationship override disallowed",
-                                     {'pointer': '/data/relationships/author/data'})
+                                      {'pointer': '/data/relationships/author/data'})
 
     def create_object(self, data, kwargs):
         move_comment = super(MoveCommentList, self).create_object(data, kwargs)
@@ -68,7 +68,7 @@ class MoveCommentDetail(ResourceDetail):
         # Check author_id
         if data.get('author', str(current_identity.id)) != str(current_identity.id):
             raise UnprocessableEntity('Author must be yourself',
-                                     {'pointer': '/data/relationships/author/data'})
+                                      {'pointer': '/data/relationships/author/data'})
 
     def update_object(self, data, qs, kwargs):
         move_comment = super(MoveCommentDetail, self).update_object(data, qs, kwargs)
