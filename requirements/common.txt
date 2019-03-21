@@ -1,4 +1,4 @@
-geokrety-api-models==0.0.4
+geokrety-api-models==0.0.5
 
 git+https://github.com/geokrety/flask-rest-jsonapi.git@geokrety2#egg=flask-rest-jsonapi
 git+https://github.com/geokrety/flask.git@issue-2900#egg=Flask&version=1.0.2

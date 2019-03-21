@@ -58,6 +58,10 @@ class MovesList(ResourceList):
             query_ = query_.filter(Move.geokret_id == view_kwargs['geokret_id'])
         return query_
 
+    # def get(self, *args, **kwargs):
+    #     print args, kwargs, request.args
+    #     return super(MovesList, self).get(args, kwargs)
+
     def post(self, *args, **kwargs):
         json_data = request.get_json()
 

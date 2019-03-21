@@ -68,6 +68,7 @@ class MoveSchema(Schema):
     comments_count = fields.Integer(dump_only=True)
     created_on_datetime = fields.DateTime(dump_only=True)
     updated_on_datetime = fields.DateTime(dump_only=True)
+    type = fields.Integer()
 
     author = Relationship(
         attribute='author',
@@ -80,24 +81,24 @@ class MoveSchema(Schema):
         include_resource_linkage=True,
     )
 
-    type = Relationship(
-        attribute='type',
-        self_view='v1.move_type',
-        self_view_kwargs={'id': '<id>'},
-        related_view='v1.move_type_details',
-        related_view_kwargs={'move_id': '<id>'},
-        schema='MovesTypesSchema',
-        type_='move-type',
-        include_resource_linkage=True,
-    )
+    # type = Relationship(
+    #     attribute='type',
+    #     self_view='v1.move_type',
+    #     self_view_kwargs={'id': '<id>'},
+    #     related_view='v1.move_type_details',
+    #     related_view_kwargs={'move_id': '<id>'},
+    #     schema='MovesTypesSchema',
+    #     type_='move-type',
+    #     include_resource_linkage=True,
+    # )
 
     geokret = Relationship(
         attribute='geokret',
         self_view='v1.move_geokret',
         self_view_kwargs={'id': '<id>'},
-        related_view='v1.geokrety_type_details',
+        related_view='v1.geokret_details',
         related_view_kwargs={'move_id': '<id>'},
-        schema='GeokretSchema',
+        schema='GeokretSchemaPublic',
         type_='geokret',
         include_resource_linkage=True,
     )

@@ -39,6 +39,7 @@ class Config(object):
     SERVER_NAME = env('SERVER_NAME', default=None)
     CORS_HEADERS = 'Content-Type'
     SQLALCHEMY_DATABASE_URI = env('DATABASE_URL', default=None)
+    SQLALCHEMY_POOL_RECYCLE = env('SQLALCHEMY_POOL_RECYCLE', default=590)
     DATABASE_QUERY_TIMEOUT = 0.1
 
     SENTRY_DSN = env('SENTRY_DSN', default=None)

@@ -102,7 +102,6 @@ api.route(GeokretTypeList, 'geokrety_type_list',
 api.route(GeokretTypeDetail, 'geokrety_type_details',
           '/geokrety-types/<int:id>',
           '/geokrety/<int:geokret_id>/type',
-          '/moves/<int:move_id>/geokret',
           )
 api.route(GeokretTypeRelationship, 'geokrety_type_geokret', '/geokrety-types/<int:id>/relationships/geokrety')
 
@@ -117,6 +116,7 @@ api.route(GeokretInACacheList, 'geokrety_in_a_cache_list',
 api.route(GeokretDetail, 'geokret_details',
           '/geokrety/<int:id>',
           '/users/<int:user_id>/geokrety-owned',
+          '/moves/<int:move_id>/geokret',
           )
 api.route(GeokretRelationship, 'geokret_owner', '/geokrety/<int:id>/relationships/owner')
 api.route(GeokretRelationship, 'geokret_holder', '/geokrety/<int:id>/relationships/holder')

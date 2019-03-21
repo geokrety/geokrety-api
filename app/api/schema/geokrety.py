@@ -56,6 +56,7 @@ class GeokretSchemaPublic(Schema):
     average_rating = fields.Float(dump_only=True)
     created_on_datetime = fields.Date(dump_only=True)
     updated_on_datetime = fields.Date(dump_only=True)
+    type = fields.Integer()
 
     owner = Relationship(
         attribute='owner',
@@ -79,16 +80,16 @@ class GeokretSchemaPublic(Schema):
         include_resource_linkage=True,
     )
 
-    type = Relationship(
-        attribute='type',
-        self_view='v1.geokret_type',
-        self_view_kwargs={'id': '<id>'},
-        related_view='v1.geokrety_type_details',
-        related_view_kwargs={'geokret_id': '<id>'},
-        schema='GeoKretyTypesSchema',
-        type_='geokrety-type',
-        include_resource_linkage=True,
-    )
+    # type = Relationship(
+    #     attribute='type',
+    #     self_view='v1.geokret_type',
+    #     self_view_kwargs={'id': '<id>'},
+    #     related_view='v1.geokrety_type_details',
+    #     related_view_kwargs={'geokret_id': '<id>'},
+    #     schema='GeoKretyTypesSchema',
+    #     type_='geokrety-type',
+    #     include_resource_linkage=True,
+    # )
 
     moves = Relationship(
         self_view='v1.geokret_moves',
