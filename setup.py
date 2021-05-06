@@ -17,7 +17,7 @@ setuptools.setup(
         "marshmallow-jsonapi==0.21.0",
         "gunicorn==19.9.0",
         "Flask-SQLAlchemy==2.3.2",
-        "flask-cors==3.0.7",
+        "flask-cors==3.0.9",
         "Flask-OAuthlib==0.9.5",
         "flask-login==0.4.1",
         "wtforms==2.2.1",
